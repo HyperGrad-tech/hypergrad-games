@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Maze - Play Free Online | HyperGrad Games</title>
+<meta name="description" content="Play Maze game online for free. Navigate through randomly generated mazes. Find the exit as fast as you can. No download needed.">
+<link rel="canonical" href="https://games.hypergrad.cn/games/maze.html">
+<link rel="stylesheet" href="../css/style.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoGame","name":"Maze","description":"Navigate through randomly generated mazes. Find the exit as fast as you can.","url":"https://games.hypergrad.cn/games/maze.html","genre":"Puzzle","gamePlatform":"Web Browser","applicationCategory":"Game","operatingSystem":"Any (Web Browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"HyperGrad"}}
+</script>
+</head>
+<body>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<div class="game-page">
+  <div class="game-header">
+    <h1 class="game-title">Maze</h1>
+    <a href="../index.html" class="game-back">← All Games</a>
+  </div>
+  <div class="game-stats">
+    <div class="stat-box"><div class="stat-label">Time</div><div class="stat-value" id="time">0</div></div>
+    <div class="stat-box"><div class="stat-label">Level</div><div class="stat-value" id="level">1</div></div>
+  </div>
+  <div class="game-board">
+    <canvas id="canvas" width="420" height="420"></canvas>
+    <div class="game-overlay hidden" id="overlay">
+      <h2>You Escaped!</h2>
+      <p id="overlay-text"></p>
+      <button class="btn" onclick="nextLevel()">Next Level</button>
+    </div>
+  </div>
+  <div class="game-controls">
+    <button class="btn" onclick="newGame(1)">New Game</button>
+  </div>
+  <div class="game-instructions">
+    <h3>How to Play</h3>
+    <ul>
+      <li>Use Arrow keys or WASD to move the blue dot</li>
+      <li>On mobile, swipe to move</li>
+      <li>Reach the green goal to complete the maze</li>
+      <li>Each level the maze gets bigger!</li>
+    </ul>
+  </div>
+</div>
+<script>
+const canvas=document.getElementById('canvas');const ctx=canvas.getContext('2d');let mazeSize=11,CELL,maze,player,goal,level,timer,timerStart;
+function newGame(lv){level=lv||1;mazeSize=11+level*2;if(mazeSize>31)mazeSize=31;CELL=canvas.width/mazeSize;maze=genMaze(mazeSize,mazeSize);player={x:0,y:0};goal={x:mazeSize-1,y:mazeSize-1};document.getElementById('level').textContent=level;document.getElementById('overlay').classList.add('hidden');timerStart=Date.now();if(timer)clearInterval(timer);timer=setInterval(()=>document.getElementById('time').textContent=Math.floor((Date.now()-timerStart)/1000),1000);document.getElementById('time').textContent=0;draw();}
+function nextLevel(){newGame(level+1);}
+function genMaze(w,h){const m=Array(h).fill().map(()=>Array(w).fill(1));function carve(x,y){m[y][x]=0;const dirs=[[0,-2],[0,2],[-2,0],[2,0]].sort(()=>Math.random()-0.5);for(const[dx,dy]of dirs){const nx=x+dx,ny=y+dy;if(nx>=0&&nx<w&&ny>=0&&ny<h&&m[ny][nx]===1){m[y+dy/2][x+dx/2]=0;carve(nx,ny);}}}carve(0,0);return m;}
+function move(dx,dy){const nx=player.x+dx,ny=player.y+dy;if(nx<0||nx>=mazeSize||ny<0||ny>=mazeSize)return;if(maze[ny][nx]===1)return;player.x=nx;player.y=ny;if(player.x===goal.x&&player.y===goal.y){clearInterval(timer);const t=Math.floor((Date.now()-timerStart)/1000);document.getElementById('overlay-text').textContent=`Level ${level} cleared in ${t}s!`;document.getElementById('overlay').classList.remove('hidden');}draw();}
+function draw(){ctx.fillStyle='#1a1a2e';ctx.fillRect(0,0,canvas.width,canvas.height);for(let y=0;y<mazeSize;y++)for(let x=0;x<mazeSize;x++){if(maze[y][x]===1){ctx.fillStyle='#232342';ctx.fillRect(x*CELL,y*CELL,CELL,CELL);}}ctx.fillStyle='#22C55E';ctx.beginPath();ctx.arc(goal.x*CELL+CELL/2,goal.y*CELL+CELL/2,CELL/3,0,Math.PI*2);ctx.fill();ctx.fillStyle='#6366F1';ctx.beginPath();ctx.arc(player.x*CELL+CELL/2,player.y*CELL+CELL/2,CELL/3,0,Math.PI*2);ctx.fill();}
+document.addEventListener('keydown',e=>{const k=e.key;if(k==='ArrowUp'||k==='w')move(0,-1);if(k==='ArrowDown'||k==='s')move(0,1);if(k==='ArrowLeft'||k==='a')move(-1,0);if(k==='ArrowRight'||k==='d')move(1,0);if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(k))e.preventDefault();});
+let tx,ty;canvas.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+canvas.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-tx;const dy=e.changedTouches[0].clientY-ty;if(Math.abs(dx)<20&&Math.abs(dy)<20)return;if(Math.abs(dx)>Math.abs(dy))move(dx>0?1:-1,0);else move(0,dy>0?1:-1);},{passive:true});
+newGame(1);
+</script>
+</body>
+</html>

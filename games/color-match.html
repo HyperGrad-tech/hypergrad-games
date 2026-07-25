@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Color Match - Play Free Online | HyperGrad Games</title>
+<meta name="description" content="Play Color Match game online for free. Test your color perception. Match the target color by mixing RGB. No download needed.">
+<link rel="canonical" href="https://games.hypergrad.cn/games/color-match.html">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  .color-board { display: flex; gap: 20px; align-items: center; justify-content: center; flex-wrap: wrap; }
+  .color-box { width: 150px; height: 150px; border-radius: 12px; border: 2px solid var(--border); }
+  .color-sliders { display: flex; flex-direction: column; gap: 16px; width: 200px; }
+  .slider-row { display: flex; align-items: center; gap: 10px; }
+  .slider-row label { font-size: 14px; font-weight: 700; width: 20px; }
+  .slider-row input[type="range"] { flex: 1; height: 8px; border-radius: 4px; -webkit-appearance: none; outline: none; }
+  .slider-r { background: linear-gradient(to right, #000, #ff0000); }
+  .slider-g { background: linear-gradient(to right, #000, #00ff00); }
+  .slider-b { background: linear-gradient(to right, #000, #0000ff); }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--text); cursor: pointer; }
+  .accuracy-display { font-size: 48px; font-weight: 700; color: var(--primary-light); text-align: center; margin: 20px 0; }
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoGame","name":"Color Match","description":"Test your color perception. Match the target color by mixing RGB.","url":"https://games.hypergrad.cn/games/color-match.html","genre":"Puzzle","gamePlatform":"Web Browser","applicationCategory":"Game","operatingSystem":"Any (Web Browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"HyperGrad"}}
+</script>
+</head>
+<body>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<div class="game-page">
+  <div class="game-header">
+    <h1 class="game-title">Color Match</h1>
+    <a href="../index.html" class="game-back">← All Games</a>
+  </div>
+  <div class="game-stats">
+    <div class="stat-box"><div class="stat-label">Round</div><div class="stat-value" id="round">1</div></div>
+    <div class="stat-box"><div class="stat-label">Score</div><div class="stat-value" id="score">0</div></div>
+    <div class="stat-box"><div class="stat-label">Best</div><div class="stat-value" id="best">--</div></div>
+  </div>
+  <div class="game-board" style="flex-direction:column;gap:16px;">
+    <div class="color-board">
+      <div><p style="text-align:center;color:var(--text-muted);margin-bottom:8px;">Target</p><div class="color-box" id="target-box"></div></div>
+      <div><p style="text-align:center;color:var(--text-muted);margin-bottom:8px;">Your Mix</p><div class="color-box" id="mix-box"></div></div>
+    </div>
+    <div class="color-sliders">
+      <div class="slider-row"><label>R</label><input type="range" class="slider-r" min="0" max="255" value="128" id="r-slider"><span id="r-val">128</span></div>
+      <div class="slider-row"><label>G</label><input type="range" class="slider-g" min="0" max="255" value="128" id="g-slider"><span id="g-val">128</span></div>
+      <div class="slider-row"><label>B</label><input type="range" class="slider-b" min="0" max="255" value="128" id="b-slider"><span id="b-val">128</span></div>
+    </div>
+    <div class="accuracy-display" id="accuracy">--%</div>
+    <div class="game-controls">
+      <button class="btn" onclick="checkMatch()">Submit</button>
+      <button class="btn btn-secondary" onclick="newGame()">New Round</button>
+    </div>
+    <div class="game-overlay hidden" id="overlay">
+      <h2 id="overlay-title">Perfect!</h2>
+      <p id="overlay-text"></p>
+      <button class="btn" onclick="nextRound()">Next Round</button>
+    </div>
+  </div>
+  <div class="game-instructions">
+    <h3>How to Play</h3>
+    <ul>
+      <li>Match the target color by adjusting the R, G, B sliders</li>
+      <li>The closer your color is to the target, the higher your score</li>
+      <li>Click Submit to lock in your guess</li>
+      <li>Aim for 95%+ accuracy for bonus points!</li>
+    </ul>
+  </div>
+</div>
+<script>
+let target,round,score,best=+localStorage.getItem('bestColor')||0;
+if(best)document.getElementById('best').textContent=best+'%';
+function newGame(){target={r:Math.floor(Math.random()*256),g:Math.floor(Math.random()*256),b:Math.floor(Math.random()*256)};document.getElementById('target-box').style.background=`rgb(${target.r},${target.g},${target.b})`;document.getElementById('overlay').classList.add('hidden');['r','g','b'].forEach(c=>{document.getElementById(c+'-slider').value=128;document.getElementById(c+'-val').textContent=128;});updateMix();}
+function updateMix(){const r=+document.getElementById('r-slider').value;const g=+document.getElementById('g-slider').value;const b=+document.getElementById('b-slider').value;document.getElementById('r-val').textContent=r;document.getElementById('g-val').textContent=g;document.getElementById('b-val').textContent=b;document.getElementById('mix-box').style.background=`rgb(${r},${g},${b})`;}
+['r','g','b'].forEach(c=>document.getElementById(c+'-slider').addEventListener('input',updateMix));
+function checkMatch(){const r=+document.getElementById('r-slider').value;const g=+document.getElementById('g-slider').value;const b=+document.getElementById('b-slider').value;const dist=Math.sqrt((r-target.r)**2+(g-target.g)**2+(b-target.b)**2);const maxDist=Math.sqrt(3)*255;const acc=Math.round((1-dist/maxDist)*100);document.getElementById('accuracy').textContent=acc+'%';score+=acc;document.getElementById('score').textContent=score;if(acc>best){best=acc;localStorage.setItem('bestColor',best);document.getElementById('best').textContent=best+'%';}document.getElementById('overlay-title').textContent=acc>=95?'Perfect!':acc>=80?'Great!':acc>=60?'Good':'Try Again';document.getElementById('overlay-text').textContent=`Accuracy: ${acc}%`;document.getElementById('overlay').classList.remove('hidden');}
+function nextRound(){round++;document.getElementById('round').textContent=round;newGame();}
+newGame();
+</script>
+</body>
+</html>

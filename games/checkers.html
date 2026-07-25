@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Checkers - Play vs AI Online Free | HyperGrad Games</title>
+<meta name="description" content="Play Checkers (Draughts) online for free against an AI opponent. Jump and capture pieces to win. No download needed.">
+<link rel="canonical" href="https://games.hypergrad.cn/games/checkers.html">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  .ck-board { display: grid; grid-template-columns: repeat(8, 48px); grid-template-rows: repeat(8, 48px); border: 3px solid var(--border); border-radius: 4px; overflow: hidden; }
+  .ck-cell { display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .ck-cell.light { background: #E8E0D0; }
+  .ck-cell.dark { background: #8B6F47; }
+  .ck-piece { width: 36px; height: 36px; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+  .ck-piece.red { background: #EF4444; border: 2px solid #DC2626; }
+  .ck-piece.black { background: #1a1a2e; border: 2px solid #000; }
+  .ck-piece.king::after { content: '♔'; color: gold; font-size: 20px; line-height: 36px; }
+  .ck-cell.selected { box-shadow: inset 0 0 0 3px var(--primary); }
+  .ck-cell.valid-move::before { content: '•'; color: var(--primary-light); font-size: 24px; }
+  @media (max-width: 768px) { .ck-board { grid-template-columns: repeat(8, 38px); grid-template-rows: repeat(8, 38px); } .ck-piece { width: 28px; height: 28px; } .ck-piece.king::after { font-size: 16px; line-height: 28px; } }
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoGame","name":"Checkers","description":"Play Checkers (Draughts) online for free against an AI opponent. Jump and capture pieces to win.","url":"https://games.hypergrad.cn/games/checkers.html","genre":"Strategy","gamePlatform":"Web Browser","applicationCategory":"Game","operatingSystem":"Any (Web Browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"HyperGrad"}}
+</script>
+</head>
+<body>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<div class="game-page">
+  <div class="game-header">
+    <h1 class="game-title">Checkers</h1>
+    <a href="../index.html" class="game-back">← All Games</a>
+  </div>
+  <div class="game-stats">
+    <div class="stat-box"><div class="stat-label">Your Pieces</div><div class="stat-value" id="red-count">12</div></div>
+    <div class="stat-box"><div class="stat-label">AI Pieces</div><div class="stat-value" id="black-count">12</div></div>
+    <div class="stat-box"><div class="stat-label">Turn</div><div class="stat-value" id="turn" style="font-size:16px;">Your Move</div></div>
+  </div>
+  <div class="game-board">
+    <div class="ck-board" id="board"></div>
+    <div class="game-overlay hidden" id="overlay">
+      <h2 id="overlay-title">You Win!</h2>
+      <button class="btn" onclick="newGame()">Play Again</button>
+    </div>
+  </div>
+  <div class="game-controls">
+    <button class="btn" onclick="newGame()">New Game</button>
+  </div>
+  <div class="game-instructions">
+    <h3>How to Play</h3>
+    <ul>
+      <li>You are Red, the AI is Black</li>
+      <li>Click your piece, then click a valid square to move</li>
+      <li>Pieces move diagonally forward on dark squares</li>
+      <li>Jump over enemy pieces to capture them (mandatory if available)</li>
+      <li>Reach the far row to become a King (can move backwards too)</li>
+      <li>Capture all enemy pieces to win!</li>
+    </ul>
+  </div>
+</div>
+<script>
+const N=8;let board,selected,validMoves,currentPlayer,gameOver;
+function newGame(){board=Array(N).fill().map(()=>Array(N).fill(null));for(let r=0;r<3;r++)for(let c=0;c<N;c++)if((r+c)%2===1)board[r][c]={color:'black',king:false};for(let r=5;r<8;r++)for(let c=0;c<N;c++)if((r+c)%2===1)board[r][c]={color:'red',king:false};selected=null;validMoves=[];currentPlayer='red';gameOver=false;document.getElementById('overlay').classList.add('hidden');render();}
+function getMoves(r,c){const piece=board[r][c];if(!piece)return[];const moves=[];const dirs=piece.king?[[-1,-1],[-1,1],[1,-1],[1,1]]:piece.color==='red'?[[-1,-1],[-1,1]]:[[1,-1],[1,1]];for(const[dr,dc]of dirs){const nr=r+dr,nc=c+dc;if(nr>=0&&nr<N&&nc>=0&&nc<N&&!board[nr][nc])moves.push({r:nr,c:nc,capture:null});const jr=r+dr*2,jc=c+dc*2;if(nr>=0&&nr<N&&nc>=0&&nc<N&&board[nr][nc]&&board[nr][nc].color!==piece.color&&jr>=0&&jr<N&&jc>=0&&jc<N&&!board[jr][jc])moves.push({r:jr,c:jc,capture:{r:nr,c:nc}});}return moves;}
+function getAllCaptures(color){let captures=[];for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(board[r][c]&&board[r][c].color===color){const caps=getMoves(r,c).filter(m=>m.capture);if(caps.length>0)captures=captures.concat(caps.map(m=>({from:{r,c},...m})));}return captures;}
+function clickCell(r,c){if(gameOver||currentPlayer!=='red')return;if(selected){const move=validMoves.find(m=>m.r===r&&m.c===c);if(move){makeMove(selected.r,selected.c,move);selected=null;validMoves=[];render();if(!gameOver)setTimeout(aiMove,500);return;}}if(board[r][c]&&board[r][c].color==='red'){selected={r,c};let moves=getMoves(r,c);const allCaps=getAllCaptures('red');if(allCaps.length>0)moves=moves.filter(m=>m.capture);validMoves=moves;render();}}
+function makeMove(fromR,fromC,move){const piece=board[fromR][fromC];board[fromR][fromC]=null;board[move.r][move.c]=piece;if(move.capture){board[move.capture.r][move.capture.c]=null;}if(piece.color==='red'&&move.r===0)piece.king=true;if(piece.color==='black'&&move.r===7)piece.king=true;updateCounts();checkWin();}
+function aiMove(){let allMoves=[];for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(board[r][c]&&board[r][c].color==='black'){const moves=getMoves(r,c);allMoves=allMoves.concat(moves.map(m=>({from:{r,c},...m})));}if(allMoves.length===0){gameOver=true;document.getElementById('overlay-title').textContent='You Win!';document.getElementById('overlay').classList.remove('hidden');return;}const captures=allMoves.filter(m=>m.capture);const chosen=captures.length>0?captures[Math.floor(Math.random()*captures.length)]:allMoves[Math.floor(Math.random()*allMoves.length)];makeMove(chosen.from.r,chosen.from.c,chosen);render();if(!gameOver){currentPlayer='red';document.getElementById('turn').textContent='Your Move';}}
+function updateCounts(){let red=0,black=0;for(let r=0;r<N;r++)for(let c=0;c<N;c++){if(board[r][c]){if(board[r][c].color==='red')red++;else black++;}}document.getElementById('red-count').textContent=red;document.getElementById('black-count').textContent=black;}
+function checkWin(){let red=0,black=0;for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(board[r][c]){if(board[r][c].color==='red')red++;else black++;}if(black===0){gameOver=true;document.getElementById('overlay-title').textContent='You Win!';document.getElementById('overlay').classList.remove('hidden');return;}if(red===0){gameOver=true;document.getElementById('overlay-title').textContent='AI Wins!';document.getElementById('overlay').classList.remove('hidden');return;}if(currentPlayer==='red'){currentPlayer='black';document.getElementById('turn').textContent='AI Thinking...';}}
+function render(){const b=document.getElementById('board');b.innerHTML='';for(let r=0;r<N;r++)for(let c=0;c<N;c++){const cell=document.createElement('div');cell.className='ck-cell '+((r+c)%2===0?'light':'dark');if(selected&&selected.r===r&&selected.c===c)cell.classList.add('selected');if(validMoves.some(m=>m.r===r&&m.c===c))cell.classList.add('valid-move');if(board[r][c]){const p=document.createElement('div');p.className='ck-piece '+board[r][c].color+(board[r][c].king?' king':'');cell.appendChild(p);}cell.onclick=()=>clickCell(r,c);b.appendChild(cell);}}
+newGame();
+</script>
+</body>
+</html>

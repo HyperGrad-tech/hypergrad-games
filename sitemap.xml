@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://games.hypergrad.cn/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/2048.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/snake.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/tetris.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/minesweeper.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/sudoku.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/wordle.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/memory.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/tic-tac-toe.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/connect4.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/sliding-puzzle.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/breakout.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/flappy.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/simon.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/whack-a-mole.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/reaction-test.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/hangman.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/pong.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/lights-out.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/maze.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/color-match.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/checkers.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+</urlset>
