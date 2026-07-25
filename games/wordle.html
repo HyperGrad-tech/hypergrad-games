@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Wordle - Play Free Online | HyperGrad Games</title>
+<meta name="description" content="Play Wordle online for free. Guess the hidden 5-letter word in 6 tries. Color hints guide you. No download needed.">
+<link rel="canonical" href="https://games.hypergrad.cn/games/wordle.html">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  .wordle-grid { display: grid; grid-template-rows: repeat(6, 56px); gap: 6px; }
+  .wordle-row { display: grid; grid-template-columns: repeat(5, 56px); gap: 6px; }
+  .w-cell { border: 2px solid var(--border); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; text-transform: uppercase; transition: all 0.2s; }
+  .w-cell.correct { background: var(--success); border-color: var(--success); color: #fff; }
+  .w-cell.present { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .w-cell.absent { background: var(--bg-elevated); border-color: var(--bg-elevated); color: var(--text-dim); }
+  .w-cell.filled { border-color: var(--text-muted); }
+  .key-pad { display: flex; flex-direction: column; gap: 6px; margin-top: 20px; align-items: center; }
+  .key-row { display: flex; gap: 4px; }
+  .key { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 6px; padding: 14px 12px; min-width: 36px; font-size: 14px; font-weight: 600; color: var(--text); cursor: pointer; user-select: none; text-transform: uppercase; transition: background 0.1s; }
+  .key:hover { background: var(--border); }
+  .key.correct { background: var(--success); color: #fff; }
+  .key.present { background: var(--accent); color: #fff; }
+  .key.absent { background: var(--bg-card); color: var(--text-dim); }
+  .key.wide { min-width: 60px; font-size: 11px; }
+  @media (max-width: 768px) { .wordle-grid { grid-template-rows: repeat(6, 50px); } .wordle-row { grid-template-columns: repeat(5, 50px); } .w-cell { font-size: 24px; } }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<div class="game-page">
+  <div class="game-header">
+    <h1 class="game-title">Wordle</h1>
+    <a href="../index.html" class="game-back">← All Games</a>
+  </div>
+  <div class="game-stats">
+    <div class="stat-box"><div class="stat-label">Attempt</div><div class="stat-value" id="attempt">1/6</div></div>
+    <div class="stat-box"><div class="stat-label">Won</div><div class="stat-value" id="won">0</div></div>
+    <div class="stat-box"><div class="stat-label">Played</div><div class="stat-value" id="played">0</div></div>
+  </div>
+  <div class="game-board" style="flex-direction:column;">
+    <div class="wordle-grid" id="grid"></div>
+    <div class="key-pad" id="keyboard"></div>
+    <div class="game-overlay hidden" id="overlay">
+      <h2 id="overlay-title">Got it!</h2>
+      <p id="overlay-text">The word was: </p>
+      <button class="btn" onclick="newGame()">Play Again</button>
+    </div>
+  </div>
+  <div class="game-instructions">
+    <h3>How to Play</h3>
+    <ul>
+      <li>Guess the hidden 5-letter word in 6 tries</li>
+      <li><span style="color:var(--success);font-weight:700">Green</span> = correct letter, correct spot</li>
+      <li><span style="color:var(--accent);font-weight:700">Yellow</span> = correct letter, wrong spot</li>
+      <li><span style="color:var(--text-dim);font-weight:700">Gray</span> = letter not in word</li>
+    </ul>
+  </div>
+</div>
+<script>
+const WORDS="about,above,abuse,actor,acute,admit,adopt,adult,after,again,agent,agree,ahead,alarm,album,alert,alien,align,alike,alive,allow,alone,along,alter,among,anger,angle,angry,apart,apple,apply,arena,argue,arise,array,arrow,aside,asset,audio,audit,avoid,award,aware,badly,baker,bases,basic,basis,beach,began,begin,begun,being,below,bench,billy,birth,black,blame,blind,block,blood,board,boost,booth,bound,brain,brand,brass,brave,bread,break,breed,brief,bring,broad,broke,brown,build,built,buyer,cable,calif,carry,catch,cause,chain,chair,chart,chase,cheap,check,chest,chief,child,china,chose,civil,claim,class,clean,clear,click,clock,close,coach,coast,could,count,court,cover,craft,crash,cream,crime,cross,crowd,crown,curve,cycle,daily,dance,dated,dealt,death,debut,delay,depth,doing,doubt,dozen,draft,drama,drawn,dream,dress,drill,drink,drive,drove,dying,eager,early,earth,eight,elite,empty,enemy,enjoy,enter,entry,equal,error,event,every,exact,exist,extra,faith,false,fault,fiber,field,fifth,fifty,fight,final,first,fixed,flash,fleet,floor,fluid,focus,force,forth,forty,forum,found,frame,frank,fraud,fresh,front,fruit,fully,funny,ghost,giant,given,glass,globe,going,grace,grade,grand,grant,grass,great,green,gross,group,grown,guard,guess,guest,guide,happy,harry,heart,heavy,horse,hotel,house,human,ideal,image,index,inner,input,issue,japan,jimmy,joint,jones,judge,known,label,large,laser,later,laugh,layer,learn,lease,least,leave,legal,level,lewis,light,limit,links,lives,local,logic,loose,lower,lucky,lunch,lying,magic,major,maker,march,maria,match,maybe,mayor,meant,medal,media,metal,might,minor,minus,mixed,model,money,month,moral,bills,brain,phone,smart,water,world";
+const answers="about,above,abuse,actor,acute,admit,adopt,adult,after,again,agent,agree,ahead,alarm,album,alert,alien,align,alike,alive,allow,alone,along,alter,among,anger,angle,angry,apart,apple,apply,arena,argue,arise,array,arrow,aside,asset,audio,audit,avoid,award,aware,badly,baker,bases,basic,basis,beach,began,begin,begun,being,below,bench,billy,birth,black,blame,blind,block,blood,board,boost,booth,bound,brain,brand,brass,brave,bread,break,breed,brief,bring,broad,broke,brown,build,built,buyer,cable,calif,carry,catch,cause,chain,chair,chart,chase,cheap,check,chest,chief,child,china,chose,civil,claim,class,clean,clear,click,clock,close,coach,coast,could,count,court,cover,craft,crash,cream,crime,cross,crowd,crown,curve,cycle,daily,dance,dated,dealt,death,debut,delay,depth,doing,doubt,dozen,draft,drama,drawn,dream,dress,drill,drink,drive,drove,dying,eager,early,earth,eight,elite,empty,enemy,enjoy,enter,entry,equal,error,event,every,exact,exist,extra,faith,false,fault,fiber,field,fifth,fifty,fight,final,first,fixed,flash,fleet,floor,fluid,focus,force,forth,forty,forum,found,frame,frank,fraud,fresh,front,fruit,fully,funny,ghost,giant,given,glass,globe,going,grace,grade,grand,grant,grass,great,green,gross,group,grown,guard,guess,guest,guide,happy,harry,heart,heavy,horse,hotel,house,human,ideal,image,index,inner,input,issue,japan,jimmy,joint,jones,judge,known,label,large,laser,later,laugh,layer,learn,lease,least,leave,legal,level,lewis,light,limit,links,lives,local,logic,loose,lower,lucky,lunch,lying,magic,major,maker,march,maria,match,maybe,mayor,meant,medal,media,metal,might,minor,minus,mixed,model,money,month,moral";
+let wordList=WORDS.split(','),answerList=answers.split(','),answer,guesses,currentRow,currentCol,gameOver,keyStates, Won=+localStorage.getItem('wordleWon')||0,played=+localStorage.getItem('wordlePlayed')||0;
+document.getElementById('won').textContent=Won;document.getElementById('played').textContent=played;
+function newGame(){answer=answerList[Math.floor(Math.random()*answerList.length)];guesses=Array(6).fill().map(()=>Array(5).fill(''));currentRow=0;currentCol=0;gameOver=false;keyStates={};renderGrid();renderKeyboard();document.getElementById('attempt').textContent=`${currentRow+1}/6`;document.getElementById('overlay').classList.add('hidden');}
+function renderGrid(){const g=document.getElementById('grid');g.innerHTML='';for(let r=0;r<6;r++){const row=document.createElement('div');row.className='wordle-row';for(let c=0;c<5;c++){const cell=document.createElement('div');cell.className='w-cell';const val=guesses[r][c];if(val)cell.textContent=val;if(guesses[r][c]&&!rowEvaluated(r))cell.classList.add('filled');if(rowEvaluated(r)){const res=evaluate(guesses[r].join(''),answer);if(res[c]==='correct')cell.classList.add('correct');else if(res[c]==='present')cell.classList.add('present');else cell.classList.add('absent');}row.appendChild(cell);}g.appendChild(row);}}
+function rowEvaluated(r){return r<currentRow;}
+function evaluate(guess,ans){const res=Array(5).fill('absent');const ansArr=ans.split('');const gArr=guess.split('');const used=Array(5).fill(false);for(let i=0;i<5;i++){if(gArr[i]===ansArr[i]){res[i]='correct';used[i]=true;}}for(let i=0;i<5;i++){if(res[i]==='correct')continue;for(let j=0;j<5;j++){if(!used[j]&&gArr[i]===ansArr[j]){res[i]='present';used[j]=true;break;}}}return res;}
+function submitGuess(){if(guesses[currentRow].some(c=>!c))return;const guess=guesses[currentRow].join('');if(!wordList.includes(guess)&&!answerList.includes(guess)){shakeRow(currentRow);return;}const res=evaluate(guess,answer);for(let i=0;i<5;i++){const letter=guess[i];if(res[i]==='correct')keyStates[letter]='correct';else if(res[i]==='present'&&keyStates[letter]!=='correct')keyStates[letter]='present';else if(!keyStates[letter])keyStates[letter]='absent';}if(guess===answer){gameOver=true;Won++;played++;localStorage.setItem('wordleWon',Won);localStorage.setItem('wordlePlayed',played);document.getElementById('won').textContent=Won;document.getElementById('played').textContent=played;renderGrid();renderKeyboard();showOverlay(true);return;}currentRow++;currentCol=0;if(currentRow>=6){gameOver=true;played++;localStorage.setItem('wordlePlayed',played);document.getElementById('played').textContent=played;renderGrid();renderKeyboard();showOverlay(false);return;}document.getElementById('attempt').textContent=`${currentRow+1}/6`;renderGrid();}
+function showOverlay(won){document.getElementById('overlay-title').textContent=won?'Got it!':'Game Over';document.getElementById('overlay-text').textContent=`The word was: ${answer.toUpperCase()}`;document.getElementById('overlay').classList.remove('hidden');}
+function shakeRow(r){const rows=document.querySelectorAll('.wordle-row');rows[r].style.animation='shake 0.3s';setTimeout(()=>rows[r].style.animation='',300);}
+function inputLetter(letter){if(gameOver)return;if(currentCol>=5)return;guesses[currentRow][currentCol]=letter;currentCol++;renderGrid();}
+function backspace(){if(gameOver||currentCol===0)return;currentCol--;guesses[currentRow][currentCol]='';renderGrid();}
+function renderKeyboard(){const layout=[['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['enter','z','x','c','v','b','n','m','back']];const kp=document.getElementById('keyboard');kp.innerHTML='';layout.forEach(row=>{const div=document.createElement('div');div.className='key-row';row.forEach(k=>{const btn=document.createElement('button');btn.className='key';if(k==='enter'){btn.textContent='ENTER';btn.classList.add('wide');btn.onclick=submitGuess;}else if(k==='back'){btn.textContent='⌫';btn.classList.add('wide');btn.onclick=backspace;}else{btn.textContent=k;if(keyStates[k])btn.classList.add(keyStates[k]);btn.onclick=()=>inputLetter(k);}div.appendChild(btn);});kp.appendChild(div);});}
+document.addEventListener('keydown',e=>{if(e.key==='Enter')submitGuess();else if(e.key==='Backspace')backspace();else if(/^[a-z]$/i.test(e.key))inputLetter(e.key.toLowerCase());});
+newGame();
+</script>
+<style>@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}</style>
+</body>
+</html>

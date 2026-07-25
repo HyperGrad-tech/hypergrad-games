@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Reaction Time Test - Play Free Online | HyperGrad Games</title>
+<meta name="description" content="Test your reaction speed online for free. Click as fast as you can when the screen turns green. See your best time and challenge friends!">
+<link rel="canonical" href="https://games.hypergrad.cn/games/reaction-test.html">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  .reaction-area { width: 100%; max-width: 500px; height: 400px; border-radius: var(--radius); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; font-size: 28px; font-weight: 700; text-align: center; padding: 20px; transition: background 0.05s; user-select: none; }
+  .reaction-area.idle { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text); }
+  .reaction-area.waiting { background: #EF4444; color: #fff; }
+  .reaction-area.go { background: #22C55E; color: #fff; }
+  .reaction-area.result { background: var(--primary); color: #fff; }
+  .reaction-area.too-early { background: var(--accent); color: #fff; }
+  .reaction-area p { font-size: 16px; font-weight: 400; opacity: 0.8; margin-top: 8px; }
+  .history { display: flex; gap: 8px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
+  .hist-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 8px 16px; font-size: 14px; color: var(--text-muted); }
+  .hist-item .hist-val { color: var(--primary-light); font-weight: 700; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<div class="game-page">
+  <div class="game-header">
+    <h1 class="game-title">Reaction Time Test</h1>
+    <a href="../index.html" class="game-back">← All Games</a>
+  </div>
+  <div class="game-stats">
+    <div class="stat-box"><div class="stat-label">Last</div><div class="stat-value" id="last">--</div></div>
+    <div class="stat-box"><div class="stat-label">Best</div><div class="stat-value" id="best">--</div></div>
+    <div class="stat-box"><div class="stat-label">Avg</div><div class="stat-value" id="avg">--</div></div>
+  </div>
+  <div class="game-board">
+    <div class="reaction-area idle" id="area">
+      <span id="main-text">Click to Start</span>
+      <p id="sub-text">Click anywhere in this box to begin</p>
+    </div>
+  </div>
+  <div class="history" id="history"></div>
+  <div class="game-instructions">
+    <h3>How to Play</h3>
+    <ul>
+      <li>Click the box to start</li>
+      <li>Wait for the box to turn green</li>
+      <li>Click as fast as you can when it turns green</li>
+      <li>Don't click too early — wait for green!</li>
+      <li>See your reaction time in milliseconds</li>
+    </ul>
+  </div>
+</div>
+<script>
+let state='idle',startTime,timeoutId,history=[],bestTime=+localStorage.getItem('bestReaction')||null;
+const area=document.getElementById('area');
+if(bestTime)document.getElementById('best').textContent=bestTime+'ms';
+function setArea(cls,main,sub){area.className='reaction-area '+cls;document.getElementById('main-text').textContent=main;document.getElementById('sub-text').textContent=sub;}
+function startWaiting(){state='waiting';setArea('waiting','Wait for Green...','Click when the box turns green');const delay=1500+Math.random()*3000;timeoutId=setTimeout(()=>{state='go';startTime=performance.now();setArea('go','CLICK!','Click now!');},delay);}
+function handleClick(){if(state==='idle'){startWaiting();}else if(state==='waiting'){clearTimeout(timeoutId);state='idle';setArea('too-early','Too Early!','You clicked before green. Click to try again');}else if(state==='go'){const reactTime=Math.round(performance.now()-startTime);state='result';setArea('result',reactTime+' ms','Click to try again');history.unshift(reactTime);if(history.length>5)history.pop();updateStats();}else if(state==='result'||state==='too-early'){startWaiting();}}
+function updateStats(){document.getElementById('last').textContent=history[0]+'ms';if(!bestTime||history[0]<bestTime){bestTime=history[0];localStorage.setItem('bestReaction',bestTime);}document.getElementById('best').textContent=bestTime+'ms';const avg=Math.round(history.reduce((a,b)=>a+b,0)/history.length);document.getElementById('avg').textContent=avg+'ms';const h=document.getElementById('history');h.innerHTML='';history.forEach((t,i)=>{const item=document.createElement('div');item.className='hist-item';item.innerHTML=`#${i+1}: <span class="hist-val">${t}ms</span>`;h.appendChild(item);});}
+area.addEventListener('click',handleClick);
+area.addEventListener('touchstart',e=>{e.preventDefault();handleClick();},{passive:false});
+</script>
+</body>
+</html>

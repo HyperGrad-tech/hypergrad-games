@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Tetris - Play Free Online | HyperGrad Games</title>
+<meta name="description" content="Play Tetris online for free. Stack falling blocks, clear lines, and chase the high score. No download needed, works on mobile and desktop.">
+<link rel="canonical" href="https://games.hypergrad.cn/games/tetris.html">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<div class="game-page">
+  <div class="game-header">
+    <h1 class="game-title">Tetris</h1>
+    <a href="../index.html" class="game-back">← All Games</a>
+  </div>
+  <div class="game-stats">
+    <div class="stat-box"><div class="stat-label">Score</div><div class="stat-value" id="score">0</div></div>
+    <div class="stat-box"><div class="stat-label">Lines</div><div class="stat-value" id="lines">0</div></div>
+    <div class="stat-box"><div class="stat-label">Level</div><div class="stat-value" id="level">1</div></div>
+  </div>
+  <div class="game-board">
+    <canvas id="canvas" width="300" height="600"></canvas>
+    <div class="game-overlay hidden" id="overlay">
+      <h2>Game Over!</h2>
+      <p id="final-score">Score: 0</p>
+      <button class="btn" onclick="startGame()">Play Again</button>
+    </div>
+  </div>
+  <div class="game-controls">
+    <button class="btn" onclick="startGame()">New Game</button>
+    <button class="btn btn-secondary" id="pause-btn" onclick="togglePause()">Pause</button>
+  </div>
+  <div class="game-instructions">
+    <h3>How to Play</h3>
+    <ul>
+      <li>Left/Right arrows: Move piece sideways</li>
+      <li>Down arrow: Soft drop (faster)</li>
+      <li>Up arrow: Rotate piece</li>
+      <li>Space: Hard drop (instant)</li>
+      <li>On mobile: tap left/right/bottom of board</li>
+    </ul>
+  </div>
+</div>
+<script>
+const canvas=document.getElementById('canvas');const ctx=canvas.getContext('2d');const COLS=10;const ROWS=20;const CELL=30;
+const PIECES={I:[[1,1,1,1]],O:[[1,1],[1,1]],T:[[0,1,0],[1,1,1]],S:[[0,1,1],[1,1,0]],Z:[[1,1,0],[0,1,1]],J:[[1,0,0],[1,1,1]],L:[[0,0,1],[1,1,1]]};
+const COLORS={I:'#06b6d4',O:'#f59e0b',T:'#a855f7',S:'#22c55e',Z:'#ef4444',J:'#3b82f6',L:'#f97316'};
+let board,piece,nextX,nextY,score,lines,level,gameLoop,running,paused,dropCounter,dropInterval;
+function startGame(){board=Array(ROWS).fill().map(()=>Array(COLS).fill(null));score=0;lines=0;level=1;dropInterval=800;running=true;paused=false;document.getElementById('overlay').classList.add('hidden');newPiece();document.getElementById('score').textContent=score;document.getElementById('lines').textContent=lines;document.getElementById('level').textContent=level;if(gameLoop)cancelAnimationFrame(gameLoop);dropCounter=0;let lastTime=0;function loop(time){gameLoop=requestAnimationFrame(loop);const dt=time-lastTime;lastTime=time;if(!paused){dropCounter+=dt;if(dropCounter>dropInterval){drop();dropCounter=0;}draw();}}gameLoop=requestAnimationFrame(loop);}
+function newPiece(){const keys=Object.keys(PIECES);const type=keys[Math.floor(Math.random()*keys.length)];piece={shape:PIECES[type].map(r=>[...r]),type,color:COLORS[type],x:Math.floor((COLS-piece.shape[0].length)/2),y:0};if(collide(piece.x,piece.y,piece.shape))gameOver();}
+function collide(px,py,shape){for(let y=0;y<shape.length;y++)for(let x=0;x<shape[y].length;x++){if(shape[y][x]){if(px+x<0||px+x>=COLS||py+y>=ROWS)return true;if(py+y>=0&&board[py+y][px+x])return true;}}return false;}
+function merge(){for(let y=0;y<piece.shape.length;y++)for(let x=0;x<piece.shape[y].length;x++)if(piece.shape[y][x]&&piece.y+y>=0)board[piece.y+y][piece.x+x]=piece.color;}
+function rotate(){const N=piece.shape.length;const M=piece.shape[0].length;const rotated=Array(M).fill().map((_,i)=>Array(N).fill().map((_,j)=>piece.shape[N-1-j][i]));const oldShape=piece.shape;piece.shape=rotated;if(collide(piece.x,piece.y,rotated)){piece.shape=oldShape;}}
+function drop(){if(!collide(piece.x,piece.y+1,piece.shape)){piece.y++;}else{merge();clearLines();newPiece();}}
+function clearLines(){let cleared=0;for(let y=ROWS-1;y>=0;y--){if(board[y].every(c=>c!==null)){board.splice(y,1);board.unshift(Array(COLS).fill(null));cleared++;y++;}}if(cleared>0){lines+=cleared;score+=[0,100,300,500,800][cleared]*level;level=1+Math.floor(lines/10);dropInterval=Math.max(100,800-(level-1)*70);document.getElementById('score').textContent=score;document.getElementById('lines').textContent=lines;document.getElementById('level').textContent=level;}}
+function gameOver(){running=false;paused=false;cancelAnimationFrame(gameLoop);if(score> (+localStorage.getItem('bestTetris')||0))localStorage.setItem('bestTetris',score);document.getElementById('final-score').textContent='Score: '+score;document.getElementById('overlay').classList.remove('hidden');}
+function draw(){ctx.fillStyle='#1a1a2e';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.strokeStyle='#232342';for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){ctx.strokeRect(x*CELL,y*CELL,CELL,CELL);if(board[y][x]){ctx.fillStyle=board[y][x];ctx.fillRect(x*CELL+1,y*CELL+1,CELL-2,CELL-2);}}ctx.fillStyle=piece.color;for(let y=0;y<piece.shape.length;y++)for(let x=0;x<piece.shape[y].length;x++)if(piece.shape[y][x])ctx.fillRect((piece.x+x)*CELL+1,(piece.y+y)*CELL+1,CELL-2,CELL-2);}
+function togglePause(){if(!running)return;paused=!paused;document.getElementById('pause-btn').textContent=paused?'Resume':'Pause';}
+document.addEventListener('keydown',e=>{if(!running||paused)return;const k=e.key;if(k==='ArrowLeft'){if(!collide(piece.x-1,piece.y,piece.shape))piece.x--;}else if(k==='ArrowRight'){if(!collide(piece.x+1,piece.y,piece.shape))piece.x++;}else if(k==='ArrowDown'){drop();score+=1;document.getElementById('score').textContent=score;}else if(k==='ArrowUp'){rotate();}else if(k===' '){while(!collide(piece.x,piece.y+1,piece.shape)){piece.y++;score+=2;}drop();document.getElementById('score').textContent=score;}if(['ArrowLeft','ArrowRight','ArrowDown','ArrowUp',' '].includes(k))e.preventDefault();});
+canvas.addEventListener('click',e=>{if(!running||paused)return;const rect=canvas.getBoundingClientRect();const x=(e.clientX-rect.left)/rect.width*canvas.width;if(x<canvas.width/3){if(!collide(piece.x-1,piece.y,piece.shape))piece.x--;}else if(x>canvas.width*2/3){if(!collide(piece.x+1,piece.y,piece.shape))piece.x++;}else{rotate();}});
+startGame();
+</script>
+</body>
+</html>

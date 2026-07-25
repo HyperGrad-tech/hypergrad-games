@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Connect Four - Play vs AI Online Free | HyperGrad Games</title>
+<meta name="description" content="Play Connect Four online for free against an AI opponent. Drop discs and get four in a row to win. No download needed.">
+<link rel="canonical" href="https://games.hypergrad.cn/games/connect4.html">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  .c4-board { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; background: var(--primary); padding: 8px; border-radius: 8px; width: 420px; }
+  .c4-cell { width: 56px; height: 56px; background: var(--bg); border-radius: 50%; cursor: pointer; transition: background 0.1s; }
+  .c4-cell.red { background: #EF4444; cursor: default; }
+  .c4-cell.yellow { background: #F59E0B; cursor: default; }
+  .c4-cell.hover-red { background: rgba(239,68,68,0.3); }
+  @media (max-width: 768px) { .c4-board { width: 340px; } .c4-cell { width: 44px; height: 44px; } }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<div class="game-page">
+  <div class="game-header">
+    <h1 class="game-title">Connect Four</h1>
+    <a href="../index.html" class="game-back">← All Games</a>
+  </div>
+  <div class="game-stats">
+    <div class="stat-box"><div class="stat-label">Wins</div><div class="stat-value" id="wins">0</div></div>
+    <div class="stat-box"><div class="stat-label">Draws</div><div class="stat-value" id="draws">0</div></div>
+    <div class="stat-box"><div class="stat-label">Losses</div><div class="stat-value" id="losses">0</div></div>
+  </div>
+  <div class="game-board">
+    <div class="c4-board" id="board"></div>
+    <div class="game-overlay hidden" id="overlay">
+      <h2 id="overlay-title">Draw!</h2>
+      <button class="btn" onclick="newGame()">Play Again</button>
+    </div>
+  </div>
+  <div class="game-controls">
+    <button class="btn" onclick="newGame()">New Game</button>
+  </div>
+  <div class="game-instructions">
+    <h3>How to Play</h3>
+    <ul>
+      <li>You are Red, the AI is Yellow</li>
+      <li>Click a column to drop your disc</li>
+      <li>Get four discs in a row (horizontal, vertical, or diagonal) to win</li>
+      <li>The AI uses a minimax algorithm with alpha-beta pruning for a tough challenge</li>
+    </ul>
+  </div>
+</div>
+<script>
+const ROWS=6,COLS=7;let board,gameOver,stats={wins:+localStorage.getItem('c4Wins')||0,draws:+localStorage.getItem('c4Draws')||0,losses:+localStorage.getItem('c4Losses')||0};
+document.getElementById('wins').textContent=stats.wins;document.getElementById('draws').textContent=stats.draws;document.getElementById('losses').textContent=stats.losses;
+function newGame(){board=Array(ROWS).fill().map(()=>Array(COLS).fill(0));gameOver=false;document.getElementById('overlay').classList.add('hidden');render();}
+function render(){const b=document.getElementById('board');b.innerHTML='';for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const cell=document.createElement('div');cell.className='c4-cell';if(board[r][c]===1)cell.classList.add('red');if(board[r][c]===2)cell.classList.add('yellow');cell.dataset.r=r;cell.dataset.c=c;cell.addEventListener('click',()=>playerDrop(c));b.appendChild(cell);}}
+function playerDrop(col){if(gameOver)return;const row=dropRow(col);if(row===-1)return;board[row][col]=1;render();if(checkWin(1)){end(1);return;}if(isFull()){end(0);return;}setTimeout(aiMove,400);}
+function aiMove(){const col=bestCol();const row=dropRow(col);board[row][col]=2;render();if(checkWin(2)){end(2);return;}if(isFull()){end(0);return;}}
+function dropRow(col){for(let r=ROWS-1;r>=0;r--)if(!board[r][col])return r;return -1;}
+function isFull(){return board[0].every(c=>c);}
+function checkWin(p){for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){if(board[r][c]!==p)continue;if(c+3<COLS&&board[r][c+1]===p&&board[r][c+2]===p&&board[r][c+3]===p)return true;if(r+3<ROWS&&board[r+1][c]===p&&board[r+2][c]===p&&board[r+3][c]===p)return true;if(r+3<ROWS&&c+3<COLS&&board[r+1][c+1]===p&&board[r+2][c+2]===p&&board[r+3][c+3]===p)return true;if(r+3<ROWS&&c-3>=0&&board[r+1][c-1]===p&&board[r+2][c-2]===p&&board[r+3][c-3]===p)return true;}return false;}
+function bestCol(){let best=-Infinity,col=3;for(let c=0;c<COLS;c++){const r=dropRow(c);if(r===-1)continue;board[r][c]=2;const score=minimax(board,4,-Infinity,Infinity,false);board[r][c]=0;if(score>best){best=score;col=c;}}return col;}
+function minimax(b,depth,alpha,beta,maxing){const winner=checkWinOn(b);if(winner===2)return 100000-depth;if(winner===1)return -100000+depth;if(depth===0||isFullOn(b))return evaluate(b);if(maxing){let val=-Infinity;for(let c=0;c<COLS;c++){const r=dropRowOn(b,c);if(r===-1)continue;b[r][c]=2;val=Math.max(val,minimax(b,depth-1,alpha,beta,false));b[r][c]=0;alpha=Math.max(alpha,val);if(beta<=alpha)break;}return val;}else{let val=Infinity;for(let c=0;c<COLS;c++){const r=dropRowOn(b,c);if(r===-1)continue;b[r][c]=1;val=Math.min(val,minimax(b,depth-1,alpha,beta,true));b[r][c]=0;beta=Math.min(beta,val);if(beta<=alpha)break;}return val;}}
+function dropRowOn(b,col){for(let r=ROWS-1;r>=0;r--)if(!b[r][col])return r;return -1;}
+function isFullOn(b){return b[0].every(c=>c);}
+function checkWinOn(b){for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const p=b[r][c];if(!p)continue;if(c+3<COLS&&b[r][c+1]===p&&b[r][c+2]===p&&b[r][c+3]===p)return p;if(r+3<ROWS&&b[r+1][c]===p&&b[r+2][c]===p&&b[r+3][c]===p)return p;if(r+3<ROWS&&c+3<COLS&&b[r+1][c+1]===p&&b[r+2][c+2]===p&&b[r+3][c+3]===p)return p;if(r+3<ROWS&&c-3>=0&&b[r+1][c-1]===p&&b[r+2][c-2]===p&&b[r+3][c-3]===p)return p;}return 0;}
+function evaluate(b){let score=0;for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){if(c+3<COLS){const w=[b[r][c],b[r][c+1],b[r][c+2],b[r][c+3]];score+=scoreWin(w);}if(r+3<ROWS){const w=[b[r][c],b[r+1][c],b[r+2][c],b[r+3][c]];score+=scoreWin(w);}if(r+3<ROWS&&c+3<COLS){const w=[b[r][c],b[r+1][c+1],b[r+2][c+2],b[r+3][c+3]];score+=scoreWin(w);}if(r+3<ROWS&&c-3>=0){const w=[b[r][c],b[r+1][c-1],b[r+2][c-2],b[r+3][c-3]];score+=scoreWin(w);}}return score;}
+function scoreWin(w){const y=w.filter(x=>x===2).length,r=w.filter(x=>x===1).length,e=w.filter(x=>x===0).length;if(y===4)return 100;if(y===3&&e===1)return 10;if(y===2&&e===2)return 2;if(r===3&&e===1)return -10;if(r===2&&e===2)return -2;return 0;}
+function end(result){gameOver=true;const t=document.getElementById('overlay-title');if(result===1){t.textContent='You Win!';stats.wins++;localStorage.setItem('c4Wins',stats.wins);}else if(result===2){t.textContent='AI Wins!';stats.losses++;localStorage.setItem('c4Losses',stats.losses);}else{t.textContent='Draw!';stats.draws++;localStorage.setItem('c4Draws',stats.draws);}document.getElementById('wins').textContent=stats.wins;document.getElementById('draws').textContent=stats.draws;document.getElementById('losses').textContent=stats.losses;setTimeout(()=>document.getElementById('overlay').classList.remove('hidden'),300);}
+newGame();
+</script>
+</body>
+</html>

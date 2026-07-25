@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Flappy Bird - Play Free Online | HyperGrad Games</title>
+<meta name="description" content="Play Flappy Bird online for free. Tap to fly through pipes and beat your high score. No download needed, works on mobile and desktop.">
+<link rel="canonical" href="https://games.hypergrad.cn/games/flappy.html">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<div class="game-page">
+  <div class="game-header">
+    <h1 class="game-title">Flappy Bird</h1>
+    <a href="../index.html" class="game-back">← All Games</a>
+  </div>
+  <div class="game-stats">
+    <div class="stat-box"><div class="stat-label">Score</div><div class="stat-value" id="score">0</div></div>
+    <div class="stat-box"><div class="stat-label">Best</div><div class="stat-value" id="best">0</div></div>
+  </div>
+  <div class="game-board">
+    <canvas id="canvas" width="400" height="500"></canvas>
+    <div class="game-overlay" id="overlay">
+      <h2 id="overlay-title">Flappy Bird</h2>
+      <p id="overlay-text">Click or tap to start</p>
+      <button class="btn" onclick="startGame()">Start</button>
+    </div>
+  </div>
+  <div class="game-instructions">
+    <h3>How to Play</h3>
+    <ul>
+      <li>Click, tap, or press Space to flap</li>
+      <li>Fly through the gaps between pipes</li>
+      <li>Each pipe you pass scores one point</li>
+      <li>Don't hit the pipes or the ground</li>
+    </ul>
+  </div>
+</div>
+<script>
+const canvas=document.getElementById('canvas');const ctx=canvas.getContext('2d');const W=400,H=500;const GRAVITY=0.5,JUMP=-8,PIPE_W=60,GAP=140,PIPE_SPEED=2.5;
+let bird,pipes,score,best=+localStorage.getItem('bestFlappy')||0,running,started,frameCount;
+document.getElementById('best').textContent=best;
+function startGame(){bird={x:80,y:H/2,vy:0,r:15};pipes=[];score=0;frameCount=0;running=true;started=true;document.getElementById('overlay').classList.add('hidden');document.getElementById('score').textContent=0;loop();}
+function loop(){if(!running)return;requestAnimationFrame(loop);frameCount++;bird.vy+=GRAVITY;bird.y+=bird.vy;if(frameCount%90===0){const topH=60+Math.random()*(H-GAP-120);pipes.push({x:W,topH,bottomY:topH+GAP,passed:false});}pipes.forEach(p=>p.x-=PIPE_SPEED);pipes=pipes.filter(p=>p.x+PIPE_W>0);if(bird.y+bird.r>H||bird.y-bird.r<0){gameOver();}pipes.forEach(p=>{if(bird.x+bird.r>p.x&&bird.x-bird.r<p.x+PIPE_W&&(bird.y-bird.r<p.topH||bird.y+bird.r>p.bottomY)){gameOver();}if(!p.passed&&p.x+PIPE_W<bird.x){p.passed=true;score++;document.getElementById('score').textContent=score;}});draw();}
+function flap(){if(!started){startGame();return;}if(running)bird.vy=JUMP;}
+function gameOver(){running=false;started=false;if(score>best){best=score;localStorage.setItem('bestFlappy',best);document.getElementById('best').textContent=best;}document.getElementById('overlay-title').textContent='Game Over!';document.getElementById('overlay-text').textContent='Score: '+score;document.getElementById('overlay').classList.remove('hidden');}
+function draw(){ctx.fillStyle='#1a1a2e';ctx.fillRect(0,0,W,H);pipes.forEach(p=>{ctx.fillStyle='#22C55E';ctx.fillRect(p.x,0,PIPE_W,p.topH);ctx.fillRect(p.x,p.bottomY,PIPE_W,H-p.bottomY);});ctx.fillStyle='#F59E0B';ctx.beginPath();ctx.arc(bird.x,bird.y,bird.r,0,Math.PI*2);ctx.fill();ctx.fillStyle='#6366F1';ctx.fillRect(0,H-20,W,20);if(!started){ctx.fillStyle='#94A3B8';ctx.font='16px sans-serif';ctx.textAlign='center';}}
+canvas.addEventListener('click',flap);canvas.addEventListener('touchstart',e=>{e.preventDefault();flap();},{passive:false});
+document.addEventListener('keydown',e=>{if(e.key===' ')flap();});
+draw();
+</script>
+</body>
+</html>

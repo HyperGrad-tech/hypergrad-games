@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Minesweeper - Play Free Online | HyperGrad Games</title>
+<meta name="description" content="Play the classic Minesweeper game online for free. Use logic and deduction to clear the minefield. No download needed.">
+<link rel="canonical" href="https://games.hypergrad.cn/games/minesweeper.html">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  .ms-grid { display: inline-grid; grid-template-columns: repeat(9, 32px); grid-template-rows: repeat(9, 32px); gap: 1px; background: var(--border); padding: 1px; border-radius: 4px; }
+  .ms-cell { background: var(--bg-elevated); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; cursor: pointer; user-select: none; border-radius: 2px; transition: background 0.1s; }
+  .ms-cell:hover:not(.revealed):not(.flagged) { background: #2D2D4A; }
+  .ms-cell.revealed { background: var(--bg-card); cursor: default; }
+  .ms-cell.flagged { background: var(--bg-elevated); }
+  .ms-cell.mine { background: var(--danger); }
+  .ms-cell[data-n="1"] { color: #60A5FA; }
+  .ms-cell[data-n="2"] { color: #34D399; }
+  .ms-cell[data-n="3"] { color: #F87171; }
+  .ms-cell[data-n="4"] { color: #C084FC; }
+  .ms-cell[data-n="5"] { color: #FB923C; }
+  .ms-cell[data-n="6"] { color: #22D3EE; }
+  .ms-cell[data-n="7"] { color: #E2E8F0; }
+  .ms-cell[data-n="8"] { color: #94A3B8; }
+  @media (max-width: 768px) { .ms-grid { grid-template-columns: repeat(9, 34px); grid-template-rows: repeat(9, 34px); } }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<div class="game-page">
+  <div class="game-header">
+    <h1 class="game-title">Minesweeper</h1>
+    <a href="../index.html" class="game-back">← All Games</a>
+  </div>
+  <div class="game-stats">
+    <div class="stat-box"><div class="stat-label">Mines</div><div class="stat-value" id="mines">10</div></div>
+    <div class="stat-box"><div class="stat-label">Time</div><div class="stat-value" id="time">0</div></div>
+  </div>
+  <div class="game-board">
+    <div class="ms-grid" id="grid"></div>
+  </div>
+  <div class="game-controls">
+    <button class="btn" onclick="newGame()">New Game</button>
+  </div>
+  <div class="game-instructions">
+    <h3>How to Play</h3>
+    <ul>
+      <li>Left-click a cell to reveal it</li>
+      <li>Right-click (or long-press on mobile) to flag a mine</li>
+      <li>Numbers show how many mines are adjacent</li>
+      <li>Reveal all safe cells to win</li>
+    </ul>
+  </div>
+</div>
+<script>
+const SIZE=9,MINES=10;let board,revealed,flagged,gameOver,win,timer,timerStart;
+function newGame(){board=Array(SIZE).fill().map(()=>Array(SIZE).fill(0));revealed=Array(SIZE).fill().map(()=>Array(SIZE).fill(false));flagged=Array(SIZE).fill().map(()=>Array(SIZE).fill(false));gameOver=false;win=false;let placed=0;while(placed<MINES){const r=Math.floor(Math.random()*SIZE),c=Math.floor(Math.random()*SIZE);if(board[r][c]!==-1){board[r][c]=-1;placed++;}}for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++){if(board[r][c]===-1)continue;let count=0;for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){const nr=r+dr,nc=c+dc;if(nr>=0&&nr<SIZE&&nc>=0&&nc<SIZE&&board[nr][nc]===-1)count++;}board[r][c]=count;}timerStart=Date.now();if(timer)clearInterval(timer);timer=setInterval(()=>{if(!gameOver&&!win)document.getElementById('time').textContent=Math.floor((Date.now()-timerStart)/1000);},1000);document.getElementById('time').textContent=0;render();}
+function reveal(r,c){if(gameOver||win||revealed[r][c]||flagged[r][c])return;revealed[r][c]=true;if(board[r][c]===-1){gameOver=true;clearInterval(timer);revealAll();render();return;}if(board[r][c]===0){for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){const nr=r+dr,nc=c+dc;if(nr>=0&&nr<SIZE&&nc>=0&&nc<SIZE&&!revealed[nr][nc])reveal(nr,nc);}}checkWin();render();}
+function toggleFlag(r,c){if(gameOver||win||revealed[r][c])return;flagged[r][c]=!flagged[r][c];updateMineCount();render();}
+function updateMineCount(){let count=MINES-flagged.flat().filter(f=>f).length;document.getElementById('mines').textContent=count;}
+function revealAll(){for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++)if(board[r][c]===-1)revealed[r][c]=true;}
+function checkWin(){let safe=0;for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++)if(board[r][c]!==-1&&revealed[r][c])safe++;if(safe===SIZE*SIZE-MINES){win=true;clearInterval(timer);}}
+function render(){const g=document.getElementById('grid');g.innerHTML='';for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++){const cell=document.createElement('div');cell.className='ms-cell';if(revealed[r][c]){cell.classList.add('revealed');if(board[r][c]===-1){cell.classList.add('mine');cell.textContent='💥';}else if(board[r][c]>0){cell.textContent=board[r][c];cell.dataset.n=board[r][c];}}else if(flagged[r][c]){cell.classList.add('flagged');cell.textContent='🚩';}cell.addEventListener('click',()=>reveal(r,c));cell.addEventListener('contextmenu',e=>{e.preventDefault();toggleFlag(r,c);});let pressTimer;cell.addEventListener('touchstart',e=>{pressTimer=setTimeout(()=>{toggleFlag(r,c);pressTimer=null;},500);},{passive:true});cell.addEventListener('touchend',e=>{if(pressTimer){clearTimeout(pressTimer);reveal(r,c);e.preventDefault();}},{passive:false});g.appendChild(cell);}}
+newGame();
+</script>
+</body>
+</html>

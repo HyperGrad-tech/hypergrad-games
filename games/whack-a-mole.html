@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Whack-a-Mole - Play Free Online | HyperGrad Games</title>
+<meta name="description" content="Play Whack-a-Mole online for free. Hit moles before they hide back in their holes. Fast reflexes win! No download needed.">
+<link rel="canonical" href="https://games.hypergrad.cn/games/whack-a-mole.html">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  .mole-grid { display: grid; grid-template-columns: repeat(3, 100px); grid-template-rows: repeat(3, 100px); gap: 12px; }
+  .mole-hole { background: radial-gradient(ellipse at center bottom, #4a3020 0%, #2D2D4A 60%, var(--bg-elevated) 100%); border-radius: 50%; overflow: hidden; position: relative; cursor: pointer; display: flex; align-items: flex-end; justify-content: center; }
+  .mole-hole.mole-active::before { content: '🐹'; font-size: 50px; animation: popUp 0.2s ease-out; position: absolute; bottom: 10px; }
+  .mole-hole.mole-hit::before { content: '💥'; font-size: 50px; position: absolute; bottom: 10px; }
+  @keyframes popUp { from { transform: translateY(80px); } to { transform: translateY(0); } }
+  @media (max-width: 768px) { .mole-grid { grid-template-columns: repeat(3, 80px); grid-template-rows: repeat(3, 80px); } .mole-hole.mole-active::before, .mole-hole.mole-hit::before { font-size: 40px; } }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<div class="game-page">
+  <div class="game-header">
+    <h1 class="game-title">Whack-a-Mole</h1>
+    <a href="../index.html" class="game-back">← All Games</a>
+  </div>
+  <div class="game-stats">
+    <div class="stat-box"><div class="stat-label">Score</div><div class="stat-value" id="score">0</div></div>
+    <div class="stat-box"><div class="stat-label">Time</div><div class="stat-value" id="time">30</div></div>
+    <div class="stat-box"><div class="stat-label">Best</div><div class="stat-value" id="best">0</div></div>
+  </div>
+  <div class="game-board">
+    <div class="mole-grid" id="grid"></div>
+    <div class="game-overlay hidden" id="overlay">
+      <h2>Time's Up!</h2>
+      <p id="overlay-text"></p>
+      <button class="btn" onclick="startGame()">Play Again</button>
+    </div>
+  </div>
+  <div class="game-controls">
+    <button class="btn" onclick="startGame()">Start Game</button>
+  </div>
+  <div class="game-instructions">
+    <h3>How to Play</h3>
+    <ul>
+      <li>Click Start to begin the 30-second round</li>
+      <li>Click moles as soon as they pop up</li>
+      <li>Each mole you hit scores one point</li>
+      <li>Be fast — moles don't stay up for long!</li>
+    </ul>
+  </div>
+</div>
+<script>
+let score,timeLeft,playing,timer,moleTimer,best=+localStorage.getItem('bestMole')||0;
+document.getElementById('best').textContent=best;
+function startGame(){score=0;timeLeft=30;playing=true;document.getElementById('score').textContent=0;document.getElementById('time').textContent=30;document.getElementById('overlay').classList.add('hidden');renderGrid();timer=setInterval(()=>{timeLeft--;document.getElementById('time').textContent=timeLeft;if(timeLeft<=0)gameOver();},1000);spawnMole();}
+function renderGrid(){const g=document.getElementById('grid');g.innerHTML='';for(let i=0;i<9;i++){const hole=document.createElement('div');hole.className='mole-hole';hole.dataset.idx=i;hole.addEventListener('click',()=>hit(i));hole.addEventListener('touchstart',e=>{e.preventDefault();hit(i);},{passive:false});g.appendChild(hole);}}
+function spawnMole(){if(!playing)return;const holes=document.querySelectorAll('.mole-hole');const active=document.querySelector('.mole-active');if(active){active.classList.remove('mole-active');}const idx=Math.floor(Math.random()*9);holes[idx].classList.add('mole-active');holes[idx].classList.remove('mole-hit');moleTimer=setTimeout(spawnMole,600+Math.random()*700);}
+function hit(idx){if(!playing)return;const hole=document.querySelectorAll('.mole-hole')[idx];if(!hole.classList.contains('mole-active'))return;hole.classList.remove('mole-active');hole.classList.add('mole-hit');score++;document.getElementById('score').textContent=score;setTimeout(()=>hole.classList.remove('mole-hit'),200);}
+function gameOver(){playing=false;clearInterval(timer);clearTimeout(moleTimer);const active=document.querySelector('.mole-active');if(active)active.classList.remove('mole-active');if(score>best){best=score;localStorage.setItem('bestMole',best);document.getElementById('best').textContent=best;}document.getElementById('overlay-text').textContent=`You scored ${score} points!`;document.getElementById('overlay').classList.remove('hidden');}
+renderGrid();
+</script>
+</body>
+</html>

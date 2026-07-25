@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Tic-Tac-Toe - Play vs AI Online Free | HyperGrad Games</title>
+<meta name="description" content="Play Tic-Tac-Toe online for free against an unbeatable AI using minimax algorithm. Choose difficulty levels. No download needed.">
+<link rel="canonical" href="https://games.hypergrad.cn/games/tic-tac-toe.html">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  .ttt-grid { display: grid; grid-template-columns: repeat(3, 100px); grid-template-rows: repeat(3, 100px); gap: 6px; background: var(--border); padding: 6px; border-radius: 8px; }
+  .ttt-cell { background: var(--bg-elevated); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 48px; font-weight: 700; cursor: pointer; transition: background 0.1s; }
+  .ttt-cell:hover:empty { background: var(--bg-card); }
+  .ttt-cell.x { color: var(--primary-light); }
+  .ttt-cell.o { color: var(--accent); }
+  .ttt-cell.win { background: rgba(34,197,94,0.2); }
+  @media (max-width: 768px) { .ttt-grid { grid-template-columns: repeat(3, 85px); grid-template-rows: repeat(3, 85px); } .ttt-cell { font-size: 40px; } }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<div class="game-page">
+  <div class="game-header">
+    <h1 class="game-title">Tic-Tac-Toe</h1>
+    <a href="../index.html" class="game-back">← All Games</a>
+  </div>
+  <div class="game-stats">
+    <div class="stat-box"><div class="stat-label">Wins</div><div class="stat-value" id="wins">0</div></div>
+    <div class="stat-box"><div class="stat-label">Draws</div><div class="stat-value" id="draws">0</div></div>
+    <div class="stat-box"><div class="stat-label">Losses</div><div class="stat-value" id="losses">0</div></div>
+  </div>
+  <div class="game-board">
+    <div class="ttt-grid" id="grid"></div>
+    <div class="game-overlay hidden" id="overlay">
+      <h2 id="overlay-title">Draw!</h2>
+      <button class="btn" onclick="newGame()">Play Again</button>
+    </div>
+  </div>
+  <div class="game-controls">
+    <button class="btn" onclick="newGame()">New Game</button>
+    <button class="btn btn-secondary" id="diff-btn" onclick="toggleDiff()">Difficulty: Unbeatable</button>
+  </div>
+  <div class="game-instructions">
+    <h3>How to Play</h3>
+    <ul>
+      <li>You are X, the AI is O</li>
+      <li>Click any empty cell to place your mark</li>
+      <li>Get three in a row (horizontally, vertically, or diagonally) to win</li>
+      <li>Unbeatable mode uses the minimax algorithm — best you can do is draw!</li>
+    </ul>
+  </div>
+</div>
+<script>
+let board,gameOver,difficulty='hard',stats={wins:+localStorage.getItem('tttWins')||0,draws:+localStorage.getItem('tttDraws')||0,losses:+localStorage.getItem('tttLosses')||0};
+updateStats();
+function updateStats(){document.getElementById('wins').textContent=stats.wins;document.getElementById('draws').textContent=stats.draws;document.getElementById('losses').textContent=stats.losses;}
+function toggleDiff(){difficulty=difficulty==='hard'?'medium':difficulty==='medium'?'easy':'hard';document.getElementById('diff-btn').textContent='Difficulty: '+{hard:'Unbeatable',medium:'Medium',easy:'Easy'}[difficulty];newGame();}
+function newGame(){board=Array(9).fill('');gameOver=false;document.getElementById('overlay').classList.add('hidden');render();}
+function render(){const g=document.getElementById('grid');g.innerHTML='';board.forEach((v,i)=>{const cell=document.createElement('div');cell.className='ttt-cell '+v.toLowerCase();if(v)cell.textContent=v;cell.addEventListener('click',()=>playerMove(i));g.appendChild(cell);});}
+function playerMove(i){if(gameOver||board[i])return;board[i]='X';render();if(checkWin('X')){endGame('X');return;}if(board.every(c=>c)){endGame('draw');return;}setTimeout(aiMove,300);}
+function aiMove(){let move;if(difficulty==='hard')move=bestMove('O');else if(difficulty==='medium')move=Math.random()<0.6?bestMove('O'):randomMove();else move=Math.random()<0.3?bestMove('O'):randomMove();if(move===null)move=randomMove();board[move]='O';render();if(checkWin('O')){endGame('O');return;}if(board.every(c=>c)){endGame('draw');return;}}
+function randomMove(){const empty=board.map((v,i)=>v?-1:i).filter(i=>i!==-1);return empty[Math.floor(Math.random()*empty.length)];}
+function bestMove(player){let best=-Infinity,move=null;for(let i=0;i<9;i++){if(!board[i]){board[i]=player;const score=minimax(board,0,false,player);board[i]='';if(score>best){best=score;move=i;}}}return move;}
+function minimax(b,depth,isMax,aiPlayer){const human=aiPlayer==='O'?'X':'O';const w=checkWinOn(b);if(w===aiPlayer)return 10-depth;if(w===human)return depth-10;if(b.every(c=>c))return 0;if(isMax){let best=-Infinity;for(let i=0;i<9;i++){if(!b[i]){b[i]=aiPlayer;best=Math.max(best,minimax(b,depth+1,false,aiPlayer));b[i]='';}}return best;}else{let best=Infinity;for(let i=0;i<9;i++){if(!b[i]){b[i]=human;best=Math.min(best,minimax(b,depth+1,true,aiPlayer));b[i]='';}}return best;}}
+function checkWinOn(b){const lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];for(const[a,c,d]of lines){if(b[a]&&b[a]===b[c]&&b[a]===b[d])return b[a];}return null;}
+function checkWin(p){return checkWinOn(board)===p;}
+function endGame(result){gameOver=true;const title=document.getElementById('overlay-title');if(result==='X'){title.textContent='You Win!';stats.wins++;localStorage.setItem('tttWins',stats.wins);}else if(result==='O'){title.textContent='AI Wins!';stats.losses++;localStorage.setItem('tttLosses',stats.losses);}else{title.textContent='Draw!';stats.draws++;localStorage.setItem('tttDraws',stats.draws);}updateStats();setTimeout(()=>document.getElementById('overlay').classList.remove('hidden'),300);}
+newGame();
+</script>
+</body>
+</html>
