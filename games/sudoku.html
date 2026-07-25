@@ -8,20 +8,16 @@
 <link rel="canonical" href="https://games.hypergrad.cn/games/sudoku.html">
 <link rel="stylesheet" href="../css/style.css">
 <style>
-  .sudoku-board { display: inline-grid; grid-template-columns: repeat(9, 1fr); grid-template-rows: repeat(9, 1fr); gap: 0; border: 2px solid var(--primary); border-radius: 4px; overflow: hidden; width: 450px; height: 450px; background: var(--border); }
-  .su-cell { background: var(--bg-card); display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 500; cursor: pointer; transition: background 0.1s; border: 1px solid var(--border); position: relative; }
+  .sudoku-board { display: grid; grid-template-columns: repeat(9, 42px); grid-template-rows: repeat(9, 42px); gap: 0; border: 3px solid var(--primary); border-radius: 6px; overflow: hidden; background: var(--bg-card); }
+  .su-cell { display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 500; cursor: pointer; transition: background 0.1s; border: 1px solid var(--border); position: relative; }
   .su-cell.given { color: var(--text); font-weight: 700; cursor: default; }
   .su-cell:not(.given) { color: var(--primary-light); }
   .su-cell.selected { background: var(--bg-elevated); box-shadow: inset 0 0 0 2px var(--primary); z-index: 1; }
-  .su-cell.highlight { background: rgba(99,102,241,0.1); }
+  .su-cell.highlight { background: rgba(99,102,241,0.08); }
   .su-cell.error { color: var(--danger) !important; }
-  .su-cell:nth-child(3n) { border-right: 2px solid var(--primary); }
-  .su-cell:nth-child(9n) { border-right: 1px solid var(--border); }
-  .su-row-3, .su-row-6 { border-bottom: 2px solid var(--primary); }
-  .num-pad { display: flex; gap: 8px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
-  .num-btn { background: var(--bg-elevated); color: var(--text); border: 1px solid var(--border); border-radius: 8px; width: 44px; height: 44px; font-size: 20px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-  .num-btn:hover { background: var(--primary); color: #fff; }
-  @media (max-width: 768px) { .sudoku-board { width: 340px; height: 340px; } .su-cell { font-size: 16px; } .num-btn { width: 36px; height: 36px; font-size: 17px; } }
+  .su-cell.br-r { border-right: 2px solid var(--primary); }
+  .su-cell.br-b { border-bottom: 2px solid var(--primary); }
+  @media (max-width: 768px) { .sudoku-board { grid-template-columns: repeat(9, 34px); grid-template-rows: repeat(9, 34px); } .su-cell { font-size: 16px; } }
 </style>
 </head>
 <body>
@@ -74,14 +70,39 @@
 </div>
 <script>
 let solution,puzzle,given,selected,mistakes,timer,timerStart,difficulty='easy';
-function genSudoku(){const base=Array(9).fill().map((_,i)=>Array(9).fill().map((_,j)=>(i*3+i%3+Math.floor(i/3)+j)%9+1));//shift rows for variety
-for(let i=0;i<9;i+=3){const rows=[0,1,2].sort(()=>Math.random()-0.5);const block=base.slice(i,i+3);base[i]=block[rows[0]];base[i+1]=block[rows[1]];base[i+2]=block[rows[2]];}for(let i=0;i<3;i++){const cols=[0,1,2].sort(()=>Math.random()-0.5);for(let r=0;r<9;r++){const tmp=[base[r][i*3],base[r][i*3+1],base[r][i*3+2]];base[r][i*3]=tmp[cols[0]];base[r][i*3+1]=tmp[cols[1]];base[r][i*3+2]=tmp[cols[2]];}}for(let i=0;i<9;i+=3){const cols=[0,1,2].sort(()=>Math.random()-0.5);const block=[[base[i][0],base[i][1],base[i][2]],[base[i+1][0],base[i+1][1],base[i+1][2]],[base[i+2][0],base[i+2][1],base[i+2][2]]];for(let r=0;r<3;r++){base[i+r][0]=block[cols[r]][0];base[i+r][1]=block[cols[r]][1];base[i+r][2]=block[cols[r]][2];}}return base;}
-function makePuzzle(sol,removeCount){const p=sol.map(r=>[...r]);let removed=0;while(removed<removeCount){const r=Math.floor(Math.random()*9),c=Math.floor(Math.random()*9);if(p[r][c]!==0){p[r][c]=0;removed++;}}return p;}
+function genSudoku(){
+  // Valid base pattern: (i*3 + floor(i/3) + j) % 9 + 1
+  const base=Array(9).fill().map((_,i)=>Array(9).fill().map((_,j)=>(i*3+Math.floor(i/3)+j)%9+1));
+  // Number relabeling
+  const perm=[1,2,3,4,5,6,7,8,9].sort(()=>Math.random()-0.5);
+  for(let r=0;r<9;r++)for(let c=0;c<9;c++)base[r][c]=perm[base[r][c]-1];
+  // Swap rows within each band
+  for(let band=0;band<3;band++){
+    const order=[0,1,2].sort(()=>Math.random()-0.5);
+    const block=[base[band*3],base[band*3+1],base[band*3+2]];
+    base[band*3]=block[order[0]];
+    base[band*3+1]=block[order[1]];
+    base[band*3+2]=block[order[2]];
+  }
+  // Swap columns within each stack
+  for(let stack=0;stack<3;stack++){
+    const order=[0,1,2].sort(()=>Math.random()-0.5);
+    for(let r=0;r<9;r++){
+      const tmp=[base[r][stack*3],base[r][stack*3+1],base[r][stack*3+2]];
+      base[r][stack*3]=tmp[order[0]];
+      base[r][stack*3+1]=tmp[order[1]];
+      base[r][stack*3+2]=tmp[order[2]];
+    }
+  }
+  return base;
+}
+function makePuzzle(sol,removeCount){const p=sol.map(r=>[...r]);let removed=0;const cells=[];for(let r=0;r<9;r++)for(let c=0;c<9;c++)cells.push([r,c]);cells.sort(()=>Math.random()-0.5);for(const[r,c]of cells){if(removed>=removeCount)break;p[r][c]=0;removed++;}return p;}
 function newGame(){const sol=genSudoku();solution=sol;const removeCount={easy:40,medium:50,hard:58}[difficulty];puzzle=makePuzzle(sol,removeCount);given=puzzle.map(r=>r.map(v=>v!==0));selected=null;mistakes=0;document.getElementById('mistakes').textContent=0;document.getElementById('diff').textContent=difficulty.charAt(0).toUpperCase()+difficulty.slice(1);document.getElementById('overlay').classList.add('hidden');timerStart=Date.now();if(timer)clearInterval(timer);timer=setInterval(()=>{if(!isComplete()){const s=Math.floor((Date.now()-timerStart)/1000);document.getElementById('time').textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}},1000);document.getElementById('time').textContent='0:00';render();}
 function setDifficulty(d){difficulty=d;newGame();}
 function inputNum(n){if(!selected)return;const[r,c]=selected;if(given[r][c])return;if(n===0){puzzle[r][c]=0;}else{puzzle[r][c]=n;if(n!==solution[r][c]){mistakes++;document.getElementById('mistakes').textContent=mistakes;}}render();if(isComplete()){clearInterval(timer);document.getElementById('overlay-title').textContent='Solved!';document.getElementById('overlay-text').textContent=`Time: ${document.getElementById('time').textContent} · Mistakes: ${mistakes}`;document.getElementById('overlay').classList.remove('hidden');}}
 function isComplete(){for(let r=0;r<9;r++)for(let c=0;c<9;c++)if(puzzle[r][c]!==solution[r][c])return false;return true;}
-function render(){const b=document.getElementById('board');b.innerHTML='';for(let r=0;r<9;r++)for(let c=0;c<9;c++){const cell=document.createElement('div');cell.className='su-cell';if([3,6].includes(r))cell.classList.add('su-row-'+r);if(given[r][c])cell.classList.add('given');if(selected&&selected[0]===r&&selected[1]===c)cell.classList.add('selected');if(selected&&selected[0]===r||selected&&selected[1]===c)cell.classList.add('highlight');if(selected&&Math.floor(selected[0]/3)===Math.floor(r/3)&&Math.floor(selected[1]/3)===Math.floor(c/3))cell.classList.add('highlight');if(puzzle[r][c]){cell.textContent=puzzle[r][c];if(!given[r][c]&&puzzle[r][c]!==solution[r][c])cell.classList.add('error');}cell.addEventListener('click',()=>{selected=[r,c];render();});b.appendChild(cell);}}
+function render(){const b=document.getElementById('board');b.innerHTML='';for(let r=0;r<9;r++)for(let c=0;c<9;c++){const cell=document.createElement('div');cell.className='su-cell';// thick borders for 3x3 subgrids
+if(c===2||c===5)cell.classList.add('br-r');if(r===2||r===5)cell.classList.add('br-b');if(given[r][c])cell.classList.add('given');if(selected){const sr=selected[0],sc=selected[1];if(sr===r&&sc===c)cell.classList.add('selected');else if(sr===r||sc===c||(Math.floor(sr/3)===Math.floor(r/3)&&Math.floor(sc/3)===Math.floor(c/3)))cell.classList.add('highlight');}if(puzzle[r][c]){cell.textContent=puzzle[r][c];if(!given[r][c]&&puzzle[r][c]!==solution[r][c])cell.classList.add('error');}cell.addEventListener('click',()=>{selected=[r,c];render();});b.appendChild(cell);}}
 document.addEventListener('keydown',e=>{if(!selected)return;if(e.key>='1'&&e.key<='9'){inputNum(+e.key);}else if(e.key==='Backspace'||e.key==='Delete'||e.key==='0'){inputNum(0);}else if(e.key==='ArrowUp'&&selected[0]>0){selected[0]--;render();}else if(e.key==='ArrowDown'&&selected[0]<8){selected[0]++;render();}else if(e.key==='ArrowLeft'&&selected[1]>0){selected[1]--;render();}else if(e.key==='ArrowRight'&&selected[1]<8){selected[1]++;render();}});
 newGame();
 </script>

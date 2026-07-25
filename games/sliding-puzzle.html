@@ -48,13 +48,13 @@
   </div>
 </div>
 <script>
-const N=4;let tiles,emptyIdx,moves,timer,timerStart,gameOver;
-function newGame(){tiles=[...Array(N*N-1).keys()].map(i=>i+1);tiles.push(0);emptyIdx=N*N-1;for(let i=0;i<300;i++){const valid=neighbors(emptyIdx);const pick=valid[Math.floor(Math.random()*valid.length)];swap(pick);shuffleEmpty();}moves=0;gameOver=false;document.getElementById('moves').textContent=0;document.getElementById('overlay').classList.add('hidden');timerStart=Date.now();if(timer)clearInterval(timer);timer=setInterval(()=>{if(!gameOver)document.getElementById('time').textContent=Math.floor((Date.now()-timerStart)/1000);},1000);document.getElementById('time').textContent=0;render();}
-function shuffleEmpty(){/*placeholder to avoid syntax issues*/}
+const N=4;let tiles,emptyIdx,moves,timer,timerStart,gameOver,lastMove=-1;
+function newGame(){tiles=[...Array(N*N-1).keys()].map(i=>i+1);tiles.push(0);emptyIdx=N*N-1;// Shuffle by making random valid moves (guarantees solvability)
+for(let i=0;i<500;i++){const valid=neighbors(emptyIdx).filter(n=>n!==lastMove);const pick=valid[Math.floor(Math.random()*valid.length)];swap(pick);lastMove=emptyIdx;}moves=0;gameOver=false;document.getElementById('moves').textContent=0;document.getElementById('time').textContent=0;document.getElementById('overlay').classList.add('hidden');timerStart=Date.now();if(timer)clearInterval(timer);timer=setInterval(()=>{if(!gameOver)document.getElementById('time').textContent=Math.floor((Date.now()-timerStart)/1000);},1000);render();}
 function neighbors(idx){const r=Math.floor(idx/N),c=idx%N;const res=[];if(r>0)res.push(idx-N);if(r<N-1)res.push(idx+N);if(c>0)res.push(idx-1);if(c<N-1)res.push(idx+1);return res;}
 function swap(i){tiles[emptyIdx]=tiles[i];tiles[i]=0;emptyIdx=i;}
 function clickTile(i){if(gameOver)return;if(!neighbors(emptyIdx).includes(i))return;swap(i);moves++;document.getElementById('moves').textContent=moves;render();checkWin();}
-function checkWin(){for(let i=0;i<N*N-1;i++)if(tiles[i]!==i+1)return;if(N*N>0&&tiles[N*N-1]===0){gameOver=true;clearInterval(timer);const t=Math.floor((Date.now()-timerStart)/1000);document.getElementById('overlay-text').textContent=`Time: ${t}s · Moves: ${moves}`;document.getElementById('overlay').classList.remove('hidden');}}
+function checkWin(){for(let i=0;i<N*N-1;i++)if(tiles[i]!==i+1)return;if(tiles[N*N-1]===0){gameOver=true;clearInterval(timer);const t=Math.floor((Date.now()-timerStart)/1000);document.getElementById('overlay-text').textContent=`Time: ${t}s · Moves: ${moves}`;document.getElementById('overlay').classList.remove('hidden');}}
 function render(){const g=document.getElementById('grid');g.innerHTML='';tiles.forEach((v,i)=>{const tile=document.createElement('div');tile.className='sp-tile';if(v===0)tile.classList.add('empty');else tile.textContent=v;tile.addEventListener('click',()=>clickTile(i));g.appendChild(tile);});}
 newGame();
 </script>
