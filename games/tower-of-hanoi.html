@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Tower of Hanoi - Play Free Online Puzzle Game | HyperGrad Games</title>
+<meta name="description" content="Play Tower of Hanoi online for free. Move all disks from the left peg to the right peg. Classic mathematical puzzle. No download needed.">
+<link rel="canonical" href="https://games.hypergrad.cn/games/tower-of-hanoi.html">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  .hanoi-area { display: flex; justify-content: space-around; align-items: flex-end; width: 100%; max-width: 480px; height: 280px; margin: 0 auto; position: relative; }
+  .hanoi-peg { display: flex; flex-direction: column-reverse; align-items: center; width: 33%; height: 100%; position: relative; cursor: pointer; }
+  .hanoi-peg::before { content: ''; position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); width: 6px; height: 200px; background: var(--border); border-radius: 3px; }
+  .hanoi-peg::after { content: ''; position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%); width: 90%; height: 5px; background: var(--border); border-radius: 3px; }
+  .hanoi-peg.selected::before { background: var(--primary); box-shadow: 0 0 8px var(--primary); }
+  .hanoi-peg.valid::before { background: var(--success); }
+  .hanoi-disk { z-index: 2; margin-bottom: 0; border-radius: 4px; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+  .hanoi-disk.top { margin-bottom: 4px; }
+  .hanoi-disk.lifted { transform: translateY(-20px); }
+  @media (max-width: 768px) { .hanoi-area { height: 220px; } }
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoGame","name":"Tower of Hanoi","description":"Play Tower of Hanoi online for free. Move all disks from the left peg to the right peg. Classic mathematical puzzle.","url":"https://games.hypergrad.cn/games/tower-of-hanoi.html","genre":"Puzzle","gamePlatform":"Web Browser","applicationCategory":"Game","operatingSystem":"Any (Web Browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"HyperGrad"}}
+</script>
+</head>
+<body>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<div class="game-page">
+  <div class="game-header">
+    <h1 class="game-title">Tower of Hanoi</h1>
+    <a href="../index.html" class="game-back">&larr; All Games</a>
+  </div>
+  <div class="game-stats">
+    <div class="stat-box"><div class="stat-label">Moves</div><div class="stat-value" id="moves">0</div></div>
+    <div class="stat-box"><div class="stat-label">Optimal</div><div class="stat-value" id="optimal">15</div></div>
+    <div class="stat-box"><div class="stat-label">Disks</div><div class="stat-value" id="disk-count">4</div></div>
+  </div>
+  <div class="game-board" style="padding:16px;">
+    <div class="hanoi-area" id="hanoi-area">
+      <div class="hanoi-peg" id="peg0" onclick="clickPeg(0)"></div>
+      <div class="hanoi-peg" id="peg1" onclick="clickPeg(1)"></div>
+      <div class="hanoi-peg" id="peg2" onclick="clickPeg(2)"></div>
+    </div>
+    <div class="game-overlay hidden" id="overlay">
+      <h2 id="overlay-title">Solved!</h2>
+      <p id="overlay-text"></p>
+      <button class="btn" onclick="newGame()">Play Again</button>
+    </div>
+  </div>
+  <div class="game-controls">
+    <select id="disk-select" onchange="newGame()" style="background:var(--bg-elevated);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:14px;">
+      <option value="3">3 Disks</option>
+      <option value="4" selected>4 Disks</option>
+      <option value="5">5 Disks</option>
+      <option value="6">6 Disks</option>
+      <option value="7">7 Disks</option>
+    </select>
+    <button class="btn" onclick="newGame()">New Game</button>
+  </div>
+  <div class="game-instructions">
+    <h3>How to Play</h3>
+    <ul>
+      <li>Click a peg to select the top disk, then click another peg to move it</li>
+      <li>Only one disk can be moved at a time</li>
+      <li>A larger disk can never be placed on a smaller disk</li>
+      <li>Move all disks from the left peg to the right peg to win</li>
+      <li>Try to solve in the minimum number of moves!</li>
+    </ul>
+  </div>
+</div>
+<script>
+const DISK_COLORS=['#EF4444','#F59E0B','#22C55E','#6366F1','#EC4899','#06B6D4','#A855F7'];
+let pegs,moves,selected,diskCount,gameOver;
+function newGame(){
+  diskCount=parseInt(document.getElementById('disk-select').value);
+  pegs=[[],[],[]];
+  for(let i=diskCount;i>=1;i--)pegs[0].push(i);
+  moves=0;selected=null;gameOver=false;
+  document.getElementById('moves').textContent='0';
+  document.getElementById('optimal').textContent=Math.pow(2,diskCount)-1;
+  document.getElementById('disk-count').textContent=diskCount;
+  document.getElementById('overlay').classList.add('hidden');
+  render();
+}
+function clickPeg(i){
+  if(gameOver)return;
+  if(selected===null){
+    if(pegs[i].length>0){selected=i;render();}
+  }else if(selected===i){
+    selected=null;render();
+  }else{
+    const disk=pegs[selected][pegs[selected].length-1];
+    if(pegs[i].length===0||pegs[i][pegs[i].length-1]>disk){
+      pegs[i].push(pegs[selected].pop());
+      moves++;selected=null;
+      document.getElementById('moves').textContent=moves;
+      if(pegs[2].length===diskCount){
+        gameOver=true;
+        const optimal=Math.pow(2,diskCount)-1;
+        document.getElementById('overlay-title').textContent='Solved!';
+        document.getElementById('overlay-text').textContent=moves===optimal?'Perfect! Optimal solution!':`Solved in ${moves} moves (optimal: ${optimal})`;
+        document.getElementById('overlay').classList.remove('hidden');
+      }
+      render();
+    }else{
+      selected=null;render();
+    }
+  }
+}
+function render(){
+  for(let i=0;i<3;i++){
+    const peg=document.getElementById('peg'+i);
+    peg.innerHTML='';
+    peg.className='hanoi-peg';
+    if(selected===i)peg.classList.add('selected');
+    else if(selected!==null){
+      const disk=pegs[selected][pegs[selected].length-1];
+      if(pegs[i].length===0||pegs[i][pegs[i].length-1]>disk)peg.classList.add('valid');
+    }
+    pegs[i].forEach((size,idx)=>{
+      const disk=document.createElement('div');
+      disk.className='hanoi-disk'+(idx===pegs[i].length-1?' top':'');
+      const w=40+size*(120/diskCount);
+      const h=18;
+      disk.style.width=w+'px';
+      disk.style.height=h+'px';
+      disk.style.background=DISK_COLORS[size-1];
+      disk.style.marginBottom='0';
+      peg.appendChild(disk);
+    });
+  }
+}
+newGame();
+</script>
+</body>
+</html>

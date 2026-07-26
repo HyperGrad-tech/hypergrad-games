@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Space Invaders - Play Free Online Shooter | HyperGrad Games</title>
+<meta name="description" content="Play Space Invaders online for free. Defend Earth from alien invaders. Classic arcade shooting game in your browser. No download needed.">
+<link rel="canonical" href="https://games.hypergrad.cn/games/space-invaders.html">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  canvas { display: block; border-radius: 8px; background: #000; cursor: crosshair; touch-action: none; }
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoGame","name":"Space Invaders","description":"Play Space Invaders online for free. Defend Earth from alien invaders. Classic arcade shooting game in your browser.","url":"https://games.hypergrad.cn/games/space-invaders.html","genre":"Arcade","gamePlatform":"Web Browser","applicationCategory":"Game","operatingSystem":"Any (Web Browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"HyperGrad"}}
+</script>
+</head>
+<body>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<div class="game-page">
+  <div class="game-header">
+    <h1 class="game-title">Space Invaders</h1>
+    <a href="../index.html" class="game-back">&larr; All Games</a>
+  </div>
+  <div class="game-stats">
+    <div class="stat-box"><div class="stat-label">Score</div><div class="stat-value" id="score">0</div></div>
+    <div class="stat-box"><div class="stat-label">Lives</div><div class="stat-value" id="lives">3</div></div>
+    <div class="stat-box"><div class="stat-label">Wave</div><div class="stat-value" id="wave">1</div></div>
+  </div>
+  <div class="game-board" style="padding:10px;">
+    <canvas id="canvas" width="400" height="450"></canvas>
+    <div class="game-overlay hidden" id="overlay">
+      <h2 id="overlay-title">Game Over</h2>
+      <p id="overlay-text"></p>
+      <button class="btn" onclick="newGame()">Play Again</button>
+    </div>
+  </div>
+  <div class="game-instructions">
+    <h3>How to Play</h3>
+    <ul>
+      <li>Use Left/Right Arrow keys or A/D to move</li>
+      <li>Press Space to shoot</li>
+      <li>Destroy all aliens to advance to the next wave</li>
+      <li>Aliens move faster as their numbers decrease</li>
+      <li>Don't let aliens reach your level or you lose a life!</li>
+    </ul>
+  </div>
+</div>
+<script>
+const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+const W=400,H=450;
+let player,bullets,alienBullets,aliens,score,lives,wave,gameOver,keys,dir,alienTimer,lastShot,stars;
+function newGame(){
+  player={x:W/2-15,y:H-40,w:30,h:12};
+  bullets=[];alienBullets=[];stars=[];
+  for(let i=0;i<60;i++)stars.push({x:Math.random()*W,y:Math.random()*H,s:Math.random()*1.5});
+  score=0;lives=3;wave=1;gameOver=false;keys={};dir=1;alienTimer=0;lastShot=0;
+  spawnWave();
+  document.getElementById('overlay').classList.add('hidden');
+  update();
+}
+function spawnWave(){
+  aliens=[];
+  const rows=4+Math.min(wave-1,2),cols=8;
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+    aliens.push({x:30+c*42,y:30+r*30,w:28,h:16,alive:true,type:r});
+  }
+}
+function update(){document.getElementById('score').textContent=score;document.getElementById('lives').textContent=lives;document.getElementById('wave').textContent=wave;}
+function shoot(){if(gameOver||Date.now()-lastShot<300)return;bullets.push({x:player.x+player.w/2,y:player.y,vx:0,vy:-7});lastShot=Date.now();}
+function endGame(){
+  gameOver=true;
+  const best=parseInt(localStorage.getItem('si-best')||0);
+  if(score>best)localStorage.setItem('si-best',score);
+  document.getElementById('overlay-title').textContent='Game Over';
+  document.getElementById('overlay-text').textContent='Score: '+score;
+  document.getElementById('overlay').classList.remove('hidden');
+}
+function draw(){
+  ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
+  // Stars
+  ctx.fillStyle='rgba(255,255,255,0.3)';
+  stars.forEach(s=>{s.y+=0.3;if(s.y>H)s.y=0;ctx.fillRect(s.x,s.y,s.s,s.s);});
+  if(!gameOver){
+    if(keys['ArrowLeft']||keys['a'])player.x-=4;
+    if(keys['ArrowRight']||keys['d'])player.x+=4;
+    player.x=Math.max(0,Math.min(W-player.w,player.x));
+  }
+  // Player
+  ctx.fillStyle='#22C55E';
+  ctx.fillRect(player.x,player.y+8,player.w,4);
+  ctx.fillRect(player.x+12,player.y,6,8);
+  // Bullets
+  bullets=bullets.filter(b=>{b.y+=b.vy;if(b.y<0)return false;ctx.fillStyle='#F59E0B';ctx.fillRect(b.x-1,b.y,3,8);return true;});
+  // Alien bullets
+  alienBullets=alienBullets.filter(b=>{b.y+=4;if(b.y>H)return false;ctx.fillStyle='#EF4444';ctx.fillRect(b.x-1,b.y,3,8);
+    if(!gameOver&&b.y>player.y&&b.x>player.x&&b.x<player.x+player.w){lives--;update();if(lives<=0)endGame();return false;}
+    return true;});
+  // Aliens movement
+  const alive=aliens.filter(a=>a.alive);
+  if(alive.length===0&&!gameOver){
+    wave++;spawnWave();update();
+  }
+  alienTimer+=16;
+  const speed=Math.max(50,400-alive.length*10);
+  if(alienTimer>speed){
+    alienTimer=0;
+    let edge=false;
+    for(const a of alive)if((dir>0&&a.x+a.w>W-10)||(dir<0&&a.x<10)){edge=true;break;}
+    if(edge){dir*=-1;for(const a of alive)a.y+=15;}
+    else for(const a of alive)a.x+=dir*8;
+    // Check aliens reaching player level
+    for(const a of alive)if(a.y+a.h>=player.y){lives=0;update();endGame();break;}
+  }
+  // Random alien shoot
+  if(Math.random()<0.02&&alive.length>0){
+    const a=alive[Math.floor(Math.random()*alive.length)];
+    alienBullets.push({x:a.x+a.w/2,y:a.y+a.h});
+  }
+  // Draw aliens + check bullet hits
+  const colors=['#EF4444','#F59E0B','#EC4899','#A855F7'];
+  for(const a of aliens){
+    if(!a.alive)continue;
+    ctx.fillStyle=colors[a.type%4];
+    ctx.fillRect(a.x,a.y,a.w,a.h);
+    ctx.fillRect(a.x+2,a.y-3,4,3);
+    ctx.fillRect(a.x+a.w-6,a.y-3,4,3);
+    ctx.fillRect(a.x+4,a.y+a.h,2,3);
+    ctx.fillRect(a.x+a.w-6,a.y+a.h,2,3);
+    for(let i=bullets.length-1;i>=0;i--){
+      if(bullets[i].x>a.x&&bullets[i].x<a.x+a.w&&bullets[i].y>a.y&&bullets[i].y<a.y+a.h){
+        a.alive=false;bullets.splice(i,1);
+        score+=a.type===0?30:a.type===1?20:a.type===2?15:10;
+        update();break;
+      }
+    }
+  }
+}
+window.addEventListener('keydown',e=>{keys[e.key]=true;if(e.key===' '){e.preventDefault();shoot();}});
+window.addEventListener('keyup',e=>{keys[e.key]=false;});
+// Touch controls
+canvas.addEventListener('touchstart',e=>{e.preventDefault();const t=e.touches[0];const rect=canvas.getBoundingClientRect();player.x=(t.clientX-rect.left)*(W/rect.width)-player.w/2;player.x=Math.max(0,Math.min(W-player.w,player.x));shoot();},{passive:false});
+canvas.addEventListener('touchmove',e=>{e.preventDefault();const t=e.touches[0];const rect=canvas.getBoundingClientRect();player.x=(t.clientX-rect.left)*(W/rect.width)-player.w/2;player.x=Math.max(0,Math.min(W-player.w,player.x));},{passive:false});
+function loop(){draw();requestAnimationFrame(loop);}
+newGame();loop();
+</script>
+</body>
+</html>

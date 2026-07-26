@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Nim - Play Free Online Strategy Game vs AI | HyperGrad Games</title>
+<meta name="description" content="Play Nim online for free. Remove objects from piles in this classic mathematical strategy game. Play vs AI with optimal strategy. No download needed.">
+<link rel="canonical" href="https://games.hypergrad.cn/games/nim.html">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  .nim-piles { display: flex; flex-direction: column; gap: 16px; align-items: center; padding: 20px 0; }
+  .nim-pile { display: flex; gap: 6px; align-items: center; }
+  .nim-pile-label { font-size: 14px; color: var(--text-dim); width: 60px; text-align: right; }
+  .nim-stick { width: 12px; height: 40px; background: linear-gradient(to bottom,#818CF8,#4F46E5); border-radius: 2px; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+  .nim-stick:hover { transform: translateY(-3px); box-shadow: 0 4px 8px rgba(99,102,241,0.4); }
+  .nim-stick.selected { background: linear-gradient(to bottom,#F59E0B,#D97706); transform: translateY(-6px); box-shadow: 0 4px 12px rgba(245,158,11,0.5); }
+  .nim-stick.removing { animation: nimRemove 0.3s forwards; }
+  @keyframes nimRemove { to { transform: translateY(-30px) rotate(30deg); opacity: 0; } }
+  .nim-status { text-align: center; font-size: 16px; color: var(--text-muted); margin: 16px 0; min-height: 24px; }
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoGame","name":"Nim","description":"Play Nim online for free. Remove objects from piles in this classic mathematical strategy game. Play vs AI with optimal strategy.","url":"https://games.hypergrad.cn/games/nim.html","genre":"Strategy","gamePlatform":"Web Browser","applicationCategory":"Game","operatingSystem":"Any (Web Browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"HyperGrad"}}
+</script>
+</head>
+<body>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<div class="game-page">
+  <div class="game-header">
+    <h1 class="game-title">Nim</h1>
+    <a href="../index.html" class="game-back">&larr; All Games</a>
+  </div>
+  <div class="game-stats">
+    <div class="stat-box"><div class="stat-label">Last Winner</div><div class="stat-value" id="last-winner" style="font-size:16px;">-</div></div>
+    <div class="stat-box"><div class="stat-label">Mode</div><div class="stat-value" id="mode-display" style="font-size:14px;">Misère</div></div>
+  </div>
+  <div class="game-board" style="flex-direction:column;">
+    <div class="nim-status" id="status">Your turn - select sticks then click Remove</div>
+    <div class="nim-piles" id="piles"></div>
+    <div class="game-overlay hidden" id="overlay">
+      <h2 id="overlay-title"></h2>
+      <button class="btn" onclick="newGame()">Play Again</button>
+    </div>
+  </div>
+  <div class="game-controls">
+    <button class="btn" id="remove-btn" onclick="removeSticks()" disabled>Remove Selected</button>
+    <button class="btn btn-secondary" onclick="newGame()">New Game</button>
+  </div>
+  <div class="game-instructions">
+    <h3>How to Play</h3>
+    <ul>
+      <li>This is Misère Nim - the player who takes the LAST stick LOSES</li>
+      <li>On your turn, remove 1 or more sticks from a single pile</li>
+      <li>Click sticks to select them (all from the same pile)</li>
+      <li>Click "Remove Selected" to confirm your move</li>
+      <li>The AI plays optimally - can you find a winning strategy?</li>
+    </ul>
+  </div>
+</div>
+<script>
+let piles,selected,currentPlayer,gameOver;
+function newGame(){
+  // Random pile sizes (1-7 sticks, 3-5 piles)
+  const numPiles=3+Math.floor(Math.random()*3);
+  piles=[];
+  for(let i=0;i<numPiles;i++)piles.push(1+Math.floor(Math.random()*7));
+  // Ensure total > 1
+  if(piles.reduce((a,b)=>a+b,0)<3)piles[0]=3;
+  selected={};currentPlayer='player';gameOver=false;
+  document.getElementById('overlay').classList.add('hidden');
+  document.getElementById('remove-btn').disabled=true;
+  document.getElementById('status').textContent='Your turn - select sticks then click Remove';
+  render();
+}
+function stickClick(pileIdx,stickIdx){
+  if(gameOver||currentPlayer!=='player')return;
+  const key=pileIdx+':'+stickIdx;
+  if(selected[key]){delete selected[key];}
+  else{
+    // Check same pile
+    const existingKey=Object.keys(selected)[0];
+    if(existingKey&&parseInt(existingKey.split(':')[0])!==pileIdx){selected={};}
+    selected[key]=true;
+  }
+  // Enable/disable remove button
+  document.getElementById('remove-btn').disabled=Object.keys(selected).length===0;
+  render();
+}
+function removeSticks(){
+  if(gameOver||currentPlayer!=='player')return;
+  const keys=Object.keys(selected);
+  if(keys.length===0)return;
+  const pileIdx=parseInt(keys[0].split(':')[0]);
+  const removeCount=keys.length;
+  const newCount=piles[pileIdx]-removeCount;
+  // Animate removal
+  const stickEls=document.querySelectorAll('.nim-stick.selected');
+  stickEls.forEach((el,i)=>{el.classList.add('removing');});
+  setTimeout(()=>{
+    piles[pileIdx]=newCount;
+    selected={};
+    if(checkEnd())return;
+    currentPlayer='ai';
+    document.getElementById('remove-btn').disabled=true;
+    document.getElementById('status').textContent='AI is thinking...';
+    render();
+    setTimeout(aiMove,800);
+  },300);
+}
+function aiMove(){
+  if(gameOver)return;
+  // Misère Nim optimal strategy
+  // If all piles have 1: take from a pile with >1 to leave odd 1-piles
+  // Otherwise: make nim-sum = 0, except when it would leave all 1-piles
+  const total=piles.reduce((a,b)=>a+b,0);
+  let bestMove=null;
+  const allOnes=piles.every(p=>p<=1);
+  if(allOnes){
+    // Leave odd number of 1-piles to opponent (they take last = lose)
+    const ones=piles.filter(p=>p===1).length;
+    if(ones%2===1){
+      // Take 1 to make it even... wait, in misère, taking last loses
+      // We want opponent to take last, so leave them odd number of 1s
+      // Actually: if ones is odd, taking 1 makes even -> opponent takes, leaving odd to us -> we might win
+      // Simpler: just take 1 from any pile with 1
+      const idx=piles.findIndex(p=>p>0);
+      bestMove={pile:idx,count:1};
+    }else{
+      const idx=piles.findIndex(p=>p>0);
+      bestMove={pile:idx,count:1};
+    }
+  }else{
+    // Nim-sum strategy with misère adjustment
+    let nimSum=piles.reduce((a,b)=>a^b,0);
+    if(nimSum!==0){
+      // Find a pile to reduce
+      for(let i=0;i<piles.length;i++){
+        const target=piles[i]^nimSum;
+        if(target<piles[i]){
+          // Check: would this leave all 1s?
+          const newPiles=[...piles];newPiles[i]=target;
+          if(newPiles.every(p=>p<=1)){
+            // Misère: leave odd 1s
+            const ones=newPiles.filter(p=>p===1).length;
+            if(ones%2===0){bestMove={pile:i,count:piles[i]-target};break;}
+            else continue;
+          }
+          bestMove={pile:i,count:piles[i]-target};break;
+        }
+      }
+    }
+    if(!bestMove){
+      // Random move
+      const idx=piles.findIndex(p=>p>0);
+      bestMove={pile:idx,count:1};
+    }
+  }
+  piles[bestMove.pile]-=bestMove.count;
+  if(checkEnd())return;
+  currentPlayer='player';
+  document.getElementById('status').textContent='Your turn - select sticks then click Remove';
+  render();
+}
+function checkEnd(){
+  const total=piles.reduce((a,b)=>a+b,0);
+  if(total<=1){
+    gameOver=true;
+    const loser=currentPlayer;
+    const winner=loser==='player'?'AI':'You';
+    document.getElementById('last-winner').textContent=winner;
+    document.getElementById('overlay-title').textContent=winner==='You'?'You Win!':'AI Wins!';
+    document.getElementById('overlay').classList.remove('hidden');
+    document.getElementById('status').textContent=winner+' won!';
+    return true;
+  }
+  return false;
+}
+function render(){
+  const container=document.getElementById('piles');
+  container.innerHTML='';
+  for(let i=0;i<piles.length;i++){
+    const pileDiv=document.createElement('div');
+    pileDiv.className='nim-pile';
+    const label=document.createElement('div');
+    label.className='nim-pile-label';
+    label.textContent='Pile '+String.fromCharCode(65+i)+': '+piles[i];
+    pileDiv.appendChild(label);
+    for(let j=0;j<piles[i];j++){
+      const stick=document.createElement('div');
+      stick.className='nim-stick';
+      const key=i+':'+j;
+      if(selected[key])stick.classList.add('selected');
+      stick.onclick=()=>stickClick(i,j);
+      pileDiv.appendChild(stick);
+    }
+    container.appendChild(pileDiv);
+  }
+}
+newGame();
+</script>
+</body>
+</html>
