@@ -46,6 +46,16 @@
         'game.level': 'Level',
         'game.moves': 'Moves',
         'game.time': 'Time',
+        'game.lives': 'Lives',
+        'game.mistakes': 'Mistakes',
+        'game.difficulty': 'Difficulty',
+        'game.pairs': 'Pairs',
+        'game.tiles': 'Tiles Left',
+        'game.streak': 'Streak',
+        'game.wpm': 'WPM',
+        'game.accuracy': 'Accuracy',
+        'game.dice': 'Dice',
+        'game.max': 'Max',
         'game.gameover': 'Game Over!',
         'game.win': 'You Win!',
         'game.tryagain': 'Press New Game to try again',
@@ -89,6 +99,16 @@
         'game.level': '关卡',
         'game.moves': '步数',
         'game.time': '时间',
+        'game.lives': '生命',
+        'game.mistakes': '错误',
+        'game.difficulty': '难度',
+        'game.pairs': '已配对',
+        'game.tiles': '剩余牌',
+        'game.streak': '连胜',
+        'game.wpm': '速度',
+        'game.accuracy': '准确率',
+        'game.dice': '骰子',
+        'game.max': '上限',
         'game.gameover': '游戏结束！',
         'game.win': '胜利！',
         'game.tryagain': '点击新游戏重新开始',
@@ -120,11 +140,20 @@
 
     apply: function () {
       document.documentElement.lang = this.lang;
+      // 1) data-i18n: 从全局词典翻译
       const els = document.querySelectorAll('[data-i18n]');
       els.forEach(el => {
         const key = el.getAttribute('data-i18n');
         const val = this.t(key);
         el.textContent = val;
+      });
+      // 2) data-i18n-zh / data-i18n-en: 属性级双语，优先于全局词典
+      // 用法: <li data-i18n-en="Original text" data-i18n-zh="中文翻译">
+      const biEls = document.querySelectorAll('[data-i18n-zh],[data-i18n-en]');
+      biEls.forEach(el => {
+        const zh = el.getAttribute('data-i18n-zh');
+        const en = el.getAttribute('data-i18n-en');
+        el.textContent = this.lang === 'zh' ? (zh || en || el.textContent) : (en || zh || el.textContent);
       });
       // 更新 hreflang link tags
       this.updateHreflang();

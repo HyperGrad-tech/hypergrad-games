@@ -7,6 +7,7 @@
 <meta name="description" content="Play Space Invaders online for free. Defend Earth from alien invaders. Classic arcade shooting game in your browser. No download needed.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/space-invaders.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <style>
   canvas { display: block; border-radius: 8px; background: #000; cursor: crosshair; touch-action: none; }
 </style>
@@ -15,33 +16,33 @@
 </script>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Space Invaders</h1>
-    <a href="../index.html" class="game-back">&larr; All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Score</div><div class="stat-value" id="score">0</div></div>
-    <div class="stat-box"><div class="stat-label">Lives</div><div class="stat-value" id="lives">3</div></div>
-    <div class="stat-box"><div class="stat-label">Wave</div><div class="stat-value" id="wave">1</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.score">Score</div><div class="stat-value" id="score">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.lives">Lives</div><div class="stat-value" id="lives">3</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Wave" data-i18n-zh="波次">Wave</div><div class="stat-value" id="wave">1</div></div>
   </div>
   <div class="game-board" style="padding:10px;">
     <canvas id="canvas" width="400" height="450"></canvas>
     <div class="game-overlay hidden" id="overlay">
-      <h2 id="overlay-title">Game Over</h2>
+      <h2 id="overlay-title" data-i18n-en="Game Over" data-i18n-zh="游戏结束">Game Over</h2>
       <p id="overlay-text"></p>
-      <button class="btn" onclick="newGame()">Play Again</button>
+      <button class="btn" onclick="newGame()" data-i18n-en="Play Again" data-i18n-zh="再玩一次">Play Again</button>
     </div>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>Use Left/Right Arrow keys or A/D to move</li>
-      <li>Press Space to shoot</li>
-      <li>Destroy all aliens to advance to the next wave</li>
-      <li>Aliens move faster as their numbers decrease</li>
-      <li>Don't let aliens reach your level or you lose a life!</li>
+      <li data-i18n-en="Use Left/Right Arrow keys or A/D to move" data-i18n-zh="用左右方向键或 A/D 移动">Use Left/Right Arrow keys or A/D to move</li>
+      <li data-i18n-en="Press Space to shoot" data-i18n-zh="按空格键射击">Press Space to shoot</li>
+      <li data-i18n-en="Destroy all aliens to advance to the next wave" data-i18n-zh="消灭所有外星人即可进入下一波">Destroy all aliens to advance to the next wave</li>
+      <li data-i18n-en="Aliens move faster as their numbers decrease" data-i18n-zh="外星人越少移动越快">Aliens move faster as their numbers decrease</li>
+      <li data-i18n-en="Don't let aliens reach your level or you lose a life!" data-i18n-zh="不要让外星人到达你的位置，否则失去一条命！">Don't let aliens reach your level or you lose a life!</li>
     </ul>
   </div>
 </div>

@@ -7,6 +7,7 @@
 <meta name="description" content="Play Tetris online for free. Stack falling blocks, clear lines, and chase the high score. No download needed, works on mobile and desktop.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/tetris.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -31,37 +32,37 @@
   </script>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Tetris</h1>
-    <a href="../index.html" class="game-back">← All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Score</div><div class="stat-value" id="score">0</div></div>
-    <div class="stat-box"><div class="stat-label">Lines</div><div class="stat-value" id="lines">0</div></div>
-    <div class="stat-box"><div class="stat-label">Level</div><div class="stat-value" id="level">1</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.score">Score</div><div class="stat-value" id="score">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Lines" data-i18n-zh="行数">Lines</div><div class="stat-value" id="lines">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.level">Level</div><div class="stat-value" id="level">1</div></div>
   </div>
   <div class="game-board">
     <canvas id="canvas" width="300" height="600"></canvas>
     <div class="game-overlay hidden" id="overlay">
       <h2>Game Over!</h2>
       <p id="final-score">Score: 0</p>
-      <button class="btn" onclick="startGame()">Play Again</button>
+      <button class="btn" onclick="startGame()" data-i18n-en="Play Again" data-i18n-zh="再玩一次">Play Again</button>
     </div>
   </div>
   <div class="game-controls">
-    <button class="btn" onclick="startGame()">New Game</button>
+    <button class="btn" onclick="startGame()" data-i18n-en="New Game" data-i18n-zh="新游戏">New Game</button>
     <button class="btn btn-secondary" id="pause-btn" onclick="togglePause()">Pause</button>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>Left/Right arrows: Move piece sideways</li>
-      <li>Down arrow: Soft drop (faster)</li>
-      <li>Up arrow: Rotate piece</li>
-      <li>Space: Hard drop (instant)</li>
-      <li>On mobile: tap left/right/bottom of board</li>
+      <li data-i18n-en="Left/Right arrows: Move piece sideways" data-i18n-zh="左右方向键：左右移动">Left/Right arrows: Move piece sideways</li>
+      <li data-i18n-en="Down arrow: Soft drop (faster)" data-i18n-zh="下方向键：软降（加速）">Down arrow: Soft drop (faster)</li>
+      <li data-i18n-en="Up arrow: Rotate piece" data-i18n-zh="上方向键：旋转">Up arrow: Rotate piece</li>
+      <li data-i18n-en="Space: Hard drop (instant)" data-i18n-zh="空格：硬降（瞬间落下）">Space: Hard drop (instant)</li>
+      <li data-i18n-en="On mobile: tap left/right/bottom of board" data-i18n-zh="手机端：点击棋盘左/右/下方">On mobile: tap left/right/bottom of board</li>
     </ul>
   </div>
 </div>

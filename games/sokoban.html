@@ -7,6 +7,7 @@
 <meta name="description" content="Play Sokoban puzzle game online for free. Push boxes to target spots. Think before you move! No download needed.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/sokoban.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <style>
   .soko-grid { display: grid; gap: 0; }
   .soko-cell { width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
@@ -24,34 +25,34 @@
 </script>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Sokoban</h1>
-    <a href="../index.html" class="game-back">← All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Moves</div><div class="stat-value" id="moves">0</div></div>
-    <div class="stat-box"><div class="stat-label">Level</div><div class="stat-value" id="level">1</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.moves">Moves</div><div class="stat-value" id="moves">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.level">Level</div><div class="stat-value" id="level">1</div></div>
   </div>
   <div class="game-board">
     <div class="soko-grid" id="grid"></div>
     <div class="game-overlay hidden" id="overlay">
       <h2>Level Complete!</h2>
       <p id="overlay-text"></p>
-      <button class="btn" id="next-btn" onclick="nextLevel()">Next Level</button>
+      <button class="btn" id="next-btn" onclick="nextLevel()" data-i18n-en="Next Level" data-i18n-zh="下一关">Next Level</button>
     </div>
   </div>
   <div class="game-controls">
-    <button class="btn" onclick="resetLevel()">Reset Level</button>
+    <button class="btn" onclick="resetLevel()" data-i18n-en="Reset Level" data-i18n-zh="重置关卡">Reset Level</button>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>Use Arrow keys or WASD to move the blue player</li>
-      <li>Push brown boxes onto the star targets</li>
-      <li>You can only push, never pull — plan ahead!</li>
-      <li>Place all boxes on targets to complete the level</li>
+      <li data-i18n-en="Use Arrow keys or WASD to move the blue player" data-i18n-zh="用方向键或 WASD 移动蓝色角色">Use Arrow keys or WASD to move the blue player</li>
+      <li data-i18n-en="Push brown boxes onto the star targets" data-i18n-zh="将棕色箱子推到星标目标上">Push brown boxes onto the star targets</li>
+      <li data-i18n-en="You can only push, never pull — plan ahead!" data-i18n-zh="只能推不能拉——提前规划！">You can only push, never pull — plan ahead!</li>
+      <li data-i18n-en="Place all boxes on targets to complete the level" data-i18n-zh="将所有箱子放到目标上即可通关">Place all boxes on targets to complete the level</li>
     </ul>
   </div>
 </div>

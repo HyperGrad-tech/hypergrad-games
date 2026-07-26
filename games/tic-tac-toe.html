@@ -7,6 +7,7 @@
 <meta name="description" content="Play Tic-Tac-Toe online for free against an unbeatable AI using minimax algorithm. Choose difficulty levels. No download needed.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/tic-tac-toe.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <style>
   .ttt-grid { display: grid; grid-template-columns: repeat(3, 100px); grid-template-rows: repeat(3, 100px); gap: 6px; background: var(--border); padding: 6px; border-radius: 8px; }
   .ttt-cell { background: var(--bg-elevated); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 48px; font-weight: 700; cursor: pointer; transition: background 0.1s; }
@@ -40,35 +41,35 @@
   </script>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Tic-Tac-Toe</h1>
-    <a href="../index.html" class="game-back">← All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Wins</div><div class="stat-value" id="wins">0</div></div>
-    <div class="stat-box"><div class="stat-label">Draws</div><div class="stat-value" id="draws">0</div></div>
-    <div class="stat-box"><div class="stat-label">Losses</div><div class="stat-value" id="losses">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Wins" data-i18n-zh="胜">Wins</div><div class="stat-value" id="wins">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Draws" data-i18n-zh="平">Draws</div><div class="stat-value" id="draws">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Losses" data-i18n-zh="负">Losses</div><div class="stat-value" id="losses">0</div></div>
   </div>
   <div class="game-board">
     <div class="ttt-grid" id="grid"></div>
     <div class="game-overlay hidden" id="overlay">
-      <h2 id="overlay-title">Draw!</h2>
-      <button class="btn" onclick="newGame()">Play Again</button>
+      <h2 id="overlay-title" data-i18n-en="Draw!" data-i18n-zh="平局！">Draw!</h2>
+      <button class="btn" onclick="newGame()" data-i18n-en="Play Again" data-i18n-zh="再玩一次">Play Again</button>
     </div>
   </div>
   <div class="game-controls">
-    <button class="btn" onclick="newGame()">New Game</button>
+    <button class="btn" onclick="newGame()" data-i18n-en="New Game" data-i18n-zh="新游戏">New Game</button>
     <button class="btn btn-secondary" id="diff-btn" onclick="toggleDiff()">Difficulty: Unbeatable</button>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>You are X, the AI is O</li>
-      <li>Click any empty cell to place your mark</li>
-      <li>Get three in a row (horizontally, vertically, or diagonally) to win</li>
-      <li>Unbeatable mode uses the minimax algorithm — best you can do is draw!</li>
+      <li data-i18n-en="You are X, the AI is O" data-i18n-zh="你是 X，AI 是 O">You are X, the AI is O</li>
+      <li data-i18n-en="Click any empty cell to place your mark" data-i18n-zh="点击任意空格落子">Click any empty cell to place your mark</li>
+      <li data-i18n-en="Get three in a row (horizontally, vertically, or diagonally) to win" data-i18n-zh="三子连成一线（横、竖、斜）即可获胜">Get three in a row (horizontally, vertically, or diagonally) to win</li>
+      <li data-i18n-en="Unbeatable mode uses the minimax algorithm — best you can do is draw!" data-i18n-zh="无敌模式使用极小化极大算法——你最多只能平局！">Unbeatable mode uses the minimax algorithm — best you can do is draw!</li>
     </ul>
   </div>
 </div>

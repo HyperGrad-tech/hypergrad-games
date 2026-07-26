@@ -7,6 +7,7 @@
 <meta name="description" content="Play Nim online for free. Remove objects from piles in this classic mathematical strategy game. Play vs AI with optimal strategy. No download needed.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/nim.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <style>
   .nim-piles { display: flex; flex-direction: column; gap: 16px; align-items: center; padding: 20px 0; }
   .nim-pile { display: flex; gap: 6px; align-items: center; }
@@ -23,36 +24,36 @@
 </script>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Nim</h1>
-    <a href="../index.html" class="game-back">&larr; All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Last Winner</div><div class="stat-value" id="last-winner" style="font-size:16px;">-</div></div>
-    <div class="stat-box"><div class="stat-label">Mode</div><div class="stat-value" id="mode-display" style="font-size:14px;">Misère</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Last Winner" data-i18n-zh="上一局">Last Winner</div><div class="stat-value" id="last-winner" style="font-size:16px;">-</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Mode" data-i18n-zh="模式">Mode</div><div class="stat-value" id="mode-display" style="font-size:14px;">Misère</div></div>
   </div>
   <div class="game-board" style="flex-direction:column;">
     <div class="nim-status" id="status">Your turn - select sticks then click Remove</div>
     <div class="nim-piles" id="piles"></div>
     <div class="game-overlay hidden" id="overlay">
       <h2 id="overlay-title"></h2>
-      <button class="btn" onclick="newGame()">Play Again</button>
+      <button class="btn" onclick="newGame()" data-i18n-en="Play Again" data-i18n-zh="再玩一次">Play Again</button>
     </div>
   </div>
   <div class="game-controls">
-    <button class="btn" id="remove-btn" onclick="removeSticks()" disabled>Remove Selected</button>
+    <button class="btn" id="remove-btn" onclick="removeSticks()" disabled data-i18n-en="Remove Selected" data-i18n-zh="移除选中">Remove Selected</button>
     <button class="btn btn-secondary" onclick="newGame()">New Game</button>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>This is Misère Nim - the player who takes the LAST stick LOSES</li>
-      <li>On your turn, remove 1 or more sticks from a single pile</li>
-      <li>Click sticks to select them (all from the same pile)</li>
-      <li>Click "Remove Selected" to confirm your move</li>
-      <li>The AI plays optimally - can you find a winning strategy?</li>
+      <li data-i18n-en="This is Misère Nim - the player who takes the LAST stick LOSES" data-i18n-zh="这是逆势尼姆——拿到最后一根火柴的人输">This is Misère Nim - the player who takes the LAST stick LOSES</li>
+      <li data-i18n-en="On your turn, remove 1 or more sticks from a single pile" data-i18n-zh="轮到你时，从一堆中拿走 1 根或更多火柴">On your turn, remove 1 or more sticks from a single pile</li>
+      <li data-i18n-en="Click sticks to select them (all from the same pile)" data-i18n-zh="点击火柴来选择（必须来自同一堆）">Click sticks to select them (all from the same pile)</li>
+      <li data-i18n-en="Click &quot;Remove Selected&quot; to confirm your move" data-i18n-zh="点击&quot;移除选中&quot;确认你的操作">Click "Remove Selected" to confirm your move</li>
+      <li data-i18n-en="The AI plays optimally - can you find a winning strategy?" data-i18n-zh="AI 会最优策略——你能找到必胜法吗？">The AI plays optimally - can you find a winning strategy?</li>
     </ul>
   </div>
 </div>

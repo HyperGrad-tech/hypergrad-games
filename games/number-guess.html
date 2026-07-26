@@ -7,6 +7,7 @@
 <meta name="description" content="Play Number Guess - a free online number guessing game. Find the secret number in minimum tries with hints. Easy to play, hard to master. No download needed.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/number-guess.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <style>
   .ng-display { font-size: 120px; font-weight: 900; text-align: center; line-height: 1; padding: 20px 0; min-height: 200px; display: flex; align-items: center; justify-content: center; flex-direction: column; }
   .ng-hint { font-size: 18px; color: var(--text-muted); text-align: center; margin-bottom: 16px; min-height: 28px; }
@@ -30,23 +31,23 @@
 </script>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Number Guess</h1>
-    <a href="../index.html" class="game-back">&larr; All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Tries</div><div class="stat-value" id="tries">0</div></div>
-    <div class="stat-box"><div class="stat-label">Best Score</div><div class="stat-value" id="best">-</div></div>
-    <div class="stat-box"><div class="stat-label">Range</div><div class="stat-value" id="range-display" style="font-size:16px;">1 - 100</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Tries" data-i18n-zh="尝试">Tries</div><div class="stat-value" id="tries">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Best Score" data-i18n-zh="最佳">Best Score</div><div class="stat-value" id="best">-</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Range" data-i18n-zh="范围">Range</div><div class="stat-value" id="range-display" style="font-size:16px;">1 - 100</div></div>
   </div>
   <div class="game-board" style="flex-direction:column;">
     <div class="ng-display" id="display">?</div>
     <div class="ng-hint" id="hint">Guess a number between 1 and 100</div>
     <div class="ng-input-row">
       <input type="number" class="ng-input" id="guess-input" min="1" max="100" placeholder="?" onkeydown="if(event.key==='Enter')submitGuess()">
-      <button class="btn" onclick="submitGuess()">Guess</button>
+      <button class="btn" onclick="submitGuess()" data-i18n-en="Guess" data-i18n-zh="猜一猜">Guess</button>
     </div>
     <div class="ng-range"><span id="range-low">1</span><span id="range-high">100</span></div>
     <div class="ng-history">
@@ -56,20 +57,20 @@
     <div class="game-overlay hidden" id="overlay" style="position:absolute;">
       <h2 id="overlay-title">You Got It!</h2>
       <p id="overlay-text"></p>
-      <button class="btn" onclick="newGame()">Play Again</button>
+      <button class="btn" onclick="newGame()" data-i18n-en="Play Again" data-i18n-zh="再玩一次">Play Again</button>
     </div>
   </div>
   <div class="game-controls">
-    <button class="btn" onclick="newGame()">New Game</button>
+    <button class="btn" onclick="newGame()" data-i18n-en="New Game" data-i18n-zh="新游戏">New Game</button>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>The game picks a secret number between 1 and 100</li>
-      <li>Enter your guess and press Enter or click Guess</li>
-      <li>You'll get a hint: too high, too low, or correct!</li>
-      <li>Try to find the number in as few tries as possible</li>
-      <li>Your best score is saved in your browser</li>
+      <li data-i18n-en="The game picks a secret number between 1 and 100" data-i18n-zh="游戏会选一个 1 到 100 之间的神秘数字">The game picks a secret number between 1 and 100</li>
+      <li data-i18n-en="Enter your guess and press Enter or click Guess" data-i18n-zh="输入你的猜测，按回车或点击猜一猜">Enter your guess and press Enter or click Guess</li>
+      <li data-i18n-en="You'll get a hint: too high, too low, or correct!" data-i18n-zh="你会得到提示：太大了、太小了、或猜对了！">You'll get a hint: too high, too low, or correct!</li>
+      <li data-i18n-en="Try to find the number in as few tries as possible" data-i18n-zh="尽量用最少的次数找到数字">Try to find the number in as few tries as possible</li>
+      <li data-i18n-en="Your best score is saved in your browser" data-i18n-zh="你的最佳成绩会保存在浏览器中">Your best score is saved in your browser</li>
     </ul>
   </div>
 </div>

@@ -7,6 +7,7 @@
 <meta name="description" content="Play 2048 Cupcakes online for free. A delicious twist on 2048 - merge cupcakes to discover new flavors! No download, works on mobile and desktop.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/2048-cupcakes.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -43,34 +44,34 @@
 </style>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="../index.html" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="../index.html" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">2048 Cupcakes</h1>
-    <a href="../index.html" class="game-back">← All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Score</div><div class="stat-value" id="score">0</div></div>
-    <div class="stat-box"><div class="stat-label">Best</div><div class="stat-value" id="best">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.score">Score</div><div class="stat-value" id="score">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.best">Best</div><div class="stat-value" id="best">0</div></div>
   </div>
   <div class="game-board">
     <div class="game-grid grid-cup" id="grid"></div>
     <div class="game-overlay hidden" id="overlay">
-      <h2 id="overlay-title">Game Over!</h2>
-      <p id="overlay-text">Press New Game to try again</p>
-      <button class="btn" onclick="newGame()">New Game</button>
+      <h2 id="overlay-title" data-i18n-en="Game Over!" data-i18n-zh="游戏结束！">Game Over!</h2>
+      <p id="overlay-text" data-i18n-en="Press New Game to try again" data-i18n-zh="点击新游戏重新开始">Press New Game to try again</p>
+      <button class="btn" onclick="newGame()" data-i18n-en="New Game" data-i18n-zh="新游戏">New Game</button>
     </div>
   </div>
   <div class="game-controls">
-    <button class="btn" onclick="newGame()">New Game</button>
+    <button class="btn" onclick="newGame()" data-i18n-en="New Game" data-i18n-zh="新游戏">New Game</button>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>Use Arrow keys (or swipe) to move all tiles</li>
-      <li>When two tiles with the same cupcake touch, they merge into one</li>
-      <li>Each merge reveals a new cupcake flavor!</li>
-      <li>Reach the final cupcake to win! Keep going for higher scores</li>
+      <li data-i18n-en="Use Arrow keys (or swipe) to move all tiles" data-i18n-zh="用方向键（或滑动）移动所有方块">Use Arrow keys (or swipe) to move all tiles</li>
+      <li data-i18n-en="When two tiles with the same cupcake touch, they merge into one" data-i18n-zh="两个相同纸杯蛋糕的方块碰到一起时，会合并为一个">When two tiles with the same cupcake touch, they merge into one</li>
+      <li data-i18n-en="Each merge reveals a new cupcake flavor!" data-i18n-zh="每次合并都会解锁新的纸杯蛋糕口味！">Each merge reveals a new cupcake flavor!</li>
+      <li data-i18n-en="Reach the final cupcake to win! Keep going for higher scores" data-i18n-zh="合成最终纸杯蛋糕即可获胜！继续挑战更高分数">Reach the final cupcake to win! Keep going for higher scores</li>
     </ul>
   </div>
 </div>

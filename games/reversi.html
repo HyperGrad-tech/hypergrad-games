@@ -7,6 +7,7 @@
 <meta name="description" content="Play Reversi (Othello) online for free against an AI opponent. Place pieces to flip your opponent's discs. Simple rules, deep strategy. No download needed.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/reversi.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <style>
   .rv-board { display: grid; grid-template-columns: repeat(8, 48px); grid-template-rows: repeat(8, 48px); border: 3px solid var(--border); border-radius: 4px; overflow: hidden; background: #2D5F3F; }
   .rv-cell { display: flex; align-items: center; justify-content: center; cursor: pointer; background: #3A7050; border: 1px solid #2D5F3F; }
@@ -22,36 +23,36 @@
 </script>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Reversi</h1>
-    <a href="../index.html" class="game-back">&larr; All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Black (You)</div><div class="stat-value" id="black-count">2</div></div>
-    <div class="stat-box"><div class="stat-label">White (AI)</div><div class="stat-value" id="white-count">2</div></div>
-    <div class="stat-box"><div class="stat-label">Turn</div><div class="stat-value" id="turn" style="font-size:16px;">Your Move</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Black (You)" data-i18n-zh="黑（你）">Black (You)</div><div class="stat-value" id="black-count">2</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="White (AI)" data-i18n-zh="白（AI）">White (AI)</div><div class="stat-value" id="white-count">2</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Turn" data-i18n-zh="回合">Turn</div><div class="stat-value" id="turn" style="font-size:16px;">Your Move</div></div>
   </div>
   <div class="game-board">
     <div class="rv-board" id="board"></div>
     <div class="game-overlay hidden" id="overlay">
-      <h2 id="overlay-title">You Win!</h2>
-      <button class="btn" onclick="newGame()">Play Again</button>
+      <h2 id="overlay-title" data-i18n-en="You Win!" data-i18n-zh="你赢了！">You Win!</h2>
+      <button class="btn" onclick="newGame()" data-i18n-en="Play Again" data-i18n-zh="再玩一次">Play Again</button>
     </div>
   </div>
   <div class="game-controls">
-    <button class="btn" onclick="newGame()">New Game</button>
+    <button class="btn" onclick="newGame()" data-i18n-en="New Game" data-i18n-zh="新游戏">New Game</button>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>You are Black, the AI is White. Black moves first.</li>
-      <li>Click on a highlighted green dot to place your disc</li>
-      <li>You must place your disc so it flanks one or more opponent discs in a straight line</li>
-      <li>All flanked opponent discs flip to your color</li>
-      <li>If you have no valid moves, your turn is skipped</li>
-      <li>Game ends when neither player can move. Most discs wins!</li>
+      <li data-i18n-en="You are Black, the AI is White. Black moves first." data-i18n-zh="你是黑方，AI 是白方。黑方先走。">You are Black, the AI is White. Black moves first.</li>
+      <li data-i18n-en="Click on a highlighted green dot to place your disc" data-i18n-zh="点击高亮的绿点来落子">Click on a highlighted green dot to place your disc</li>
+      <li data-i18n-en="You must place your disc so it flanks one or more opponent discs in a straight line" data-i18n-zh="落子时必须能在直线上夹住一颗或多颗对手棋子">You must place your disc so it flanks one or more opponent discs in a straight line</li>
+      <li data-i18n-en="All flanked opponent discs flip to your color" data-i18n-zh="被夹住的对手棋子全部翻转为你的颜色">All flanked opponent discs flip to your color</li>
+      <li data-i18n-en="If you have no valid moves, your turn is skipped" data-i18n-zh="如果没有有效走法，则跳过你的回合">If you have no valid moves, your turn is skipped</li>
+      <li data-i18n-en="Game ends when neither player can move. Most discs wins!" data-i18n-zh="双方都无法走时结束。棋子多者获胜！">Game ends when neither player can move. Most discs wins!</li>
     </ul>
   </div>
 </div>

@@ -7,6 +7,7 @@
 <meta name="description" content="Play Connect Four online for free against an AI opponent. Drop discs and get four in a row to win. No download needed.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/connect4.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <style>
   .c4-board { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; background: var(--primary); padding: 8px; border-radius: 8px; width: 420px; }
   .c4-cell { width: 56px; height: 56px; background: var(--bg); border-radius: 50%; cursor: pointer; transition: background 0.1s; }
@@ -39,34 +40,34 @@
   </script>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Connect Four</h1>
-    <a href="../index.html" class="game-back">← All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Wins</div><div class="stat-value" id="wins">0</div></div>
-    <div class="stat-box"><div class="stat-label">Draws</div><div class="stat-value" id="draws">0</div></div>
-    <div class="stat-box"><div class="stat-label">Losses</div><div class="stat-value" id="losses">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Wins" data-i18n-zh="胜">Wins</div><div class="stat-value" id="wins">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Draws" data-i18n-zh="平">Draws</div><div class="stat-value" id="draws">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Losses" data-i18n-zh="负">Losses</div><div class="stat-value" id="losses">0</div></div>
   </div>
   <div class="game-board">
     <div class="c4-board" id="board"></div>
     <div class="game-overlay hidden" id="overlay">
-      <h2 id="overlay-title">Draw!</h2>
-      <button class="btn" onclick="newGame()">Play Again</button>
+      <h2 id="overlay-title" data-i18n-en="Draw!" data-i18n-zh="平局！">Draw!</h2>
+      <button class="btn" onclick="newGame()" data-i18n-en="Play Again" data-i18n-zh="再玩一次">Play Again</button>
     </div>
   </div>
   <div class="game-controls">
-    <button class="btn" onclick="newGame()">New Game</button>
+    <button class="btn" onclick="newGame()" data-i18n-en="New Game" data-i18n-zh="新游戏">New Game</button>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>You are Red, the AI is Yellow</li>
-      <li>Click a column to drop your disc</li>
-      <li>Get four discs in a row (horizontal, vertical, or diagonal) to win</li>
-      <li>The AI uses a minimax algorithm with alpha-beta pruning for a tough challenge</li>
+      <li data-i18n-en="You are Red, the AI is Yellow" data-i18n-zh="你是红方，AI 是黄方">You are Red, the AI is Yellow</li>
+      <li data-i18n-en="Click a column to drop your disc" data-i18n-zh="点击某一列放下你的棋子">Click a column to drop your disc</li>
+      <li data-i18n-en="Get four discs in a row (horizontal, vertical, or diagonal) to win" data-i18n-zh="连成四子一线（横、竖、斜）即可获胜">Get four discs in a row (horizontal, vertical, or diagonal) to win</li>
+      <li data-i18n-en="The AI uses a minimax algorithm with alpha-beta pruning for a tough challenge" data-i18n-zh="AI 使用极小化极大算法加阿尔法-贝塔剪枝，挑战性十足">The AI uses a minimax algorithm with alpha-beta pruning for a tough challenge</li>
     </ul>
   </div>
 </div>

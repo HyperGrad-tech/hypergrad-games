@@ -7,6 +7,7 @@
 <meta name="description" content="Play Simon Says memory game online for free. Watch the color sequence and repeat it back. How long can you go? No download needed.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/simon.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <style>
   .simon-board { width: 320px; height: 320px; position: relative; border-radius: 50%; overflow: hidden; }
   .simon-pad { position: absolute; width: 50%; height: 50%; opacity: 0.6; cursor: pointer; transition: opacity 0.1s; display: flex; align-items: center; justify-content: center; }
@@ -41,15 +42,15 @@
   </script>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Simon Says</h1>
-    <a href="../index.html" class="game-back">← All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Round</div><div class="stat-value" id="round">0</div></div>
-    <div class="stat-box"><div class="stat-label">Best</div><div class="stat-value" id="best">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Round" data-i18n-zh="轮次">Round</div><div class="stat-value" id="round">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.best">Best</div><div class="stat-value" id="best">0</div></div>
   </div>
   <div class="game-board">
     <div class="simon-board" id="board">
@@ -62,19 +63,19 @@
     <div class="game-overlay hidden" id="overlay">
       <h2>Game Over!</h2>
       <p id="overlay-text"></p>
-      <button class="btn" onclick="startGame()">Play Again</button>
+      <button class="btn" onclick="startGame()" data-i18n-en="Play Again" data-i18n-zh="再玩一次">Play Again</button>
     </div>
   </div>
   <div class="game-controls">
-    <button class="btn" onclick="startGame()">Start</button>
+    <button class="btn" onclick="startGame()" data-i18n-en="Start" data-i18n-zh="开始">Start</button>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>Press Start to begin</li>
-      <li>Watch the sequence of flashing colors</li>
-      <li>Repeat the sequence by clicking the pads in the same order</li>
-      <li>Each round adds one more step. How far can you go?</li>
+      <li data-i18n-en="Press Start to begin" data-i18n-zh="按开始键启动">Press Start to begin</li>
+      <li data-i18n-en="Watch the sequence of flashing colors" data-i18n-zh="观察闪烁的颜色顺序">Watch the sequence of flashing colors</li>
+      <li data-i18n-en="Repeat the sequence by clicking the pads in the same order" data-i18n-zh="按相同顺序点击色块来重复序列">Repeat the sequence by clicking the pads in the same order</li>
+      <li data-i18n-en="Each round adds one more step. How far can you go?" data-i18n-zh="每轮增加一步。你能走多远？">Each round adds one more step. How far can you go?</li>
     </ul>
   </div>
 </div>

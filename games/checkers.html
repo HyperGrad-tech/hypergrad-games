@@ -7,6 +7,7 @@
 <meta name="description" content="Play Checkers (Draughts) online for free against an AI opponent. Jump and capture pieces to win. No download needed.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/checkers.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <style>
   .ck-board { display: grid; grid-template-columns: repeat(8, 48px); grid-template-rows: repeat(8, 48px); border: 3px solid var(--border); border-radius: 4px; overflow: hidden; }
   .ck-cell { display: flex; align-items: center; justify-content: center; cursor: pointer; }
@@ -25,36 +26,36 @@
 </script>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Checkers</h1>
-    <a href="../index.html" class="game-back">← All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Your Pieces</div><div class="stat-value" id="red-count">12</div></div>
-    <div class="stat-box"><div class="stat-label">AI Pieces</div><div class="stat-value" id="black-count">12</div></div>
-    <div class="stat-box"><div class="stat-label">Turn</div><div class="stat-value" id="turn" style="font-size:16px;">Your Move</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Your Pieces" data-i18n-zh="你的棋子">Your Pieces</div><div class="stat-value" id="red-count">12</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="AI Pieces" data-i18n-zh="AI 棋子">AI Pieces</div><div class="stat-value" id="black-count">12</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Turn" data-i18n-zh="回合">Turn</div><div class="stat-value" id="turn" style="font-size:16px;">Your Move</div></div>
   </div>
   <div class="game-board">
     <div class="ck-board" id="board"></div>
     <div class="game-overlay hidden" id="overlay">
-      <h2 id="overlay-title">You Win!</h2>
-      <button class="btn" onclick="newGame()">Play Again</button>
+      <h2 id="overlay-title" data-i18n-en="You Win!" data-i18n-zh="你赢了！">You Win!</h2>
+      <button class="btn" onclick="newGame()" data-i18n-en="Play Again" data-i18n-zh="再玩一次">Play Again</button>
     </div>
   </div>
   <div class="game-controls">
-    <button class="btn" onclick="newGame()">New Game</button>
+    <button class="btn" onclick="newGame()" data-i18n-en="New Game" data-i18n-zh="新游戏">New Game</button>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>You are Red, the AI is Black</li>
-      <li>Click your piece, then click a valid square to move</li>
-      <li>Pieces move diagonally forward on dark squares</li>
-      <li>Jump over enemy pieces to capture them (mandatory if available)</li>
-      <li>Reach the far row to become a King (can move backwards too)</li>
-      <li>Capture all enemy pieces to win!</li>
+      <li data-i18n-en="You are Red, the AI is Black" data-i18n-zh="你是红方，AI 是黑方">You are Red, the AI is Black</li>
+      <li data-i18n-en="Click your piece, then click a valid square to move" data-i18n-zh="点击你的棋子，再点击有效格子来移动">Click your piece, then click a valid square to move</li>
+      <li data-i18n-en="Pieces move diagonally forward on dark squares" data-i18n-zh="棋子沿深色格子斜向前移动">Pieces move diagonally forward on dark squares</li>
+      <li data-i18n-en="Jump over enemy pieces to capture them (mandatory if available)" data-i18n-zh="跳过敌方棋子可吃掉它（如有跳吃必须跳）">Jump over enemy pieces to capture them (mandatory if available)</li>
+      <li data-i18n-en="Reach the far row to become a King (can move backwards too)" data-i18n-zh="到达对方底线升变为王（可向后移动）">Reach the far row to become a King (can move backwards too)</li>
+      <li data-i18n-en="Capture all enemy pieces to win!" data-i18n-zh="吃掉所有敌方棋子即可获胜！">Capture all enemy pieces to win!</li>
     </ul>
   </div>
 </div>

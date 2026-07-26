@@ -7,6 +7,7 @@
 <meta name="description" content="Test your reaction speed online for free. Click as fast as you can when the screen turns green. See your best time and challenge friends!">
 <link rel="canonical" href="https://games.hypergrad.cn/games/reaction-test.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <style>
   .reaction-area { width: 100%; max-width: 500px; height: 400px; border-radius: var(--radius); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; font-size: 28px; font-weight: 700; text-align: center; padding: 20px; transition: background 0.05s; user-select: none; }
   .reaction-area.idle { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text); }
@@ -43,16 +44,16 @@
   </script>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Reaction Time Test</h1>
-    <a href="../index.html" class="game-back">← All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Last</div><div class="stat-value" id="last">--</div></div>
-    <div class="stat-box"><div class="stat-label">Best</div><div class="stat-value" id="best">--</div></div>
-    <div class="stat-box"><div class="stat-label">Avg</div><div class="stat-value" id="avg">--</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Last" data-i18n-zh="上次">Last</div><div class="stat-value" id="last">--</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.best">Best</div><div class="stat-value" id="best">--</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Avg" data-i18n-zh="平均">Avg</div><div class="stat-value" id="avg">--</div></div>
   </div>
   <div class="game-board">
     <div class="reaction-area idle" id="area">
@@ -62,13 +63,13 @@
   </div>
   <div class="history" id="history"></div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>Click the box to start</li>
-      <li>Wait for the box to turn green</li>
-      <li>Click as fast as you can when it turns green</li>
-      <li>Don't click too early — wait for green!</li>
-      <li>See your reaction time in milliseconds</li>
+      <li data-i18n-en="Click the box to start" data-i18n-zh="点击方框开始">Click the box to start</li>
+      <li data-i18n-en="Wait for the box to turn green" data-i18n-zh="等待方框变绿">Wait for the box to turn green</li>
+      <li data-i18n-en="Click as fast as you can when it turns green" data-i18n-zh="变绿后尽快点击">Click as fast as you can when it turns green</li>
+      <li data-i18n-en="Don't click too early — wait for green!" data-i18n-zh="不要点太早——等变绿再点！">Don't click too early — wait for green!</li>
+      <li data-i18n-en="See your reaction time in milliseconds" data-i18n-zh="查看你的反应时间（毫秒）">See your reaction time in milliseconds</li>
     </ul>
   </div>
 </div>

@@ -7,6 +7,7 @@
 <meta name="description" content="Play the classic Minesweeper game online for free. Use logic and deduction to clear the minefield. No download needed.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/minesweeper.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <style>
   .ms-grid { display: inline-grid; grid-template-columns: repeat(9, 32px); grid-template-rows: repeat(9, 32px); gap: 1px; background: var(--border); padding: 1px; border-radius: 4px; }
   .ms-cell { background: var(--bg-elevated); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; cursor: pointer; user-select: none; border-radius: 2px; transition: background 0.1s; }
@@ -48,29 +49,29 @@
   </script>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Minesweeper</h1>
-    <a href="../index.html" class="game-back">← All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Mines</div><div class="stat-value" id="mines">10</div></div>
-    <div class="stat-box"><div class="stat-label">Time</div><div class="stat-value" id="time">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Mines" data-i18n-zh="雷数">Mines</div><div class="stat-value" id="mines">10</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.time">Time</div><div class="stat-value" id="time">0</div></div>
   </div>
   <div class="game-board">
     <div class="ms-grid" id="grid"></div>
   </div>
   <div class="game-controls">
-    <button class="btn" onclick="newGame()">New Game</button>
+    <button class="btn" onclick="newGame()" data-i18n-en="New Game" data-i18n-zh="新游戏">New Game</button>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>Left-click a cell to reveal it</li>
-      <li>Right-click (or long-press on mobile) to flag a mine</li>
-      <li>Numbers show how many mines are adjacent</li>
-      <li>Reveal all safe cells to win</li>
+      <li data-i18n-en="Left-click a cell to reveal it" data-i18n-zh="左键点击格子可翻开">Left-click a cell to reveal it</li>
+      <li data-i18n-en="Right-click (or long-press on mobile) to flag a mine" data-i18n-zh="右键点击（手机长按）可标记地雷">Right-click (or long-press on mobile) to flag a mine</li>
+      <li data-i18n-en="Numbers show how many mines are adjacent" data-i18n-zh="数字表示周围有多少颗地雷">Numbers show how many mines are adjacent</li>
+      <li data-i18n-en="Reveal all safe cells to win" data-i18n-zh="翻开所有安全格即可获胜">Reveal all safe cells to win</li>
     </ul>
   </div>
 </div>

@@ -7,6 +7,7 @@
 <meta name="description" content="Play Tower of Hanoi online for free. Move all disks from the left peg to the right peg. Classic mathematical puzzle. No download needed.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/tower-of-hanoi.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <style>
   .hanoi-area { display: flex; justify-content: space-around; align-items: flex-end; width: 100%; max-width: 480px; height: 280px; margin: 0 auto; position: relative; }
   .hanoi-peg { display: flex; flex-direction: column-reverse; align-items: center; width: 33%; height: 100%; position: relative; cursor: pointer; }
@@ -24,16 +25,16 @@
 </script>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Tower of Hanoi</h1>
-    <a href="../index.html" class="game-back">&larr; All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Moves</div><div class="stat-value" id="moves">0</div></div>
-    <div class="stat-box"><div class="stat-label">Optimal</div><div class="stat-value" id="optimal">15</div></div>
-    <div class="stat-box"><div class="stat-label">Disks</div><div class="stat-value" id="disk-count">4</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.moves">Moves</div><div class="stat-value" id="moves">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Optimal" data-i18n-zh="最优">Optimal</div><div class="stat-value" id="optimal">15</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Disks" data-i18n-zh="盘数">Disks</div><div class="stat-value" id="disk-count">4</div></div>
   </div>
   <div class="game-board" style="padding:16px;">
     <div class="hanoi-area" id="hanoi-area">
@@ -44,7 +45,7 @@
     <div class="game-overlay hidden" id="overlay">
       <h2 id="overlay-title">Solved!</h2>
       <p id="overlay-text"></p>
-      <button class="btn" onclick="newGame()">Play Again</button>
+      <button class="btn" onclick="newGame()" data-i18n-en="Play Again" data-i18n-zh="再玩一次">Play Again</button>
     </div>
   </div>
   <div class="game-controls">
@@ -55,16 +56,16 @@
       <option value="6">6 Disks</option>
       <option value="7">7 Disks</option>
     </select>
-    <button class="btn" onclick="newGame()">New Game</button>
+    <button class="btn" onclick="newGame()" data-i18n-en="New Game" data-i18n-zh="新游戏">New Game</button>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>Click a peg to select the top disk, then click another peg to move it</li>
-      <li>Only one disk can be moved at a time</li>
-      <li>A larger disk can never be placed on a smaller disk</li>
-      <li>Move all disks from the left peg to the right peg to win</li>
-      <li>Try to solve in the minimum number of moves!</li>
+      <li data-i18n-en="Click a peg to select the top disk, then click another peg to move it" data-i18n-zh="点击柱子选中顶部圆盘，再点另一根柱子移动">Click a peg to select the top disk, then click another peg to move it</li>
+      <li data-i18n-en="Only one disk can be moved at a time" data-i18n-zh="每次只能移动一个圆盘">Only one disk can be moved at a time</li>
+      <li data-i18n-en="A larger disk can never be placed on a smaller disk" data-i18n-zh="大圆盘不能放在小圆盘上">A larger disk can never be placed on a smaller disk</li>
+      <li data-i18n-en="Move all disks from the left peg to the right peg to win" data-i18n-zh="将所有圆盘从左柱移到右柱即可获胜">Move all disks from the left peg to the right peg to win</li>
+      <li data-i18n-en="Try to solve in the minimum number of moves!" data-i18n-zh="尽量用最少的步数完成！">Try to solve in the minimum number of moves!</li>
     </ul>
   </div>
 </div>

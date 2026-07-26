@@ -7,6 +7,7 @@
 <meta name="description" content="Play Mastermind online for free. Crack the secret color code in this classic logic puzzle. No download, works on mobile and desktop.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/mastermind.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -40,15 +41,15 @@
 </style>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="../index.html" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="../index.html" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Mastermind</h1>
-    <a href="../index.html" class="game-back">← All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Round</div><div class="stat-value" id="round">1</div></div>
-    <div class="stat-box"><div class="stat-label">Max</div><div class="stat-value">10</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Round" data-i18n-zh="轮次">Round</div><div class="stat-value" id="round">1</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.max">Max</div><div class="stat-value">10</div></div>
   </div>
   <div class="game-board">
     <div class="mm-board" id="board"></div>
@@ -57,16 +58,16 @@
     <div class="mm-picker" id="picker"></div>
   </div>
   <div class="game-controls" style="margin-top:12px;">
-    <button class="btn" onclick="submitGuess()">Submit Guess</button>
+    <button class="btn" onclick="submitGuess()" data-i18n-en="Submit Guess" data-i18n-zh="提交猜测">Submit Guess</button>
     <button class="btn btn-secondary" onclick="newGame()">New Game</button>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>Click color buttons below to fill the 4 pegs in the current row</li>
-      <li>Click a peg to cycle its color, or click again to clear</li>
-      <li>Green dot = right color, right position. Orange dot = right color, wrong position</li>
-      <li>Crack the code in 10 rounds or fewer to win</li>
+      <li data-i18n-en="Click color buttons below to fill the 4 pegs in the current row" data-i18n-zh="点击下方颜色按钮来填满当前行的 4 个孔">Click color buttons below to fill the 4 pegs in the current row</li>
+      <li data-i18n-en="Click a peg to cycle its color, or click again to clear" data-i18n-zh="点击孔可切换颜色，再点一次可清除">Click a peg to cycle its color, or click again to clear</li>
+      <li data-i18n-en="Green dot = right color, right position. Orange dot = right color, wrong position" data-i18n-zh="绿点 = 颜色位置都对。橙点 = 颜色对位置错">Green dot = right color, right position. Orange dot = right color, wrong position</li>
+      <li data-i18n-en="Crack the code in 10 rounds or fewer to win" data-i18n-zh="在 10 轮以内破解密码即可获胜">Crack the code in 10 rounds or fewer to win</li>
     </ul>
   </div>
 </div>

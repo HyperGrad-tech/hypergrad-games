@@ -7,6 +7,7 @@
 <meta name="description" content="Play Wordle online for free. Guess the hidden 5-letter word in 6 tries. Color hints guide you. No download needed.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/wordle.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <style>
   .wordle-grid { display: grid; grid-template-rows: repeat(6, 56px); gap: 6px; }
   .wordle-row { display: grid; grid-template-columns: repeat(5, 56px); gap: 6px; }
@@ -49,16 +50,16 @@
   </script>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Wordle</h1>
-    <a href="../index.html" class="game-back">← All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Attempt</div><div class="stat-value" id="attempt">1/6</div></div>
-    <div class="stat-box"><div class="stat-label">Won</div><div class="stat-value" id="won">0</div></div>
-    <div class="stat-box"><div class="stat-label">Played</div><div class="stat-value" id="played">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Attempt" data-i18n-zh="尝试">Attempt</div><div class="stat-value" id="attempt">1/6</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Won" data-i18n-zh="已胜">Won</div><div class="stat-value" id="won">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Played" data-i18n-zh="已玩">Played</div><div class="stat-value" id="played">0</div></div>
   </div>
   <div class="game-board" style="flex-direction:column;">
     <div class="wordle-grid" id="grid"></div>
@@ -66,13 +67,13 @@
     <div class="game-overlay hidden" id="overlay">
       <h2 id="overlay-title">Got it!</h2>
       <p id="overlay-text">The word was: </p>
-      <button class="btn" onclick="newGame()">Play Again</button>
+      <button class="btn" onclick="newGame()" data-i18n-en="Play Again" data-i18n-zh="再玩一次">Play Again</button>
     </div>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>Guess the hidden 5-letter word in 6 tries</li>
+      <li data-i18n-en="Guess the hidden 5-letter word in 6 tries" data-i18n-zh="在 6 次内猜出隐藏的 5 字母单词">Guess the hidden 5-letter word in 6 tries</li>
       <li><span style="color:var(--success);font-weight:700">Green</span> = correct letter, correct spot</li>
       <li><span style="color:var(--accent);font-weight:700">Yellow</span> = correct letter, wrong spot</li>
       <li><span style="color:var(--text-dim);font-weight:700">Gray</span> = letter not in word</li>

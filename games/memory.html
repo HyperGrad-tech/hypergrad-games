@@ -7,6 +7,7 @@
 <meta name="description" content="Play Memory Match online for free. Flip cards and find all matching pairs. Test your memory and improve focus. No download needed.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/memory.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <style>
   .mem-grid { display: grid; grid-template-columns: repeat(4, 80px); gap: 10px; }
   .mem-card { width: 80px; height: 80px; perspective: 600px; cursor: pointer; }
@@ -42,35 +43,35 @@
   </script>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Memory Match</h1>
-    <a href="../index.html" class="game-back">← All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Moves</div><div class="stat-value" id="moves">0</div></div>
-    <div class="stat-box"><div class="stat-label">Pairs</div><div class="stat-value" id="pairs">0/8</div></div>
-    <div class="stat-box"><div class="stat-label">Time</div><div class="stat-value" id="time">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.moves">Moves</div><div class="stat-value" id="moves">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.pairs">Pairs</div><div class="stat-value" id="pairs">0/8</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.time">Time</div><div class="stat-value" id="time">0</div></div>
   </div>
   <div class="game-board">
     <div class="mem-grid" id="grid"></div>
     <div class="game-overlay hidden" id="overlay">
       <h2>You Win!</h2>
       <p id="overlay-text"></p>
-      <button class="btn" onclick="newGame()">Play Again</button>
+      <button class="btn" onclick="newGame()" data-i18n-en="Play Again" data-i18n-zh="再玩一次">Play Again</button>
     </div>
   </div>
   <div class="game-controls">
-    <button class="btn" onclick="newGame()">New Game</button>
+    <button class="btn" onclick="newGame()" data-i18n-en="New Game" data-i18n-zh="新游戏">New Game</button>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>Click cards to flip them over</li>
-      <li>Find all 8 matching pairs of emojis</li>
-      <li>Matched pairs stay face-up</li>
-      <li>Try to win in as few moves as possible</li>
+      <li data-i18n-en="Click cards to flip them over" data-i18n-zh="点击卡片翻面">Click cards to flip them over</li>
+      <li data-i18n-en="Find all 8 matching pairs of emojis" data-i18n-zh="找出全部 8 对相同的表情">Find all 8 matching pairs of emojis</li>
+      <li data-i18n-en="Matched pairs stay face-up" data-i18n-zh="配对成功的卡片保持正面">Matched pairs stay face-up</li>
+      <li data-i18n-en="Try to win in as few moves as possible" data-i18n-zh="尽量用最少的翻牌次数完成">Try to win in as few moves as possible</li>
     </ul>
   </div>
 </div>

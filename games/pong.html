@@ -7,36 +7,37 @@
 <meta name="description" content="Play Pong online for free against an AI opponent. The classic arcade game in your browser. No download needed.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/pong.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"VideoGame","name":"Pong","description":"Play Pong online for free against an AI opponent. The classic arcade game in your browser.","url":"https://games.hypergrad.cn/games/pong.html","genre":"Arcade","gamePlatform":"Web Browser","applicationCategory":"Game","operatingSystem":"Any (Web Browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"HyperGrad"}}
 </script>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Pong</h1>
-    <a href="../index.html" class="game-back">← All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">You</div><div class="stat-value" id="pscore">0</div></div>
-    <div class="stat-box"><div class="stat-label">AI</div><div class="stat-value" id="ascore">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="You" data-i18n-zh="你">You</div><div class="stat-value" id="pscore">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="AI" data-i18n-zh="AI">AI</div><div class="stat-value" id="ascore">0</div></div>
   </div>
   <div class="game-board">
     <canvas id="canvas" width="500" height="350"></canvas>
     <div class="game-overlay" id="overlay">
       <h2 id="overlay-title">Pong</h2>
       <p id="overlay-text">First to 7 wins</p>
-      <button class="btn" onclick="startGame()">Start</button>
+      <button class="btn" onclick="startGame()" data-i18n-en="Start" data-i18n-zh="开始">Start</button>
     </div>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>Move mouse or touch to control your paddle (left side)</li>
-      <li>First to 7 points wins the match</li>
-      <li>The ball speeds up with each paddle hit</li>
-      <li>Don't let the ball pass your paddle!</li>
+      <li data-i18n-en="Move mouse or touch to control your paddle (left side)" data-i18n-zh="移动鼠标或触摸来控制你的挡板（左侧）">Move mouse or touch to control your paddle (left side)</li>
+      <li data-i18n-en="First to 7 points wins the match" data-i18n-zh="先得 7 分者获胜">First to 7 points wins the match</li>
+      <li data-i18n-en="The ball speeds up with each paddle hit" data-i18n-zh="球速随每次击球加快">The ball speeds up with each paddle hit</li>
+      <li data-i18n-en="Don't let the ball pass your paddle!" data-i18n-zh="不要让球越过你的挡板！">Don't let the ball pass your paddle!</li>
     </ul>
   </div>
 </div>

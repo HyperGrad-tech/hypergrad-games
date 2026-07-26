@@ -7,6 +7,7 @@
 <meta name="description" content="Play Dice Roll online for free. Yahtzee-style dice game. Roll 5 dice, hold and reroll, score combos. Best score wins. No download needed.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/dice-roll.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <style>
   .dr-dice-row { display: flex; gap: 16px; justify-content: center; margin: 20px 0; }
   .dr-die { width: 64px; height: 64px; background: var(--bg-elevated); border: 2px solid var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; cursor: pointer; transition: all 0.3s; position: relative; }
@@ -32,42 +33,42 @@
 </script>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Dice Roll</h1>
-    <a href="../index.html" class="game-back">&larr; All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Total Score</div><div class="stat-value" id="total">0</div></div>
-    <div class="stat-box"><div class="stat-label">Best</div><div class="stat-value" id="best">0</div></div>
-    <div class="stat-box"><div class="stat-label">Round</div><div class="stat-value" id="round">1/13</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Total Score" data-i18n-zh="总分">Total Score</div><div class="stat-value" id="total">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.best">Best</div><div class="stat-value" id="best">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Round" data-i18n-zh="轮次">Round</div><div class="stat-value" id="round">1/13</div></div>
   </div>
   <div class="game-board" style="flex-direction:column;padding:20px;">
     <div class="dr-dice-row" id="dice-row"></div>
     <div class="dr-rolls-left" id="rolls-left">Rolls left: 3</div>
     <div class="game-controls" style="margin-top:0;">
-      <button class="btn" id="roll-btn" onclick="rollDice()">Roll Dice</button>
+      <button class="btn" id="roll-btn" onclick="rollDice()" data-i18n-en="Roll Dice" data-i18n-zh="掷骰子">Roll Dice</button>
     </div>
     <div class="dr-scorecard">
       <h3>Score Categories</h3>
       <div class="dr-categories" id="categories"></div>
     </div>
     <div class="game-overlay hidden" id="overlay">
-      <h2 id="overlay-title">Game Over</h2>
+      <h2 id="overlay-title" data-i18n-en="Game Over" data-i18n-zh="游戏结束">Game Over</h2>
       <p id="overlay-text"></p>
-      <button class="btn" onclick="newGame()">Play Again</button>
+      <button class="btn" onclick="newGame()" data-i18n-en="Play Again" data-i18n-zh="再玩一次">Play Again</button>
     </div>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>Click Roll Dice to roll 5 dice</li>
-      <li>Click individual dice to hold them (locked dice won't reroll)</li>
-      <li>You get up to 3 rolls per turn</li>
-      <li>After rolling, click a score category to score your dice</li>
-      <li>Each category can only be used once per game</li>
-      <li>13 rounds total - try to maximize your score!</li>
+      <li data-i18n-en="Click Roll Dice to roll 5 dice" data-i18n-zh="点击掷骰子来投掷 5 个骰子">Click Roll Dice to roll 5 dice</li>
+      <li data-i18n-en="Click individual dice to hold them (locked dice won't reroll)" data-i18n-zh="点击单个骰子可锁定（锁定的骰子不会重投）">Click individual dice to hold them (locked dice won't reroll)</li>
+      <li data-i18n-en="You get up to 3 rolls per turn" data-i18n-zh="每轮最多投 3 次">You get up to 3 rolls per turn</li>
+      <li data-i18n-en="After rolling, click a score category to score your dice" data-i18n-zh="投完后点击记分类别来记分">After rolling, click a score category to score your dice</li>
+      <li data-i18n-en="Each category can only be used once per game" data-i18n-zh="每个类别每局只能使用一次">Each category can only be used once per game</li>
+      <li data-i18n-en="13 rounds total - try to maximize your score!" data-i18n-zh="共 13 轮——尽量拿高分！">13 rounds total - try to maximize your score!</li>
     </ul>
   </div>
 </div>

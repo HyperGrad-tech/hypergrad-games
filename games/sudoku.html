@@ -7,6 +7,7 @@
 <meta name="description" content="Play Sudoku online for free. Fill the 9x9 grid with numbers 1-9. Multiple difficulty levels. No download, no registration needed.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/sudoku.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <style>
   .sudoku-board { display: grid; grid-template-columns: repeat(9, 42px); grid-template-rows: repeat(9, 42px); gap: 0; border: 3px solid var(--primary); border-radius: 6px; overflow: hidden; background: var(--bg-card); }
   .su-cell { display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 500; cursor: pointer; transition: background 0.1s; border: 1px solid var(--border); position: relative; }
@@ -43,23 +44,23 @@
   </script>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Sudoku</h1>
-    <a href="../index.html" class="game-back">← All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Time</div><div class="stat-value" id="time">0:00</div></div>
-    <div class="stat-box"><div class="stat-label">Mistakes</div><div class="stat-value" id="mistakes">0</div></div>
-    <div class="stat-box"><div class="stat-label">Difficulty</div><div class="stat-value" id="diff">Easy</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.time">Time</div><div class="stat-value" id="time">0:00</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.mistakes">Mistakes</div><div class="stat-value" id="mistakes">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.difficulty">Difficulty</div><div class="stat-value" id="diff">Easy</div></div>
   </div>
   <div class="game-board">
     <div class="sudoku-board" id="board"></div>
     <div class="game-overlay hidden" id="overlay">
       <h2 id="overlay-title">Solved!</h2>
       <p id="overlay-text">Well done!</p>
-      <button class="btn" onclick="newGame()">New Game</button>
+      <button class="btn" onclick="newGame()" data-i18n-en="New Game" data-i18n-zh="新游戏">New Game</button>
     </div>
   </div>
   <div class="num-pad">
@@ -75,18 +76,18 @@
     <button class="num-btn" onclick="inputNum(0)">✕</button>
   </div>
   <div class="game-controls">
-    <button class="btn" onclick="newGame()">New Game</button>
+    <button class="btn" onclick="newGame()" data-i18n-en="New Game" data-i18n-zh="新游戏">New Game</button>
     <button class="btn btn-secondary" onclick="setDifficulty('easy')">Easy</button>
     <button class="btn btn-secondary" onclick="setDifficulty('medium')">Medium</button>
     <button class="btn btn-secondary" onclick="setDifficulty('hard')">Hard</button>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>Click a cell to select it, then click a number to fill it in</li>
-      <li>Each row, column, and 3x3 box must contain 1-9 with no repeats</li>
-      <li>Given numbers (white) are fixed, your numbers (blue) can be changed</li>
-      <li>Click ✕ to erase a number you entered</li>
+      <li data-i18n-en="Click a cell to select it, then click a number to fill it in" data-i18n-zh="点击格子选中，再点击数字填入">Click a cell to select it, then click a number to fill it in</li>
+      <li data-i18n-en="Each row, column, and 3x3 box must contain 1-9 with no repeats" data-i18n-zh="每行、每列、每个 3x3 宫格必须包含 1-9 且不重复">Each row, column, and 3x3 box must contain 1-9 with no repeats</li>
+      <li data-i18n-en="Given numbers (white) are fixed, your numbers (blue) can be changed" data-i18n-zh="白底数字为已知不可改，蓝底数字可修改">Given numbers (white) are fixed, your numbers (blue) can be changed</li>
+      <li data-i18n-en="Click ✕ to erase a number you entered" data-i18n-zh="点击 ✕ 可清除你填入的数字">Click ✕ to erase a number you entered</li>
     </ul>
   </div>
 </div>

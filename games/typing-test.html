@@ -7,6 +7,7 @@
 <meta name="description" content="Test your typing speed online for free. Measure WPM and accuracy. Improve your typing skills with real-time feedback. No download needed.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/typing-test.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <style>
   .typing-area { width: 100%; max-width: 600px; }
   .typing-text { font-size: 22px; line-height: 1.8; color: var(--text-dim); font-family: monospace; user-select: none; min-height: 120px; }
@@ -21,16 +22,16 @@
 </script>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Typing Test</h1>
-    <a href="../index.html" class="game-back">← All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">WPM</div><div class="stat-value" id="wpm">0</div></div>
-    <div class="stat-box"><div class="stat-label">Accuracy</div><div class="stat-value" id="acc">100%</div></div>
-    <div class="stat-box"><div class="stat-label">Time</div><div class="stat-value" id="time">60</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.wpm">WPM</div><div class="stat-value" id="wpm">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.accuracy">Accuracy</div><div class="stat-value" id="acc">100%</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.time">Time</div><div class="stat-value" id="time">60</div></div>
   </div>
   <div class="game-board" style="flex-direction:column;align-items:stretch;">
     <div class="typing-area">
@@ -40,16 +41,16 @@
     <div class="game-overlay hidden" id="overlay">
       <h2>Test Complete!</h2>
       <p id="overlay-text"></p>
-      <button class="btn" onclick="newGame()">Try Again</button>
+      <button class="btn" onclick="newGame()" data-i18n-en="Try Again" data-i18n-zh="再试一次">Try Again</button>
     </div>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>Click the input box and start typing the text shown above</li>
-      <li>You have 60 seconds to type as much as you can</li>
-      <li>WPM (Words Per Minute) and accuracy are tracked live</li>
-      <li>Type accurately — wrong characters are marked red</li>
+      <li data-i18n-en="Click the input box and start typing the text shown above" data-i18n-zh="点击输入框，开始输入上方显示的文字">Click the input box and start typing the text shown above</li>
+      <li data-i18n-en="You have 60 seconds to type as much as you can" data-i18n-zh="你有 60 秒时间尽可能多打字">You have 60 seconds to type as much as you can</li>
+      <li data-i18n-en="WPM (Words Per Minute) and accuracy are tracked live" data-i18n-zh="实时追踪每分钟字数和准确率">WPM (Words Per Minute) and accuracy are tracked live</li>
+      <li data-i18n-en="Type accurately — wrong characters are marked red" data-i18n-zh="准确输入——错误字符会标红">Type accurately — wrong characters are marked red</li>
     </ul>
   </div>
 </div>

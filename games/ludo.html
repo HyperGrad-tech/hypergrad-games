@@ -7,6 +7,7 @@
 <meta name="description" content="Play Ludo online for free. Classic board race game for 1-4 players. Roll dice, move tokens, reach home first to win. No download, works on mobile and desktop.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/ludo.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -28,38 +29,38 @@
 </style>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="../index.html" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#card">Board</a><a href="../index.html#strategy">Strategy</a><a href="../index.html#puzzle">Puzzle</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="../index.html" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#card">Board</a><a href="../index.html#strategy">Strategy</a><a href="../index.html#puzzle">Puzzle</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Ludo</h1>
-    <a href="../index.html" class="game-back">← All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Turn</div><div class="stat-value" id="turn">Red</div></div>
-    <div class="stat-box"><div class="stat-label">Dice</div><div class="stat-value" id="dice">-</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Turn" data-i18n-zh="回合">Turn</div><div class="stat-value" id="turn">Red</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.dice">Dice</div><div class="stat-value" id="dice">-</div></div>
   </div>
   <div class="game-board">
     <canvas id="c" class="ludo-canvas" width="420" height="420"></canvas>
   </div>
   <div class="ludo-msg" id="msg">Click "Roll Dice" to start</div>
   <div class="game-controls">
-    <button class="btn" onclick="rollDice()">Roll Dice</button>
+    <button class="btn" onclick="rollDice()" data-i18n-en="Roll Dice" data-i18n-zh="掷骰子">Roll Dice</button>
     <button class="btn btn-secondary" onclick="newGame()">New Game</button>
   </div>
   <div class="game-overlay hidden" id="overlay">
-    <h2 id="overlay-title">Game Over!</h2>
+    <h2 id="overlay-title" data-i18n-en="Game Over!" data-i18n-zh="游戏结束！">Game Over!</h2>
     <p id="overlay-text"></p>
-    <button class="btn" onclick="newGame()">New Game</button>
+    <button class="btn" onclick="newGame()" data-i18n-en="New Game" data-i18n-zh="新游戏">New Game</button>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
       <li><b>Goal:</b> Move all 4 of your tokens from base to the center Home</li>
       <li>You play <span style="color:#EF4444;">Red</span>, AI plays Yellow, Green, Blue</li>
-      <li>Roll a 6 to move a token out of base. Roll again on a 6</li>
-      <li>Move tokens along the path. Landing on opponent sends them back to base</li>
-      <li>Click a token after rolling to move it (when movable tokens glow)</li>
-      <li>Safe squares (star) protect tokens from capture</li>
+      <li data-i18n-en="Roll a 6 to move a token out of base. Roll again on a 6" data-i18n-zh="掷出 6 才能将棋子移出基地。掷 6 可再掷一次">Roll a 6 to move a token out of base. Roll again on a 6</li>
+      <li data-i18n-en="Move tokens along the path. Landing on opponent sends them back to base" data-i18n-zh="沿路径移动棋子。落到对手棋子上可将其送回基地">Move tokens along the path. Landing on opponent sends them back to base</li>
+      <li data-i18n-en="Click a token after rolling to move it (when movable tokens glow)" data-i18n-zh="掷骰后点击棋子移动（可移动的棋子会发光）">Click a token after rolling to move it (when movable tokens glow)</li>
+      <li data-i18n-en="Safe squares (star) protect tokens from capture" data-i18n-zh="安全格（星标）保护棋子不被吃掉">Safe squares (star) protect tokens from capture</li>
     </ul>
   </div>
 </div>

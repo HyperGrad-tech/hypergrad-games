@@ -7,6 +7,7 @@
 <meta name="description" content="Play Word Search online for free. Find hidden words in a grid of letters. Multiple themes and difficulty levels. No download needed.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/word-search.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <style>
   .ws-grid { display: grid; grid-template-columns: repeat(12, 32px); gap: 1px; background: var(--border); padding: 1px; border-radius: 8px; margin: 0 auto; width: fit-content; }
   .ws-cell { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: var(--bg-card); color: var(--text); font-size: 14px; font-weight: 600; cursor: pointer; text-transform: uppercase; user-select: none; -webkit-user-select: none; transition: background 0.15s; }
@@ -24,16 +25,16 @@
 </script>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Word Search</h1>
-    <a href="../index.html" class="game-back">&larr; All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Found</div><div class="stat-value" id="found-count">0</div></div>
-    <div class="stat-box"><div class="stat-label">Total</div><div class="stat-value" id="total-count">10</div></div>
-    <div class="stat-box"><div class="stat-label">Time</div><div class="stat-value" id="timer" style="font-size:16px;">0:00</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Found" data-i18n-zh="已找到">Found</div><div class="stat-value" id="found-count">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Total" data-i18n-zh="总计">Total</div><div class="stat-value" id="total-count">10</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.time">Time</div><div class="stat-value" id="timer" style="font-size:16px;">0:00</div></div>
   </div>
   <div class="game-board" style="flex-direction:column;padding:16px;">
     <div class="ws-grid" id="grid"></div>
@@ -44,19 +45,19 @@
     <div class="game-overlay hidden" id="overlay">
       <h2>You Win!</h2>
       <p id="overlay-text"></p>
-      <button class="btn" onclick="newGame()">Play Again</button>
+      <button class="btn" onclick="newGame()" data-i18n-en="Play Again" data-i18n-zh="再玩一次">Play Again</button>
     </div>
   </div>
   <div class="game-controls">
-    <button class="btn" onclick="newGame()">New Puzzle</button>
+    <button class="btn" onclick="newGame()" data-i18n-en="New Puzzle" data-i18n-zh="新谜题">New Puzzle</button>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>Click and drag from the first letter to the last letter of a word</li>
-      <li>Words can be horizontal, vertical, or diagonal</li>
-      <li>Words can be forwards or backwards</li>
-      <li>Find all hidden words to win!</li>
+      <li data-i18n-en="Click and drag from the first letter to the last letter of a word" data-i18n-zh="从单词首字母点击并拖动到末字母">Click and drag from the first letter to the last letter of a word</li>
+      <li data-i18n-en="Words can be horizontal, vertical, or diagonal" data-i18n-zh="单词可横向、纵向或斜向排列">Words can be horizontal, vertical, or diagonal</li>
+      <li data-i18n-en="Words can be forwards or backwards" data-i18n-zh="单词可正向或反向">Words can be forwards or backwards</li>
+      <li data-i18n-en="Find all hidden words to win!" data-i18n-zh="找到所有隐藏单词即可获胜！">Find all hidden words to win!</li>
     </ul>
   </div>
 </div>

@@ -7,6 +7,7 @@
 <meta name="description" content="Play Color Match game online for free. Test your color perception. Match the target color by mixing RGB. No download needed.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/color-match.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <style>
   .color-board { display: flex; gap: 20px; align-items: center; justify-content: center; flex-wrap: wrap; }
   .color-box { width: 150px; height: 150px; border-radius: 12px; border: 2px solid var(--border); }
@@ -25,16 +26,16 @@
 </script>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Color Match</h1>
-    <a href="../index.html" class="game-back">← All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Round</div><div class="stat-value" id="round">1</div></div>
-    <div class="stat-box"><div class="stat-label">Score</div><div class="stat-value" id="score">0</div></div>
-    <div class="stat-box"><div class="stat-label">Best</div><div class="stat-value" id="best">--</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Round" data-i18n-zh="轮次">Round</div><div class="stat-value" id="round">1</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.score">Score</div><div class="stat-value" id="score">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.best">Best</div><div class="stat-value" id="best">--</div></div>
   </div>
   <div class="game-board" style="flex-direction:column;gap:16px;">
     <div class="color-board">
@@ -48,22 +49,22 @@
     </div>
     <div class="accuracy-display" id="accuracy">--%</div>
     <div class="game-controls">
-      <button class="btn" onclick="checkMatch()">Submit</button>
+      <button class="btn" onclick="checkMatch()" data-i18n-en="Submit" data-i18n-zh="提交">Submit</button>
       <button class="btn btn-secondary" onclick="newGame()">New Round</button>
     </div>
     <div class="game-overlay hidden" id="overlay">
       <h2 id="overlay-title">Perfect!</h2>
       <p id="overlay-text"></p>
-      <button class="btn" onclick="nextRound()">Next Round</button>
+      <button class="btn" onclick="nextRound()" data-i18n-en="Next Round" data-i18n-zh="下一轮">Next Round</button>
     </div>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>Match the target color by adjusting the R, G, B sliders</li>
-      <li>The closer your color is to the target, the higher your score</li>
-      <li>Click Submit to lock in your guess</li>
-      <li>Aim for 95%+ accuracy for bonus points!</li>
+      <li data-i18n-en="Match the target color by adjusting the R, G, B sliders" data-i18n-zh="调节 R、G、B 滑块来匹配目标颜色">Match the target color by adjusting the R, G, B sliders</li>
+      <li data-i18n-en="The closer your color is to the target, the higher your score" data-i18n-zh="颜色越接近目标，得分越高">The closer your color is to the target, the higher your score</li>
+      <li data-i18n-en="Click Submit to lock in your guess" data-i18n-zh="点击提交锁定你的答案">Click Submit to lock in your guess</li>
+      <li data-i18n-en="Aim for 95%+ accuracy for bonus points!" data-i18n-zh="达到 95% 以上准确率可获得奖励分！">Aim for 95%+ accuracy for bonus points!</li>
     </ul>
   </div>
 </div>

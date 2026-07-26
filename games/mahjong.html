@@ -7,6 +7,7 @@
 <meta name="description" content="Play Mahjong Solitaire online for free. Match pairs of identical tiles to clear the board. Classic Chinese matching puzzle. No download, works on mobile and desktop.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/mahjong.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -36,35 +37,35 @@
 </style>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="../index.html" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#card">Board</a><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="../index.html" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#card">Board</a><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Mahjong</h1>
-    <a href="../index.html" class="game-back">← All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Tiles Left</div><div class="stat-value" id="left">144</div></div>
-    <div class="stat-box"><div class="stat-label">Pairs</div><div class="stat-value" id="pairs">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.tiles">Tiles Left</div><div class="stat-value" id="left">144</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.pairs">Pairs</div><div class="stat-value" id="pairs">0</div></div>
   </div>
   <div class="game-board" style="min-height:auto;overflow:visible;">
     <div class="mj-board" id="board"></div>
   </div>
   <div class="game-controls">
-    <button class="btn" onclick="newGame()">New Game</button>
+    <button class="btn" onclick="newGame()" data-i18n-en="New Game" data-i18n-zh="新游戏">New Game</button>
     <button class="btn btn-secondary" onclick="hint()">Hint</button>
   </div>
   <div class="game-overlay hidden" id="overlay">
-    <h2 id="overlay-title">Game Over!</h2>
+    <h2 id="overlay-title" data-i18n-en="Game Over!" data-i18n-zh="游戏结束！">Game Over!</h2>
     <p id="overlay-text"></p>
-    <button class="btn" onclick="newGame()">New Game</button>
+    <button class="btn" onclick="newGame()" data-i18n-en="New Game" data-i18n-zh="新游戏">New Game</button>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>Click two identical tiles to remove them as a pair</li>
+      <li data-i18n-en="Click two identical tiles to remove them as a pair" data-i18n-zh="点击两个相同的牌即可配对消除">Click two identical tiles to remove them as a pair</li>
       <li>A tile can only be matched if it is <b>free</b>: no tile on top, and at least one side (left or right) is open</li>
-      <li>Clear all 144 tiles to win</li>
-      <li>Click Hint to find a valid match if you're stuck</li>
+      <li data-i18n-en="Clear all 144 tiles to win" data-i18n-zh="清除全部 144 张牌即可获胜">Clear all 144 tiles to win</li>
+      <li data-i18n-en="Click Hint to find a valid match if you're stuck" data-i18n-zh="卡住时点击提示可找到可配对的牌">Click Hint to find a valid match if you're stuck</li>
     </ul>
   </div>
 </div>

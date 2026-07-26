@@ -7,6 +7,7 @@
 <meta name="description" content="Play Breakout online for free. Bounce the ball, break all bricks, and clear every level. No download needed, works on mobile and desktop.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/breakout.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -31,35 +32,35 @@
   </script>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Breakout</h1>
-    <a href="../index.html" class="game-back">← All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Score</div><div class="stat-value" id="score">0</div></div>
-    <div class="stat-box"><div class="stat-label">Lives</div><div class="stat-value" id="lives">3</div></div>
-    <div class="stat-box"><div class="stat-label">Level</div><div class="stat-value" id="level">1</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.score">Score</div><div class="stat-value" id="score">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.lives">Lives</div><div class="stat-value" id="lives">3</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.level">Level</div><div class="stat-value" id="level">1</div></div>
   </div>
   <div class="game-board">
     <canvas id="canvas" width="480" height="400"></canvas>
     <div class="game-overlay hidden" id="overlay">
-      <h2 id="overlay-title">Game Over!</h2>
+      <h2 id="overlay-title" data-i18n-en="Game Over!" data-i18n-zh="游戏结束！">Game Over!</h2>
       <p id="overlay-text">Score: 0</p>
-      <button class="btn" onclick="startGame()">Play Again</button>
+      <button class="btn" onclick="startGame()" data-i18n-en="Play Again" data-i18n-zh="再玩一次">Play Again</button>
     </div>
   </div>
   <div class="game-controls">
-    <button class="btn" onclick="startGame()">New Game</button>
+    <button class="btn" onclick="startGame()" data-i18n-en="New Game" data-i18n-zh="新游戏">New Game</button>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>Move mouse or touch to control the paddle</li>
-      <li>Bounce the ball to break all bricks</li>
-      <li>Don't let the ball fall below the paddle</li>
-      <li>Clear all bricks to advance to the next level</li>
+      <li data-i18n-en="Move mouse or touch to control the paddle" data-i18n-zh="移动鼠标或触摸屏幕来控制挡板">Move mouse or touch to control the paddle</li>
+      <li data-i18n-en="Bounce the ball to break all bricks" data-i18n-zh="弹球击碎所有砖块">Bounce the ball to break all bricks</li>
+      <li data-i18n-en="Don't let the ball fall below the paddle" data-i18n-zh="不要让球掉到挡板下方">Don't let the ball fall below the paddle</li>
+      <li data-i18n-en="Clear all bricks to advance to the next level" data-i18n-zh="清除所有砖块即可进入下一关">Clear all bricks to advance to the next level</li>
     </ul>
   </div>
 </div>

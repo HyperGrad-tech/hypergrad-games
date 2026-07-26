@@ -7,6 +7,7 @@
 <meta name="description" content="Play Hangman online for free. Guess the hidden word letter by letter before the stickman is complete. No download needed.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/hangman.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <style>
   .hangman-svg { width: 200px; height: 250px; }
   .hangman-svg line, .hangman-svg circle { stroke: var(--text); stroke-width: 3; fill: none; }
@@ -24,16 +25,16 @@
 </script>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Hangman</h1>
-    <a href="../index.html" class="game-back">← All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Wrong</div><div class="stat-value" id="wrong">0/6</div></div>
-    <div class="stat-box"><div class="stat-label">Wins</div><div class="stat-value" id="wins">0</div></div>
-    <div class="stat-box"><div class="stat-label">Losses</div><div class="stat-value" id="losses">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Wrong" data-i18n-zh="错误">Wrong</div><div class="stat-value" id="wrong">0/6</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Wins" data-i18n-zh="胜">Wins</div><div class="stat-value" id="wins">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Losses" data-i18n-zh="负">Losses</div><div class="stat-value" id="losses">0</div></div>
   </div>
   <div class="game-board" style="flex-direction:column;gap:16px;">
     <svg class="hangman-svg" viewBox="0 0 200 250">
@@ -51,18 +52,18 @@
     <div class="word-display" id="word"></div>
     <div class="alpha-pad" id="alpha-pad"></div>
     <div class="game-overlay hidden" id="overlay">
-      <h2 id="overlay-title">You Win!</h2>
+      <h2 id="overlay-title" data-i18n-en="You Win!" data-i18n-zh="你赢了！">You Win!</h2>
       <p id="overlay-text"></p>
-      <button class="btn" onclick="newGame()">Play Again</button>
+      <button class="btn" onclick="newGame()" data-i18n-en="Play Again" data-i18n-zh="再玩一次">Play Again</button>
     </div>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>Click letters to guess the hidden word</li>
-      <li>Correct letters appear in the word</li>
-      <li>Wrong guesses add body parts to the stickman</li>
-      <li>Six wrong guesses and you lose!</li>
+      <li data-i18n-en="Click letters to guess the hidden word" data-i18n-zh="点击字母来猜测隐藏的单词">Click letters to guess the hidden word</li>
+      <li data-i18n-en="Correct letters appear in the word" data-i18n-zh="猜对的字母会显示在单词中">Correct letters appear in the word</li>
+      <li data-i18n-en="Wrong guesses add body parts to the stickman" data-i18n-zh="猜错会为火柴人添加身体部位">Wrong guesses add body parts to the stickman</li>
+      <li data-i18n-en="Six wrong guesses and you lose!" data-i18n-zh="猜错 6 次即失败！">Six wrong guesses and you lose!</li>
     </ul>
   </div>
 </div>

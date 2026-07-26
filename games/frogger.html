@@ -7,6 +7,7 @@
 <meta name="description" content="Play Frogger online for free. Guide the frog across the road and river. Classic arcade game in your browser. No download needed.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/frogger.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <style>
   canvas { display: block; border-radius: 8px; background: #1a1a2e; touch-action: none; }
 </style>
@@ -15,33 +16,33 @@
 </script>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Frogger</h1>
-    <a href="../index.html" class="game-back">&larr; All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Score</div><div class="stat-value" id="score">0</div></div>
-    <div class="stat-box"><div class="stat-label">Lives</div><div class="stat-value" id="lives">3</div></div>
-    <div class="stat-box"><div class="stat-label">Level</div><div class="stat-value" id="level">1</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.score">Score</div><div class="stat-value" id="score">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.lives">Lives</div><div class="stat-value" id="lives">3</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.level">Level</div><div class="stat-value" id="level">1</div></div>
   </div>
   <div class="game-board" style="padding:10px;">
     <canvas id="canvas" width="390" height="420"></canvas>
     <div class="game-overlay hidden" id="overlay">
-      <h2 id="overlay-title">Game Over</h2>
+      <h2 id="overlay-title" data-i18n-en="Game Over" data-i18n-zh="游戏结束">Game Over</h2>
       <p id="overlay-text"></p>
-      <button class="btn" onclick="newGame()">Play Again</button>
+      <button class="btn" onclick="newGame()" data-i18n-en="Play Again" data-i18n-zh="再玩一次">Play Again</button>
     </div>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>Use Arrow keys or WASD to hop the frog</li>
-      <li>Cross the road - avoid cars and trucks</li>
-      <li>Cross the river - jump on logs and lily pads</li>
-      <li>Reach each of the 5 home slots to complete the level</li>
-      <li>Don't fall in the water and don't get hit!</li>
+      <li data-i18n-en="Use Arrow keys or WASD to hop the frog" data-i18n-zh="用方向键或 WASD 让青蛙跳跃">Use Arrow keys or WASD to hop the frog</li>
+      <li data-i18n-en="Cross the road - avoid cars and trucks" data-i18n-zh="过马路——躲开汽车和卡车">Cross the road - avoid cars and trucks</li>
+      <li data-i18n-en="Cross the river - jump on logs and lily pads" data-i18n-zh="过河——跳到圆木和荷叶上">Cross the river - jump on logs and lily pads</li>
+      <li data-i18n-en="Reach each of the 5 home slots to complete the level" data-i18n-zh="到达 5 个家位即可通关">Reach each of the 5 home slots to complete the level</li>
+      <li data-i18n-en="Don't fall in the water and don't get hit!" data-i18n-zh="不要掉进水里，也不要被撞到！">Don't fall in the water and don't get hit!</li>
     </ul>
   </div>
 </div>

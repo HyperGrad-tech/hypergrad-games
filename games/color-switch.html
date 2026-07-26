@@ -7,6 +7,7 @@
 <meta name="description" content="Play Color Switch online for free. Tap to switch ball color and pass through matching obstacles. Addictive hyper-casual game. No download, works on mobile and desktop.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/color-switch.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -27,30 +28,30 @@
 </style>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="../index.html" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#arcade">Arcade</a><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="../index.html" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#arcade">Arcade</a><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Color Switch</h1>
-    <a href="../index.html" class="game-back">← All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Score</div><div class="stat-value" id="score">0</div></div>
-    <div class="stat-box"><div class="stat-label">Best</div><div class="stat-value" id="best">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.score">Score</div><div class="stat-value" id="score">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.best">Best</div><div class="stat-value" id="best">0</div></div>
   </div>
   <div class="game-board">
     <canvas id="c" class="cs-canvas" width="360" height="500"></canvas>
   </div>
   <div class="game-controls">
-    <button class="btn" onclick="startGame()">Start / Restart</button>
+    <button class="btn" onclick="startGame()" data-i18n-en="Start / Restart" data-i18n-zh="开始 / 重新开始">Start / Restart</button>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>Tap or click anywhere on the game area to switch your ball color</li>
-      <li>The ball cycles through 4 colors: Red, Yellow, Green, Blue</li>
-      <li>Pass through obstacles that match your ball's color</li>
-      <li>Hitting the wrong color or falling off = Game Over</li>
-      <li>The ball auto-moves up; obstacles scroll down</li>
+      <li data-i18n-en="Tap or click anywhere on the game area to switch your ball color" data-i18n-zh="点击或触摸游戏区域任意位置来切换球的颜色">Tap or click anywhere on the game area to switch your ball color</li>
+      <li data-i18n-en="The ball cycles through 4 colors: Red, Yellow, Green, Blue" data-i18n-zh="球在 4 种颜色间循环：红、黄、绿、蓝">The ball cycles through 4 colors: Red, Yellow, Green, Blue</li>
+      <li data-i18n-en="Pass through obstacles that match your ball's color" data-i18n-zh="穿过与球颜色相同的障碍物">Pass through obstacles that match your ball's color</li>
+      <li data-i18n-en="Hitting the wrong color or falling off = Game Over" data-i18n-zh="撞到错误颜色或掉落 = 游戏结束">Hitting the wrong color or falling off = Game Over</li>
+      <li data-i18n-en="The ball auto-moves up; obstacles scroll down" data-i18n-zh="球自动向上移动，障碍物向下滚动">The ball auto-moves up; obstacles scroll down</li>
     </ul>
   </div>
 </div>

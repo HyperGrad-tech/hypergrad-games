@@ -7,6 +7,7 @@
 <meta name="description" content="Play Mancala online for free against an AI opponent. Classic stone-counting strategy game. Simple to learn, deep strategy. No download needed.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/mancala.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <style>
   .mc-board { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 20px; }
   .mc-store { width: 50px; height: 180px; background: var(--bg-elevated); border: 2px solid var(--border); border-radius: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
@@ -25,16 +26,16 @@
 </script>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Mancala</h1>
-    <a href="../index.html" class="game-back">&larr; All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Your Store</div><div class="stat-value" id="p-score">0</div></div>
-    <div class="stat-box"><div class="stat-label">AI Store</div><div class="stat-value" id="a-score">0</div></div>
-    <div class="stat-box"><div class="stat-label">Turn</div><div class="stat-value" id="turn" style="font-size:16px;">Your Move</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Your Store" data-i18n-zh="你的仓库">Your Store</div><div class="stat-value" id="p-score">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="AI Store" data-i18n-zh="AI 仓库">AI Store</div><div class="stat-value" id="a-score">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Turn" data-i18n-zh="回合">Turn</div><div class="stat-value" id="turn" style="font-size:16px;">Your Move</div></div>
   </div>
   <div class="game-board" style="flex-direction:column;">
     <div class="mc-board">
@@ -54,22 +55,22 @@
     <div class="game-overlay hidden" id="overlay">
       <h2 id="overlay-title"></h2>
       <p id="overlay-text"></p>
-      <button class="btn" onclick="newGame()">Play Again</button>
+      <button class="btn" onclick="newGame()" data-i18n-en="Play Again" data-i18n-zh="再玩一次">Play Again</button>
     </div>
   </div>
   <div class="game-controls">
-    <button class="btn" onclick="newGame()">New Game</button>
+    <button class="btn" onclick="newGame()" data-i18n-en="New Game" data-i18n-zh="新游戏">New Game</button>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>You are the bottom row, AI is the top row</li>
-      <li>Click one of your pits to scoop all stones from it</li>
-      <li>Stones are distributed counterclockwise, one per pit</li>
-      <li>You skip the AI's store, AI skips yours</li>
-      <li>If the last stone lands in your store, you get another turn</li>
-      <li>If the last stone lands in an empty pit on your side, you capture it plus opposite pit stones</li>
-      <li>Game ends when one side is empty. Most stones wins!</li>
+      <li data-i18n-en="You are the bottom row, AI is the top row" data-i18n-zh="你是下方一行，AI 是上方一行">You are the bottom row, AI is the top row</li>
+      <li data-i18n-en="Click one of your pits to scoop all stones from it" data-i18n-zh="点击你的一个坑，取出里面所有石子">Click one of your pits to scoop all stones from it</li>
+      <li data-i18n-en="Stones are distributed counterclockwise, one per pit" data-i18n-zh="石子逆时针分发，每坑一颗">Stones are distributed counterclockwise, one per pit</li>
+      <li data-i18n-en="You skip the AI's store, AI skips yours" data-i18n-zh="你跳过 AI 的仓库，AI 跳过你的">You skip the AI's store, AI skips yours</li>
+      <li data-i18n-en="If the last stone lands in your store, you get another turn" data-i18n-zh="如果最后一颗石子落入你的仓库，可再走一步">If the last stone lands in your store, you get another turn</li>
+      <li data-i18n-en="If the last stone lands in an empty pit on your side, you capture it plus opposite pit stones" data-i18n-zh="如果最后一颗石子落入你方的空坑，你可获得该石子及对坑的石子">If the last stone lands in an empty pit on your side, you capture it plus opposite pit stones</li>
+      <li data-i18n-en="Game ends when one side is empty. Most stones wins!" data-i18n-zh="一方空了即结束。石子多者获胜！">Game ends when one side is empty. Most stones wins!</li>
     </ul>
   </div>
 </div>

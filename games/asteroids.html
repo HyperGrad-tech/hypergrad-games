@@ -7,6 +7,7 @@
 <meta name="description" content="Play Asteroids online for free. Pilot your spaceship, shoot asteroids and avoid collisions. Classic arcade space shooter in your browser. No download needed.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/asteroids.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <style>
   canvas { display: block; border-radius: 8px; background: #050510; cursor: crosshair; touch-action: none; }
 </style>
@@ -15,34 +16,34 @@
 </script>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Asteroids</h1>
-    <a href="../index.html" class="game-back">&larr; All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Score</div><div class="stat-value" id="score">0</div></div>
-    <div class="stat-box"><div class="stat-label">Lives</div><div class="stat-value" id="lives">3</div></div>
-    <div class="stat-box"><div class="stat-label">Wave</div><div class="stat-value" id="wave">1</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.score">Score</div><div class="stat-value" id="score">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.lives">Lives</div><div class="stat-value" id="lives">3</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Wave" data-i18n-zh="波次">Wave</div><div class="stat-value" id="wave">1</div></div>
   </div>
   <div class="game-board" style="padding:10px;">
     <canvas id="canvas" width="400" height="500"></canvas>
     <div class="game-overlay hidden" id="overlay">
-      <h2 id="overlay-title">Game Over</h2>
+      <h2 id="overlay-title" data-i18n-en="Game Over" data-i18n-zh="游戏结束">Game Over</h2>
       <p id="overlay-text"></p>
-      <button class="btn" onclick="newGame()">Play Again</button>
+      <button class="btn" onclick="newGame()" data-i18n-en="Play Again" data-i18n-zh="再玩一次">Play Again</button>
     </div>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>Use Arrow keys or WASD: Left/Right to rotate, Up to thrust</li>
-      <li>Press Space to shoot asteroids</li>
-      <li>Large asteroids split into medium, then small when shot</li>
-      <li>Small asteroids give the most points</li>
-      <li>Don't crash into asteroids - you have 3 lives</li>
-      <li>Clear all asteroids to advance to the next wave</li>
+      <li data-i18n-en="Use Arrow keys or WASD: Left/Right to rotate, Up to thrust" data-i18n-zh="用方向键或 WASD：左右键旋转，上键加速">Use Arrow keys or WASD: Left/Right to rotate, Up to thrust</li>
+      <li data-i18n-en="Press Space to shoot asteroids" data-i18n-zh="按空格键射击陨石">Press Space to shoot asteroids</li>
+      <li data-i18n-en="Large asteroids split into medium, then small when shot" data-i18n-zh="大陨石被击中后会分裂成中陨石，再分裂成小陨石">Large asteroids split into medium, then small when shot</li>
+      <li data-i18n-en="Small asteroids give the most points" data-i18n-zh="击毁小陨石得分最高">Small asteroids give the most points</li>
+      <li data-i18n-en="Don't crash into asteroids - you have 3 lives" data-i18n-zh="不要撞到陨石——你有 3 条命">Don't crash into asteroids - you have 3 lives</li>
+      <li data-i18n-en="Clear all asteroids to advance to the next wave" data-i18n-zh="清除所有陨石即可进入下一波">Clear all asteroids to advance to the next wave</li>
     </ul>
   </div>
 </div>

@@ -7,6 +7,7 @@
 <meta name="description" content="Play Gomoku (Five in a Row) online for free. Classic strategy board game vs AI. Place 5 stones in a row to win. No download, works on mobile and desktop.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/gomoku.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -33,34 +34,34 @@
 </style>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="../index.html" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#strategy">Strategy</a><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="../index.html" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#strategy">Strategy</a><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Gomoku (五子棋)</h1>
-    <a href="../index.html" class="game-back">← All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Turn</div><div class="stat-value" id="turn">You (Black)</div></div>
-    <div class="stat-box"><div class="stat-label">Moves</div><div class="stat-value" id="moves">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Turn" data-i18n-zh="回合">Turn</div><div class="stat-value" id="turn">You (Black)</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.moves">Moves</div><div class="stat-value" id="moves">0</div></div>
   </div>
   <div class="game-board">
     <div class="gomoku-board" id="board"></div>
   </div>
   <div class="game-controls">
-    <button class="btn" onclick="newGame()">New Game</button>
+    <button class="btn" onclick="newGame()" data-i18n-en="New Game" data-i18n-zh="新游戏">New Game</button>
   </div>
   <div class="game-overlay hidden" id="overlay">
-    <h2 id="overlay-title">Game Over!</h2>
+    <h2 id="overlay-title" data-i18n-en="Game Over!" data-i18n-zh="游戏结束！">Game Over!</h2>
     <p id="overlay-text"></p>
-    <button class="btn" onclick="newGame()">New Game</button>
+    <button class="btn" onclick="newGame()" data-i18n-en="New Game" data-i18n-zh="新游戏">New Game</button>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>You play Black, AI plays White. Click an intersection to place your stone</li>
-      <li>Get 5 stones in a row (horizontal, vertical, or diagonal) to win</li>
-      <li>Black goes first. The AI will try to block you and build its own lines</li>
-      <li>Click the board to place — works on desktop and mobile</li>
+      <li data-i18n-en="You play Black, AI plays White. Click an intersection to place your stone" data-i18n-zh="你执黑，AI 执白。点击交叉点落子">You play Black, AI plays White. Click an intersection to place your stone</li>
+      <li data-i18n-en="Get 5 stones in a row (horizontal, vertical, or diagonal) to win" data-i18n-zh="连成五子一线（横、竖、斜）即可获胜">Get 5 stones in a row (horizontal, vertical, or diagonal) to win</li>
+      <li data-i18n-en="Black goes first. The AI will try to block you and build its own lines" data-i18n-zh="黑先走。AI 会尝试阻挡你并构建自己的连线">Black goes first. The AI will try to block you and build its own lines</li>
+      <li data-i18n-en="Click the board to place — works on desktop and mobile" data-i18n-zh="点击棋盘落子——支持电脑和手机">Click the board to place — works on desktop and mobile</li>
     </ul>
   </div>
 </div>

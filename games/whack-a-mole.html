@@ -7,6 +7,7 @@
 <meta name="description" content="Play Whack-a-Mole online for free. Hit moles before they hide back in their holes. Fast reflexes win! No download needed.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/whack-a-mole.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <style>
   .mole-grid { display: grid; grid-template-columns: repeat(3, 100px); grid-template-rows: repeat(3, 100px); gap: 12px; }
   .mole-hole { background: radial-gradient(ellipse at center bottom, #4a3020 0%, #2D2D4A 60%, var(--bg-elevated) 100%); border-radius: 50%; overflow: hidden; position: relative; cursor: pointer; display: flex; align-items: flex-end; justify-content: center; }
@@ -39,35 +40,35 @@
   </script>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Whack-a-Mole</h1>
-    <a href="../index.html" class="game-back">← All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Score</div><div class="stat-value" id="score">0</div></div>
-    <div class="stat-box"><div class="stat-label">Time</div><div class="stat-value" id="time">30</div></div>
-    <div class="stat-box"><div class="stat-label">Best</div><div class="stat-value" id="best">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.score">Score</div><div class="stat-value" id="score">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.time">Time</div><div class="stat-value" id="time">30</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n="game.best">Best</div><div class="stat-value" id="best">0</div></div>
   </div>
   <div class="game-board">
     <div class="mole-grid" id="grid"></div>
     <div class="game-overlay hidden" id="overlay">
       <h2>Time's Up!</h2>
       <p id="overlay-text"></p>
-      <button class="btn" onclick="startGame()">Play Again</button>
+      <button class="btn" onclick="startGame()" data-i18n-en="Play Again" data-i18n-zh="再玩一次">Play Again</button>
     </div>
   </div>
   <div class="game-controls">
-    <button class="btn" onclick="startGame()">Start Game</button>
+    <button class="btn" onclick="startGame()" data-i18n-en="Start Game" data-i18n-zh="开始游戏">Start Game</button>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>Click Start to begin the 30-second round</li>
-      <li>Click moles as soon as they pop up</li>
-      <li>Each mole you hit scores one point</li>
-      <li>Be fast — moles don't stay up for long!</li>
+      <li data-i18n-en="Click Start to begin the 30-second round" data-i18n-zh="点击开始进入 30 秒回合">Click Start to begin the 30-second round</li>
+      <li data-i18n-en="Click moles as soon as they pop up" data-i18n-zh="地鼠一冒头就点击它">Click moles as soon as they pop up</li>
+      <li data-i18n-en="Each mole you hit scores one point" data-i18n-zh="每打中一只地鼠得一分">Each mole you hit scores one point</li>
+      <li data-i18n-en="Be fast — moles don't stay up for long!" data-i18n-zh="要快——地鼠不会停留太久！">Be fast — moles don't stay up for long!</li>
     </ul>
   </div>
 </div>

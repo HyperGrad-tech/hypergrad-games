@@ -7,6 +7,7 @@
 <meta name="description" content="Play Rock Paper Scissors online for free against an AI that learns your patterns. Best of streaks, win tracker. No download needed.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/rock-paper-scissors.html">
 <link rel="stylesheet" href="../css/style.css">
+<script src="../js/i18n.js"></script>
 <style>
   .rps-arena { display: flex; justify-content: space-around; align-items: center; height: 200px; }
   .rps-choice { font-size: 80px; line-height: 1; }
@@ -32,16 +33,16 @@
 </script>
 </head>
 <body>
-<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
     <h1 class="game-title">Rock Paper Scissors</h1>
-    <a href="../index.html" class="game-back">&larr; All Games</a>
+    <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
-    <div class="stat-box"><div class="stat-label">Round</div><div class="stat-value" id="round">0</div></div>
-    <div class="stat-box"><div class="stat-label">Your Streak</div><div class="stat-value" id="streak">0</div></div>
-    <div class="stat-box"><div class="stat-label">Best Streak</div><div class="stat-value" id="best-streak">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Round" data-i18n-zh="轮次">Round</div><div class="stat-value" id="round">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Your Streak" data-i18n-zh="连胜">Your Streak</div><div class="stat-value" id="streak">0</div></div>
+    <div class="stat-box"><div class="stat-label" data-i18n-en="Best Streak" data-i18n-zh="最佳连胜">Best Streak</div><div class="stat-value" id="best-streak">0</div></div>
   </div>
   <div class="game-board" style="flex-direction:column;padding:20px;">
     <div class="rps-arena">
@@ -68,13 +69,13 @@
     </div>
   </div>
   <div class="game-instructions">
-    <h3>How to Play</h3>
+    <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li>Click Rock, Paper, or Scissors to make your choice</li>
-      <li>Rock beats Scissors, Scissors beats Paper, Paper beats Rock</li>
-      <li>The AI tracks your patterns to predict your next move</li>
-      <li>Try to beat the AI's pattern recognition!</li>
-      <li>Build win streaks for bonus points</li>
+      <li data-i18n-en="Click Rock, Paper, or Scissors to make your choice" data-i18n-zh="点击石头、剪刀或布来选择">Click Rock, Paper, or Scissors to make your choice</li>
+      <li data-i18n-en="Rock beats Scissors, Scissors beats Paper, Paper beats Rock" data-i18n-zh="石头克剪刀，剪刀克布，布克石头">Rock beats Scissors, Scissors beats Paper, Paper beats Rock</li>
+      <li data-i18n-en="The AI tracks your patterns to predict your next move" data-i18n-zh="AI 会分析你的出拳规律来预测下一步">The AI tracks your patterns to predict your next move</li>
+      <li data-i18n-en="Try to beat the AI's pattern recognition!" data-i18n-zh="挑战能否战胜 AI 的模式识别！">Try to beat the AI's pattern recognition!</li>
+      <li data-i18n-en="Build win streaks for bonus points" data-i18n-zh="连胜可获得额外奖励分">Build win streaks for bonus points</li>
     </ul>
   </div>
 </div>
