@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Frogger - Play Free Online Arcade Game | HyperGrad Games</title>
+<meta name="description" content="Play Frogger online for free. Guide the frog across the road and river. Classic arcade game in your browser. No download needed.">
+<link rel="canonical" href="https://games.hypergrad.cn/games/frogger.html">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  canvas { display: block; border-radius: 8px; background: #1a1a2e; touch-action: none; }
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoGame","name":"Frogger","description":"Play Frogger online for free. Guide the frog across the road and river. Classic arcade game in your browser.","url":"https://games.hypergrad.cn/games/frogger.html","genre":"Arcade","gamePlatform":"Web Browser","applicationCategory":"Game","operatingSystem":"Any (Web Browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"HyperGrad"}}
+</script>
+</head>
+<body>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<div class="game-page">
+  <div class="game-header">
+    <h1 class="game-title">Frogger</h1>
+    <a href="../index.html" class="game-back">&larr; All Games</a>
+  </div>
+  <div class="game-stats">
+    <div class="stat-box"><div class="stat-label">Score</div><div class="stat-value" id="score">0</div></div>
+    <div class="stat-box"><div class="stat-label">Lives</div><div class="stat-value" id="lives">3</div></div>
+    <div class="stat-box"><div class="stat-label">Level</div><div class="stat-value" id="level">1</div></div>
+  </div>
+  <div class="game-board" style="padding:10px;">
+    <canvas id="canvas" width="390" height="420"></canvas>
+    <div class="game-overlay hidden" id="overlay">
+      <h2 id="overlay-title">Game Over</h2>
+      <p id="overlay-text"></p>
+      <button class="btn" onclick="newGame()">Play Again</button>
+    </div>
+  </div>
+  <div class="game-instructions">
+    <h3>How to Play</h3>
+    <ul>
+      <li>Use Arrow keys or WASD to hop the frog</li>
+      <li>Cross the road - avoid cars and trucks</li>
+      <li>Cross the river - jump on logs and lily pads</li>
+      <li>Reach each of the 5 home slots to complete the level</li>
+      <li>Don't fall in the water and don't get hit!</li>
+    </ul>
+  </div>
+</div>
+<script>
+const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+const W=390,H=420,CELL=30,COLS=13,ROWS=14;
+let frog,score,lives,level,gameOver,cars,logs,homes,timer,keys;
+const COLORS=['#EF4444','#F59E0B','#22C55E','#6366F1','#EC4899','#06B6D4'];
+
+function newGame(){
+  frog={x:6,y:13,hops:0,ox:6,oy:13};
+  score=0;lives=3;level=1;gameOver=false;keys={};
+  homes=[false,false,false,false,false];
+  setupLevel();
+  document.getElementById('overlay').classList.add('hidden');
+  update();
+}
+function setupLevel(){
+  const spd=1+level*0.3;
+  cars=[];logs=[];
+  // Road rows 7-12
+  cars.push({row:7,dir:1,speed:spd*1.5,color:'#EF4444',x:0});
+  cars.push({row:7,dir:1,speed:spd*1.5,color:'#EF4444',x:180});
+  cars.push({row:8,dir:-1,speed:spd*2,color:'#F59E0B',x:60});
+  cars.push({row:8,dir:-1,speed:spd*2,color:'#F59E0B',x:240});
+  cars.push({row:9,dir:1,speed:spd*1,color:'#6366F1',x:30});
+  cars.push({row:9,dir:1,speed:spd*1,color:'#6366F1',x:150});
+  cars.push({row:9,dir:1,speed:spd*1,color:'#6366F1',x:270});
+  cars.push({row:10,dir:-1,speed:spd*1.8,color:'#22C55E',x:100});
+  cars.push({row:10,dir:-1,speed:spd*1.8,color:'#22C55E',x:280});
+  cars.push({row:11,dir:1,speed:spd*1.2,color:'#EC4899',x:50});
+  cars.push({row:11,dir:1,speed:spd*1.2,color:'#EC4899',x:200});
+  cars.push({row:12,dir:-1,speed:spd*1.5,color:'#06B6D4',x:0});
+  cars.push({row:12,dir:-1,speed:spd*1.5,color:'#06B6D4',x:200});
+  // River rows 1-5
+  for(let r=1;r<6;r++){
+    const dir=r%2===0?1:-1;
+    const spd2=spd*(0.8+r*0.2)*(dir<0?-1:1);
+    for(let i=0;i<3;i++){
+      logs.push({row:r,x:i*130+w(r),w:60+r%2*30,speed:spd2});
+    }
+  }
+  function w(r){return r%2===0?50:80;}
+}
+function update(){document.getElementById('score').textContent=score;document.getElementById('lives').textContent=lives;document.getElementById('level').textContent=level;}
+function hop(dx,dy){
+  if(gameOver)return;
+  const nx=Math.max(0,Math.min(COLS-1,frog.x+dx));
+  const ny=Math.max(0,Math.min(ROWS-1,frog.y+dy));
+  frog.x=nx;frog.y=ny;
+  frog.ox=nx;frog.oy=ny;
+  if(dy<0)score+=10;
+  update();
+  checkHome();
+}
+function checkHome(){
+  if(frog.y===1){
+    const slot=Math.floor(frog.x/2.6);
+    const slots=[1,3,5,7,9];
+    const idx=slots.findIndex(s=>Math.abs(s-frog.x)<=1);
+    if(idx>=0&&!homes[idx]){
+      homes[idx]=true;score+=200;
+      if(homes.every(h=>h)){level++;homes=[false,false,false,false,false];setupLevel();}
+      frog.x=6;frog.y=13;frog.ox=6;frog.oy=13;
+      update();
+    }else if(idx>=0&&homes[idx]){
+      frog.x=6;frog.y=13;frog.ox=6;frog.oy=13;
+    }
+  }
+}
+function die(){
+  if(gameOver)return;
+  lives--;update();
+  if(lives<=0){endGame();return;}
+  frog.x=6;frog.y=13;frog.ox=6;frog.oy=13;
+}
+function endGame(){
+  gameOver=true;
+  const best=parseInt(localStorage.getItem('frog-best')||0);
+  if(score>best)localStorage.setItem('frog-best',score);
+  document.getElementById('overlay-title').textContent='Game Over';
+  document.getElementById('overlay-text').textContent='Score: '+score;
+  document.getElementById('overlay').classList.remove('hidden');
+}
+function draw(){
+  ctx.fillStyle='#1a1a2e';ctx.fillRect(0,0,W,H);
+  // Home row (row 0)
+  ctx.fillStyle='#22C55E';ctx.fillRect(0,0,W,CELL);
+  ctx.fillStyle='#0f0f1a';
+  for(let i=0;i<5;i++){if(!homes[i]){ctx.beginPath();ctx.arc(30+i*90+30,15,12,0,Math.PI*2);ctx.fill();}else{ctx.fillStyle='#F59E0B';ctx.beginPath();ctx.arc(30+i*90+30,15,10,0,Math.PI*2);ctx.fill();ctx.fillStyle='#0f0f1a';}}
+  // River (rows 1-5)
+  ctx.fillStyle='#1E3A8A';ctx.fillRect(0,CELL,W,CELL*5+5);
+  // Safe row (row 6)
+  ctx.fillStyle='#22C55E';ctx.fillRect(0,CELL*6,W,CELL);
+  // Road (rows 7-12)
+  ctx.fillStyle='#374151';ctx.fillRect(0,CELL*7,W,CELL*6);
+  ctx.strokeStyle='rgba(255,255,255,0.1)';
+  for(let r=8;r<13;r++){ctx.beginPath();ctx.moveTo(0,r*CELL);ctx.lineTo(W,r*CELL);ctx.stroke();}
+  // Start row (row 13)
+  ctx.fillStyle='#22C55E';ctx.fillRect(0,CELL*13,W,CELL);
+
+  // Logs
+  for(const log of logs){
+    log.x+=log.speed;
+    if(log.speed>0&&log.x>W)log.x=-log.w;
+    if(log.speed<0&&log.x+log.w<0)log.x=W;
+    ctx.fillStyle='#92400E';ctx.fillRect(log.x,log.row*CELL+4,log.w,CELL-8);
+    ctx.fillStyle='#78350F';ctx.fillRect(log.x+4,log.row*CELL+8,log.w-8,CELL-16);
+  }
+  // Cars
+  for(const car of cars){
+    car.x+=car.speed;
+    if(car.speed>0&&car.x>W)car.x=-CELL*2;
+    if(car.speed<0&&car.x<-CELL*2)car.x=W;
+    ctx.fillStyle=car.color;
+    ctx.fillRect(car.x,car.row*CELL+4,CELL*1.5,CELL-8);
+    ctx.fillStyle='rgba(255,255,255,0.3)';
+    ctx.fillRect(car.x+4,car.row*CELL+6,CELL*0.4,CELL-12);
+  }
+  // Frog on log
+  if(frog.y>=1&&frog.y<=5){
+    let onLog=false;
+    for(const log of logs){
+      if(log.row===frog.y&&frog.ox*CELL>=log.x&&frog.ox*CELL<log.x+log.w){
+        frog.ox+=log.speed/CELL;
+        frog.x=Math.round(frog.ox);
+        onLog=true;
+        break;
+      }
+    }
+    if(!onLog&&frog.y!==1&&frog.y!==6){die();}
+  }
+  // Car collision
+  if(frog.y>=7&&frog.y<=12){
+    for(const car of cars){
+      if(car.row===frog.y&&frog.ox*CELL>=car.x-CELL&&frog.ox*CELL<car.x+CELL*1.5){die();break;}
+    }
+  }
+  // Frog
+  const fx=frog.ox*CELL,fy=frog.y*CELL;
+  ctx.fillStyle='#22C55E';
+  ctx.beginPath();ctx.arc(fx+15,fy+18,11,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#166534';ctx.beginPath();ctx.arc(fx+8,fy+10,5,0,Math.PI*2);ctx.arc(fx+22,fy+10,5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(fx+8,fy+10,2,0,Math.PI*2);ctx.arc(fx+22,fy+10,2,0,Math.PI*2);ctx.fill();
+}
+window.addEventListener('keydown',e=>{
+  if(gameOver)return;
+  const k=e.key;
+  if(k==='ArrowUp'||k==='w'){e.preventDefault();hop(0,-1);}
+  else if(k==='ArrowDown'||k==='s'){e.preventDefault();hop(0,1);}
+  else if(k==='ArrowLeft'||k==='a'){e.preventDefault();hop(-1,0);}
+  else if(k==='ArrowRight'||k==='d'){e.preventDefault();hop(1,0);}
+});
+// Touch
+canvas.addEventListener('touchstart',e=>{
+  e.preventDefault();
+  if(gameOver)return;
+  const t=e.touches[0];const rect=canvas.getBoundingClientRect();
+  const tx=(t.clientX-rect.left)*(W/rect.width);
+  const ty=(t.clientY-rect.top)*(H/rect.height);
+  const fx=frog.ox*CELL;const fy=frog.y*CELL;
+  const dx=tx-(fx+15),dy=ty-(fy+15);
+  if(Math.abs(dx)>Math.abs(dy))hop(dx>0?1:-1,0);
+  else hop(0,dy>0?1:-1);
+},{passive:false});
+function loop(){draw();requestAnimationFrame(loop);}
+newGame();loop();
+</script>
+</body>
+</html>

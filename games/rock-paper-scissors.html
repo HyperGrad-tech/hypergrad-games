@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Rock Paper Scissors - Play Free Online vs AI | HyperGrad Games</title>
+<meta name="description" content="Play Rock Paper Scissors online for free against an AI that learns your patterns. Best of streaks, win tracker. No download needed.">
+<link rel="canonical" href="https://games.hypergrad.cn/games/rock-paper-scissors.html">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  .rps-arena { display: flex; justify-content: space-around; align-items: center; height: 200px; }
+  .rps-choice { font-size: 80px; line-height: 1; }
+  .rps-vs { font-size: 28px; font-weight: 800; color: var(--text-dim); }
+  .rps-buttons { display: flex; gap: 20px; justify-content: center; margin-top: 24px; }
+  .rps-btn { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--border); background: var(--bg-elevated); font-size: 40px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+  .rps-btn:hover { border-color: var(--primary); transform: translateY(-4px); box-shadow: 0 6px 16px rgba(99,102,241,0.3); }
+  .rps-btn:active { transform: translateY(0); }
+  .rps-result { text-align: center; font-size: 24px; font-weight: 700; margin: 16px 0; min-height: 32px; transition: all 0.3s; }
+  .rps-result.win { color: var(--success); }
+  .rps-result.lose { color: var(--danger); }
+  .rps-result.tie { color: var(--accent); }
+  .rps-scores { display: flex; justify-content: center; gap: 30px; margin-top: 16px; }
+  .rps-score-item { text-align: center; }
+  .rps-score-label { font-size: 12px; color: var(--text-dim); text-transform: uppercase; }
+  .rps-score-val { font-size: 28px; font-weight: 700; }
+  .rps-streak { text-align: center; margin-top: 12px; font-size: 14px; color: var(--text-muted); }
+  .rps-shake { animation: rpsShake 0.4s ease; }
+  @keyframes rpsShake { 0%,100%{transform:scale(1);} 25%{transform:scale(1.15) rotate(-5deg);} 75%{transform:scale(1.15) rotate(5deg);} }
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoGame","name":"Rock Paper Scissors","description":"Play Rock Paper Scissors online for free against an AI that learns your patterns. Best of streaks, win tracker.","url":"https://games.hypergrad.cn/games/rock-paper-scissors.html","genre":"Strategy","gamePlatform":"Web Browser","applicationCategory":"Game","operatingSystem":"Any (Web Browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"HyperGrad"}}
+</script>
+</head>
+<body>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<div class="game-page">
+  <div class="game-header">
+    <h1 class="game-title">Rock Paper Scissors</h1>
+    <a href="../index.html" class="game-back">&larr; All Games</a>
+  </div>
+  <div class="game-stats">
+    <div class="stat-box"><div class="stat-label">Round</div><div class="stat-value" id="round">0</div></div>
+    <div class="stat-box"><div class="stat-label">Your Streak</div><div class="stat-value" id="streak">0</div></div>
+    <div class="stat-box"><div class="stat-label">Best Streak</div><div class="stat-value" id="best-streak">0</div></div>
+  </div>
+  <div class="game-board" style="flex-direction:column;padding:20px;">
+    <div class="rps-arena">
+      <div>
+        <div style="text-align:center;font-size:12px;color:var(--text-dim);margin-bottom:8px;">YOU</div>
+        <div class="rps-choice" id="player-choice">✊</div>
+      </div>
+      <div class="rps-vs">VS</div>
+      <div>
+        <div style="text-align:center;font-size:12px;color:var(--text-dim);margin-bottom:8px;">AI</div>
+        <div class="rps-choice" id="ai-choice">✊</div>
+      </div>
+    </div>
+    <div class="rps-result" id="result">Choose your weapon!</div>
+    <div class="rps-buttons">
+      <button class="rps-btn" onclick="play('rock')">✊</button>
+      <button class="rps-btn" onclick="play('paper')">✋</button>
+      <button class="rps-btn" onclick="play('scissors')">✌️</button>
+    </div>
+    <div class="rps-scores">
+      <div class="rps-score-item"><div class="rps-score-label">Wins</div><div class="rps-score-val" style="color:var(--success);" id="wins">0</div></div>
+      <div class="rps-score-item"><div class="rps-score-label">Losses</div><div class="rps-score-val" style="color:var(--danger);" id="losses">0</div></div>
+      <div class="rps-score-item"><div class="rps-score-label">Ties</div><div class="rps-score-val" style="color:var(--accent);" id="ties">0</div></div>
+    </div>
+  </div>
+  <div class="game-instructions">
+    <h3>How to Play</h3>
+    <ul>
+      <li>Click Rock, Paper, or Scissors to make your choice</li>
+      <li>Rock beats Scissors, Scissors beats Paper, Paper beats Rock</li>
+      <li>The AI tracks your patterns to predict your next move</li>
+      <li>Try to beat the AI's pattern recognition!</li>
+      <li>Build win streaks for bonus points</li>
+    </ul>
+  </div>
+</div>
+<script>
+const EMOJI={rock:'✊',paper:'✋',scissors:'✌️'};
+const NAMES={rock:'Rock',paper:'Paper',scissors:'Scissors'};
+let wins,losses,ties,round,streak,bestStreak,history,winning;
+function newGame(){
+  wins=0;losses=0;ties=0;round=0;streak=0;bestStreak=0;history=[];winning=[];
+  document.getElementById('round').textContent='0';
+  document.getElementById('streak').textContent='0';
+  document.getElementById('wins').textContent='0';
+  document.getElementById('losses').textContent='0';
+  document.getElementById('ties').textContent='0';
+  document.getElementById('best-streak').textContent=localStorage.getItem('rps-best')||'0';
+  document.getElementById('player-choice').textContent='✊';
+  document.getElementById('ai-choice').textContent='✊';
+  document.getElementById('result').textContent='Choose your weapon!';
+  document.getElementById('result').className='rps-result';
+}
+function aiPredict(){
+  if(history.length<2)return['rock','paper','scissors'][Math.floor(Math.random()*3)];
+  // Look at last 2 moves pattern
+  const last2=history.slice(-2).join(',');
+  let patternMoves=[];
+  for(let i=0;i<history.length-2;i++){
+    if(history.slice(i,i+2).join(',')===last2&&i+2<history.length){
+      patternMoves.push(history[i+2]);
+    }
+  }
+  if(patternMoves.length>0){
+    // Count most likely next move
+    const counts={rock:0,paper:0,scissors:0};
+    patternMoves.forEach(m=>counts[m]++);
+    const predicted=Object.entries(counts).sort((a,b)=>b[1]-a[1])[0][0];
+    // Counter the predicted move
+    return predicted==='rock'?'paper':predicted==='paper'?'scissors':'rock';
+  }
+  // Simple frequency counter
+  const counts={rock:0,paper:0,scissors:0};
+  history.forEach(m=>counts[m]++);
+  const most=Object.entries(counts).sort((a,b)=>b[1]-a[1])[0][0];
+  return most==='rock'?'paper':most==='paper'?'scissors':'rock';
+}
+function play(choice){
+  const aiChoice=aiPredict();
+  const pEl=document.getElementById('player-choice');
+  const aEl=document.getElementById('ai-choice');
+  pEl.textContent=EMOJI[choice];aEl.textContent=EMOJI[aiChoice];
+  pEl.classList.add('rps-shake');aEl.classList.add('rps-shake');
+  setTimeout(()=>{pEl.classList.remove('rps-shake');aEl.classList.remove('rps-shake');},400);
+  history.push(choice);
+  round++;
+  document.getElementById('round').textContent=round;
+  const result=document.getElementById('result');
+  if(choice===aiChoice){
+    ties++;result.textContent="It's a Tie!";result.className='rps-result tie';
+    streak=0;document.getElementById('streak').textContent='0';
+  }else if(
+    (choice==='rock'&&aiChoice==='scissors')||
+    (choice==='scissors'&&aiChoice==='paper')||
+    (choice==='paper'&&aiChoice==='rock')
+  ){
+    wins++;streak++;
+    result.textContent='You Win! '+NAMES[choice]+' beats '+NAMES[aiChoice];
+    result.className='rps-result win';
+    if(streak>bestStreak){
+      bestStreak=streak;
+      const lb=parseInt(localStorage.getItem('rps-best')||0);
+      if(bestStreak>lb)localStorage.setItem('rps-best',bestStreak);
+      document.getElementById('best-streak').textContent=bestStreak;
+    }
+    document.getElementById('streak').textContent=streak;
+  }else{
+    losses++;streak=0;
+    result.textContent='You Lose! '+NAMES[aiChoice]+' beats '+NAMES[choice];
+    result.className='rps-result lose';
+    document.getElementById('streak').textContent='0';
+  }
+  document.getElementById('wins').textContent=wins;
+  document.getElementById('losses').textContent=losses;
+  document.getElementById('ties').textContent=ties;
+}
+newGame();
+</script>
+</body>
+</html>

@@ -32,4 +32,8 @@
   <url><loc>https://games.hypergrad.cn/games/word-search.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://games.hypergrad.cn/games/space-invaders.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://games.hypergrad.cn/games/nim.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/frogger.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/mancala.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/rock-paper-scissors.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/dice-roll.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
 </urlset>

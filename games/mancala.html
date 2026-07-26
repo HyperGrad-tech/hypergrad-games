@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Mancala - Play Free Online Strategy Game vs AI | HyperGrad Games</title>
+<meta name="description" content="Play Mancala online for free against an AI opponent. Classic stone-counting strategy game. Simple to learn, deep strategy. No download needed.">
+<link rel="canonical" href="https://games.hypergrad.cn/games/mancala.html">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  .mc-board { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 20px; }
+  .mc-store { width: 50px; height: 180px; background: var(--bg-elevated); border: 2px solid var(--border); border-radius: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+  .mc-store-label { font-size: 11px; color: var(--text-dim); position: absolute; top: 8px; }
+  .mc-store-value { font-size: 28px; font-weight: 700; color: var(--primary-light); }
+  .mc-pits { display: flex; flex-direction: column; gap: 4px; }
+  .mc-row { display: flex; gap: 4px; }
+  .mc-pit { width: 60px; height: 85px; background: var(--bg-card); border: 2px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: var(--text); cursor: pointer; transition: all 0.2s; position: relative; flex-direction: column; }
+  .mc-pit:hover:not(.disabled) { border-color: var(--primary); transform: scale(1.05); }
+  .mc-pit.disabled { cursor: not-allowed; opacity: 0.5; }
+  .mc-pit-label { font-size: 10px; color: var(--text-dim); position: absolute; top: 3px; }
+  @media (max-width: 768px) { .mc-store { width: 36px; height: 140px; } .mc-store-value { font-size: 20px; } .mc-pit { width: 42px; height: 60px; font-size: 14px; } }
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoGame","name":"Mancala","description":"Play Mancala online for free against an AI opponent. Classic stone-counting strategy game. Simple to learn, deep strategy.","url":"https://games.hypergrad.cn/games/mancala.html","genre":"Strategy","gamePlatform":"Web Browser","applicationCategory":"Game","operatingSystem":"Any (Web Browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"HyperGrad"}}
+</script>
+</head>
+<body>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<div class="game-page">
+  <div class="game-header">
+    <h1 class="game-title">Mancala</h1>
+    <a href="../index.html" class="game-back">&larr; All Games</a>
+  </div>
+  <div class="game-stats">
+    <div class="stat-box"><div class="stat-label">Your Store</div><div class="stat-value" id="p-score">0</div></div>
+    <div class="stat-box"><div class="stat-label">AI Store</div><div class="stat-value" id="a-score">0</div></div>
+    <div class="stat-box"><div class="stat-label">Turn</div><div class="stat-value" id="turn" style="font-size:16px;">Your Move</div></div>
+  </div>
+  <div class="game-board" style="flex-direction:column;">
+    <div class="mc-board">
+      <div class="mc-store" id="store-a">
+        <div class="mc-store-label">AI</div>
+        <div class="mc-store-value" id="a-store">0</div>
+      </div>
+      <div class="mc-pits">
+        <div class="mc-row" id="row-a"></div>
+        <div class="mc-row" id="row-p"></div>
+      </div>
+      <div class="mc-store" id="store-p">
+        <div class="mc-store-label">You</div>
+        <div class="mc-store-value" id="p-store">0</div>
+      </div>
+    </div>
+    <div class="game-overlay hidden" id="overlay">
+      <h2 id="overlay-title"></h2>
+      <p id="overlay-text"></p>
+      <button class="btn" onclick="newGame()">Play Again</button>
+    </div>
+  </div>
+  <div class="game-controls">
+    <button class="btn" onclick="newGame()">New Game</button>
+  </div>
+  <div class="game-instructions">
+    <h3>How to Play</h3>
+    <ul>
+      <li>You are the bottom row, AI is the top row</li>
+      <li>Click one of your pits to scoop all stones from it</li>
+      <li>Stones are distributed counterclockwise, one per pit</li>
+      <li>You skip the AI's store, AI skips yours</li>
+      <li>If the last stone lands in your store, you get another turn</li>
+      <li>If the last stone lands in an empty pit on your side, you capture it plus opposite pit stones</li>
+      <li>Game ends when one side is empty. Most stones wins!</li>
+    </ul>
+  </div>
+</div>
+<script>
+// Board layout: player pits 0-5, player store 6, AI pits 7-12, AI store 13
+let board,currentPlayer,gameOver;
+function newGame(){
+  board=[4,4,4,4,4,4,0,4,4,4,4,4,4,0];
+  currentPlayer='player';gameOver=false;
+  document.getElementById('overlay').classList.add('hidden');
+  render();
+}
+function render(){
+  // AI row (indices 12-7, reversed for display)
+  const rowA=document.getElementById('row-a');
+  rowA.innerHTML='';
+  for(let i=12;i>=7;i--){
+    const pit=document.createElement('div');
+    pit.className='mc-pit disabled';
+    pit.innerHTML=`<div class="mc-pit-label">${i-6}</div>${board[i]}`;
+    rowA.appendChild(pit);
+  }
+  // Player row (indices 0-5)
+  const rowP=document.getElementById('row-p');
+  rowP.innerHTML='';
+  for(let i=0;i<6;i++){
+    const pit=document.createElement('div');
+    pit.className='mc-pit'+(currentPlayer==='player'&&!gameOver?'':' disabled');
+    pit.innerHTML=`<div class="mc-pit-label">${i+1}</div>${board[i]}`;
+    pit.onclick=()=>playerMove(i);
+    rowP.appendChild(pit);
+  }
+  document.getElementById('p-store').textContent=board[6];
+  document.getElementById('a-store').textContent=board[13];
+  document.getElementById('p-score').textContent=board[6];
+  document.getElementById('a-score').textContent=board[13];
+  document.getElementById('turn').textContent=gameOver?'Game Over':currentPlayer==='player'?'Your Move':'AI Thinking...';
+}
+function playerMove(pit){
+  if(gameOver||currentPlayer!=='player')return;
+  if(board[pit]===0)return;
+  sow(pit);
+  if(checkEnd())return;
+  if(currentPlayer==='ai'){render();setTimeout(aiMove,800);}
+  else render();
+}
+function sow(start){
+  let stones=board[start];board[start]=0;
+  let idx=start;
+  const myStore=currentPlayer==='player'?6:13;
+  const oppStore=currentPlayer==='player'?13:6;
+  while(stones>0){
+    idx=(idx+1)%14;
+    if(idx===oppStore)continue;
+    board[idx]++;stones--;
+  }
+  // Extra turn if last in store
+  const extraTurn=idx===myStore;
+  // Capture: last stone in empty pit on own side
+  if(currentPlayer==='player'&&idx<6&&board[idx]===1){
+    const opp=12-idx;
+    if(board[opp]>0){board[6]+=board[opp]+1;board[opp]=0;board[idx]=0;}
+  }else if(currentPlayer==='ai'&&idx>=7&&idx<=12&&board[idx]===1){
+    const opp=12-idx;
+    if(board[opp]>0){board[13]+=board[opp]+1;board[opp]=0;board[idx]=0;}
+  }
+  if(!extraTurn){currentPlayer=currentPlayer==='player'?'ai':'player';}
+}
+function aiMove(){
+  if(gameOver)return;
+  // AI picks the move that gives most stones, preferring extra turns
+  let best=-1,bestScore=-999;
+  for(let i=7;i<=12;i++){
+    if(board[i]===0)continue;
+    const sim=[...board];
+    let stones=sim[i];sim[i]=0;let idx=i;let extra=false;
+    while(stones>0){idx=(idx+1)%14;if(idx===6)continue;sim[idx]++;stones--;}
+    extra=idx===13;
+    let score=sim[13]-board[13];
+    if(extra)score+=5;
+    if(idx>=7&&idx<=12&&sim[idx]===1){const opp=12-idx;if(sim[opp]>0)score+=sim[opp]+1;}
+    if(score>bestScore){bestScore=score;best=i;}
+  }
+  if(best>=0){sow(best);}
+  if(checkEnd())return;
+  if(currentPlayer==='ai'){render();setTimeout(aiMove,800);}
+  else render();
+}
+function checkEnd(){
+  let pEmpty=board.slice(0,6).every(x=>x===0);
+  let aEmpty=board.slice(7,13).every(x=>x===0);
+  if(pEmpty||aEmpty){
+    // Remaining stones go to that side's store
+    if(pEmpty){for(let i=7;i<=12;i++){board[13]+=board[i];board[i]=0;}}
+    else{for(let i=0;i<6;i++){board[6]+=board[i];board[i]=0;}}
+    gameOver=true;
+    const p=board[6],a=board[13];
+    document.getElementById('overlay-title').textContent=p>a?'You Win!':a>p?'AI Wins!':"It's a Tie!";
+    document.getElementById('overlay-text').textContent=`You: ${p}  AI: ${a}`;
+    document.getElementById('overlay').classList.remove('hidden');
+    render();
+    return true;
+  }
+  return false;
+}
+newGame();
+</script>
+</body>
+</html>

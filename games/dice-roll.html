@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Dice Roll - Play Free Online Dice Game | HyperGrad Games</title>
+<meta name="description" content="Play Dice Roll online for free. Yahtzee-style dice game. Roll 5 dice, hold and reroll, score combos. Best score wins. No download needed.">
+<link rel="canonical" href="https://games.hypergrad.cn/games/dice-roll.html">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  .dr-dice-row { display: flex; gap: 16px; justify-content: center; margin: 20px 0; }
+  .dr-die { width: 64px; height: 64px; background: var(--bg-elevated); border: 2px solid var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; cursor: pointer; transition: all 0.3s; position: relative; }
+  .dr-die.held { border-color: var(--accent); background: rgba(245,158,11,0.15); }
+  .dr-die.held::after { content: '🔒'; position: absolute; top: -8px; right: -8px; font-size: 14px; }
+  .dr-die:hover:not(.disabled) { border-color: var(--primary); transform: translateY(-4px); }
+  .dr-die.disabled { cursor: default; }
+  .dr-die.rolling { animation: drRoll 0.4s ease; }
+  @keyframes drRoll { 0%{transform:rotate(0deg) scale(1);} 50%{transform:rotate(180deg) scale(1.2);} 100%{transform:rotate(360deg) scale(1);} }
+  .dr-rolls-left { text-align: center; font-size: 16px; color: var(--text-muted); margin: 8px 0; }
+  .dr-scorecard { margin-top: 20px; }
+  .dr-scorecard h3 { font-size: 14px; color: var(--text-dim); margin-bottom: 8px; }
+  .dr-categories { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; }
+  .dr-cat { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+  .dr-cat:hover:not(.scored):not(.disabled) { border-color: var(--primary); }
+  .dr-cat.scored { opacity: 0.4; cursor: default; }
+  .dr-cat.disabled { cursor: default; opacity: 0.5; }
+  .dr-cat-name { font-size: 13px; color: var(--text); }
+  .dr-cat-score { font-size: 16px; font-weight: 700; color: var(--primary-light); }
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoGame","name":"Dice Roll","description":"Play Dice Roll online for free. Yahtzee-style dice game. Roll 5 dice, hold and reroll, score combos. Best score wins.","url":"https://games.hypergrad.cn/games/dice-roll.html","genre":"Strategy","gamePlatform":"Web Browser","applicationCategory":"Game","operatingSystem":"Any (Web Browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"HyperGrad"}}
+</script>
+</head>
+<body>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<div class="game-page">
+  <div class="game-header">
+    <h1 class="game-title">Dice Roll</h1>
+    <a href="../index.html" class="game-back">&larr; All Games</a>
+  </div>
+  <div class="game-stats">
+    <div class="stat-box"><div class="stat-label">Total Score</div><div class="stat-value" id="total">0</div></div>
+    <div class="stat-box"><div class="stat-label">Best</div><div class="stat-value" id="best">0</div></div>
+    <div class="stat-box"><div class="stat-label">Round</div><div class="stat-value" id="round">1/13</div></div>
+  </div>
+  <div class="game-board" style="flex-direction:column;padding:20px;">
+    <div class="dr-dice-row" id="dice-row"></div>
+    <div class="dr-rolls-left" id="rolls-left">Rolls left: 3</div>
+    <div class="game-controls" style="margin-top:0;">
+      <button class="btn" id="roll-btn" onclick="rollDice()">Roll Dice</button>
+    </div>
+    <div class="dr-scorecard">
+      <h3>Score Categories</h3>
+      <div class="dr-categories" id="categories"></div>
+    </div>
+    <div class="game-overlay hidden" id="overlay">
+      <h2 id="overlay-title">Game Over</h2>
+      <p id="overlay-text"></p>
+      <button class="btn" onclick="newGame()">Play Again</button>
+    </div>
+  </div>
+  <div class="game-instructions">
+    <h3>How to Play</h3>
+    <ul>
+      <li>Click Roll Dice to roll 5 dice</li>
+      <li>Click individual dice to hold them (locked dice won't reroll)</li>
+      <li>You get up to 3 rolls per turn</li>
+      <li>After rolling, click a score category to score your dice</li>
+      <li>Each category can only be used once per game</li>
+      <li>13 rounds total - try to maximize your score!</li>
+    </ul>
+  </div>
+</div>
+<script>
+const DOTS=['⚀','⚁','⚂','⚃','⚄','⚅'];
+const CATS=[
+  {name:'Ones',desc:'Sum of 1s',calc:d=>d.filter(x=>x===1).reduce((a,b)=>a+b,0)},
+  {name:'Twos',desc:'Sum of 2s',calc:d=>d.filter(x=>x===2).reduce((a,b)=>a+b,0)},
+  {name:'Threes',desc:'Sum of 3s',calc:d=>d.filter(x=>x===3).reduce((a,b)=>a+b,0)},
+  {name:'Fours',desc:'Sum of 4s',calc:d=>d.filter(x=>x===4).reduce((a,b)=>a+b,0)},
+  {name:'Fives',desc:'Sum of 5s',calc:d=>d.filter(x=>x===5).reduce((a,b)=>a+b,0)},
+  {name:'Sixes',desc:'Sum of 6s',calc:d=>d.filter(x=>x===6).reduce((a,b)=>a+b,0)},
+  {name:'3 of Kind',desc:'3+ same: sum',calc:d=>{const c={};d.forEach(x=>c[x]=(c[x]||0)+1);return Object.values(c).some(v=>v>=3)?d.reduce((a,b)=>a+b,0):0;}},
+  {name:'4 of Kind',desc:'4+ same: sum',calc:d=>{const c={};d.forEach(x=>c[x]=(c[x]||0)+1);return Object.values(c).some(v=>v>=4)?d.reduce((a,b)=>a+b,0):0;}},
+  {name:'Full House',desc:'3+2 same: 25',calc:d=>{const c={};d.forEach(x=>c[x]=(c[x]||0)+1);const v=Object.values(c).sort();return v.length===2&&v[0]===2&&v[1]===3?25:0;}},
+  {name:'Sm Straight',desc:'4 seq: 30',calc:d=>{const s=[...new Set(d)].sort();const runs=[[1,2,3,4],[2,3,4,5],[3,4,5,6]];return runs.some(r=>r.every(n=>s.includes(n)))?30:0;}},
+  {name:'Lg Straight',desc:'5 seq: 40',calc:d=>{const s=[...new Set(d)].sort();const runs=[[1,2,3,4,5],[2,3,4,5,6]];return runs.some(r=>r.every(n=>s.includes(n)))?40:0;}},
+  {name:'Yahtzee',desc:'5 same: 50',calc:d=>{const c={};d.forEach(x=>c[x]=(c[x]||0)+1);return Object.values(c).some(v=>v===5)?50:0;}},
+  {name:'Chance',desc:'Sum of all',calc:d=>d.reduce((a,b)=>a+b,0)}
+];
+let dice,held,rollsLeft,scores,round,gameOver,hasRolled;
+function newGame(){
+  dice=[1,1,1,1,1];held=[false,false,false,false,false];rollsLeft=3;scores=Array(CATS.length).fill(null);round=1;gameOver=false;hasRolled=false;
+  document.getElementById('overlay').classList.add('hidden');
+  document.getElementById('best').textContent=localStorage.getItem('dr-best')||0;
+  renderDice();renderCats();updateStats();
+}
+function updateStats(){
+  const total=scores.reduce((a,b)=>a+(b||0),0);
+  document.getElementById('total').textContent=total;
+  document.getElementById('round').textContent=round+'/13';
+  document.getElementById('rolls-left').textContent='Rolls left: '+rollsLeft;
+  document.getElementById('roll-btn').disabled=rollsLeft===0||gameOver;
+  document.getElementById('roll-btn').textContent=rollsLeft===3?'Roll Dice':rollsLeft===0?'Score a Category':'Roll Again';
+}
+function rollDice(){
+  if(rollsLeft===0||gameOver)return;
+  for(let i=0;i<5;i++){
+    if(!held[i]){
+      dice[i]=Math.floor(Math.random()*6)+1;
+      const el=document.getElementById('die-'+i);
+      el.classList.add('rolling');
+      setTimeout(()=>el.classList.remove('rolling'),400);
+    }
+  }
+  rollsLeft--;hasRolled=true;
+  renderDice();updateStats();renderCats();
+}
+function toggleHold(i){
+  if(!hasRolled||rollsLeft===0||gameOver)return;
+  held[i]=!held[i];renderDice();
+}
+function renderDice(){
+  const row=document.getElementById('dice-row');row.innerHTML='';
+  for(let i=0;i<5;i++){
+    const die=document.createElement('div');
+    die.className='dr-die'+(held[i]?' held':'')+(!hasRolled?' disabled':'');
+    die.id='die-'+i;
+    die.textContent=DOTS[dice[i]-1];
+    die.onclick=()=>toggleHold(i);
+    row.appendChild(die);
+  }
+}
+function renderCats(){
+  const cont=document.getElementById('categories');cont.innerHTML='';
+  CATS.forEach((cat,i)=>{
+    const el=document.createElement('div');
+    const scored=scores[i]!==null;
+    const score=scored?scores[i]:(hasRolled?cat.calc(dice):0);
+    el.className='dr-cat'+(scored?' scored':'')+(hasRolled&&!scored?'':' disabled');
+    el.innerHTML=`<span class="dr-cat-name">${cat.name}</span><span class="dr-cat-score">${scored?scores[i]:hasRolled?'→ '+score:'-'}</span>`;
+    if(!scored&&hasRolled&&!gameOver)el.onclick=()=>scoreCat(i);
+    cont.appendChild(el);
+  });
+}
+function scoreCat(i){
+  if(scores[i]!==null||!hasRolled||gameOver)return;
+  scores[i]=CATS[i].calc(dice);
+  // Next round
+  if(round>=13){endGame();return;}
+  round++;rollsLeft=3;held=[false,false,false,false,false];dice=[1,1,1,1,1];hasRolled=false;
+  renderDice();renderCats();updateStats();
+}
+function endGame(){
+  gameOver=true;
+  const total=scores.reduce((a,b)=>a+(b||0),0);
+  const best=parseInt(localStorage.getItem('dr-best')||0);
+  if(total>best)localStorage.setItem('dr-best',total);
+  document.getElementById('overlay-title').textContent='Game Over!';
+  document.getElementById('overlay-text').textContent='Total Score: '+total;
+  document.getElementById('overlay').classList.remove('hidden');
+  updateStats();
+}
+newGame();
+</script>
+</body>
+</html>
