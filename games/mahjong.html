@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Mahjong Solitaire - Play Free Online | HyperGrad Games</title>
+<meta name="description" content="Play Mahjong Solitaire online for free. Match pairs of identical tiles to clear the board. Classic Chinese matching puzzle. No download, works on mobile and desktop.">
+<link rel="canonical" href="https://games.hypergrad.cn/games/mahjong.html">
+<link rel="stylesheet" href="../css/style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Mahjong Solitaire",
+  "description": "Match pairs of identical Mahjong tiles to clear the board. Classic Chinese matching puzzle game.",
+  "url": "https://games.hypergrad.cn/games/mahjong.html",
+  "genre": "Board",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any (Web Browser)",
+  "offers": {"@type":"Offer","price":"0","priceCurrency":"USD"},
+  "publisher": {"@type":"Organization","name":"HyperGrad"}
+}
+</script>
+<style>
+  .mj-board { position: relative; width: 100%; max-width: 560px; margin: 0 auto; min-height: 340px; }
+  .mj-tile { position: absolute; width: 38px; height: 52px; background: linear-gradient(145deg, #F5E6C8, #E8D5A8); border: 1px solid #C4A86A; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; box-shadow: 1px 2px 4px rgba(0,0,0,0.3); transition: all 0.15s; user-select: none; }
+  .mj-tile:hover { transform: translateY(-2px); box-shadow: 1px 4px 8px rgba(0,0,0,0.4); }
+  .mj-tile.selected { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary), 1px 4px 8px rgba(99,102,241,0.4); }
+  .mj-tile.removed { opacity: 0; pointer-events: none; transform: scale(0.5); }
+  .mj-tile.blocked { opacity: 0.5; cursor: not-allowed; }
+  @media (max-width: 768px) {
+    .mj-tile { width: 30px; height: 42px; font-size: 18px; }
+    .mj-board { transform: scale(0.92); }
+  }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="site-header-inner"><a href="../index.html" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#card">Board</a><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<div class="game-page">
+  <div class="game-header">
+    <h1 class="game-title">Mahjong</h1>
+    <a href="../index.html" class="game-back">← All Games</a>
+  </div>
+  <div class="game-stats">
+    <div class="stat-box"><div class="stat-label">Tiles Left</div><div class="stat-value" id="left">144</div></div>
+    <div class="stat-box"><div class="stat-label">Pairs</div><div class="stat-value" id="pairs">0</div></div>
+  </div>
+  <div class="game-board" style="min-height:auto;overflow:visible;">
+    <div class="mj-board" id="board"></div>
+  </div>
+  <div class="game-controls">
+    <button class="btn" onclick="newGame()">New Game</button>
+    <button class="btn btn-secondary" onclick="hint()">Hint</button>
+  </div>
+  <div class="game-overlay hidden" id="overlay">
+    <h2 id="overlay-title">Game Over!</h2>
+    <p id="overlay-text"></p>
+    <button class="btn" onclick="newGame()">New Game</button>
+  </div>
+  <div class="game-instructions">
+    <h3>How to Play</h3>
+    <ul>
+      <li>Click two identical tiles to remove them as a pair</li>
+      <li>A tile can only be matched if it is <b>free</b>: no tile on top, and at least one side (left or right) is open</li>
+      <li>Clear all 144 tiles to win</li>
+      <li>Click Hint to find a valid match if you're stuck</li>
+    </ul>
+  </div>
+</div>
+<script>
+// Tile symbols - 4 of each (suits), plus bonus tiles
+const SUITS_TILES=[
+  // Dots (万) 1-9, x4
+  '一万','二万','三万','四万','五万','六万','七万','八万','九万',
+  // Bamboo (条) 1-9, x4
+  '一条','二条','三条','四条','五条','六条','七条','八条','九条',
+  // Characters (筒) 1-9, x4
+  '一筒','二筒','三筒','四筒','五筒','六筒','七筒','八筒','九筒',
+  // Winds x4
+  '东','南','西','北',
+  // Dragons x4
+  '中','发','白',
+];
+const FLOWERS=['春','夏','秋','冬','梅','兰','竹','菊'];
+
+// Layout: pyramid shape - 144 tiles total
+// Layer 0: 8×9=72, Layer 1: 6×7=42, Layer 2: 4×5=20, Layer 3: 2×3=6, Layer 4: 2×1=4 → 144
+const LAYOUT=[];
+for(let y=0;y<8;y++)for(let x=0;x<9;x++)LAYOUT.push({l:0,x,y});
+for(let y=0;y<6;y++)for(let x=0;x<7;x++)LAYOUT.push({l:1,x,y});
+for(let y=0;y<4;y++)for(let x=0;x<5;x++)LAYOUT.push({l:2,x,y});
+for(let y=0;y<2;y++)for(let x=0;x<3;x++)LAYOUT.push({l:3,x,y});
+for(let y=0;y<2;y++)for(let x=0;x<2;x++)LAYOUT.push({l:4,x,y});
+
+let tiles,selected,matchCount,gameOver;
+
+function newGame(){
+  // build 144 tiles: 34x4=136 + 8 flowers
+  let symbols=[];
+  for(let s of SUITS_TILES){for(let i=0;i<4;i++)symbols.push(s);}
+  for(let f of FLOWERS)symbols.push(f);
+  // shuffle
+  for(let i=symbols.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[symbols[i],symbols[j]]=[symbols[j],symbols[i]];}
+  // assign to positions
+  tiles=LAYOUT.map((pos,i)=>({
+    ...pos,
+    symbol:symbols[i],
+    removed:false,
+    id:i
+  }));
+  selected=null;matchCount=0;gameOver=false;
+  document.getElementById('overlay').classList.add('hidden');
+  render();
+  updateStats();
+}
+
+function tilePx(t){
+  const tileW=38,tileH=52,gap=2;
+  const offX=tileW-gap,offY=tileH-gap;
+  const layerColOffset=[0,1,2,3,3.5];
+  return {x:(t.x+layerColOffset[t.l])*offX,y:(t.y)*offY-t.l*4};
+}
+
+function isFree(tile){
+  if(tile.removed)return false;
+  const tp=tilePx(tile);
+  // check if any tile on top (higher layer, overlapping in pixel space)
+  let onTop=tiles.some(t=>{
+    if(t.removed||t.l<=tile.l)return false;
+    const p=tilePx(t);
+    return Math.abs(p.x-tp.x)<20&&Math.abs(p.y-tp.y)<24;
+  });
+  if(onTop)return false;
+  // check left or right open (same layer, adjacent x)
+  let leftBlocked=tiles.some(t=>!t.removed&&t.l===tile.l&&t.y===tile.y&&t.x===tile.x-1);
+  let rightBlocked=tiles.some(t=>!t.removed&&t.l===tile.l&&t.y===tile.y&&t.x===tile.x+1);
+  return !leftBlocked||!rightBlocked;
+}
+
+function render(){
+  const b=document.getElementById('board');b.innerHTML='';
+  for(let t of tiles){
+    if(t.removed)continue;
+    const el=document.createElement('div');
+    el.className='mj-tile';
+    if(selected===t.id)el.classList.add('selected');
+    if(!isFree(t))el.classList.add('blocked');
+    el.textContent=t.symbol;
+    const px=tilePx(t);
+    el.style.left=px.x+'px';
+    el.style.top=px.y+'px';
+    el.style.zIndex=t.l*100+(8-t.y);
+    el.onclick=()=>clickTile(t.id);
+    b.appendChild(el);
+  }
+}
+
+function clickTile(id){
+  if(gameOver)return;
+  let tile=tiles[id];
+  if(tile.removed||!isFree(tile))return;
+  if(selected===null){selected=id;render();return;}
+  if(selected===id){selected=null;render();return;}
+  let s1=tiles[selected],s2=tile;
+  if(s1.symbol===s2.symbol){
+    s1.removed=true;s2.removed=true;
+    matchCount++;selected=null;
+    render();updateStats();checkWin();
+  }else{
+    selected=id;render();
+  }
+}
+
+function updateStats(){
+  let left=tiles.filter(t=>!t.removed).length;
+  document.getElementById('left').textContent=left;
+  document.getElementById('pairs').textContent=matchCount;
+}
+
+function hint(){
+  let free=tiles.filter(t=>!t.removed&&isFree(t));
+  for(let i=0;i<free.length;i++){
+    for(let j=i+1;j<free.length;j++){
+      if(free[i].symbol===free[j].symbol){
+        selected=free[i].id;render();
+        setTimeout(()=>{selected=free[j].id;render();setTimeout(()=>{selected=null;render();},800);},400);
+        return;
+      }
+    }
+  }
+  alert('No valid matches available!');
+}
+
+function checkWin(){
+  if(tiles.every(t=>t.removed)){
+    gameOver=true;
+    document.getElementById('overlay-title').textContent='You Win!';
+    document.getElementById('overlay-text').textContent='All '+matchCount+' pairs cleared!';
+    document.getElementById('overlay').classList.remove('hidden');
+  }
+}
+
+newGame();
+</script>
+</body>
+</html>

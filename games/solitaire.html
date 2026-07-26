@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Solitaire (Klondike) - Play Free Online | HyperGrad Games</title>
+<meta name="description" content="Play Klondike Solitaire online for free. The classic card game - sort all cards into foundations by suit. No download, works on mobile and desktop.">
+<link rel="canonical" href="https://games.hypergrad.cn/games/solitaire.html">
+<link rel="stylesheet" href="../css/style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Solitaire",
+  "description": "Classic Klondike Solitaire - sort all cards into foundations by suit. The most popular card game in the world.",
+  "url": "https://games.hypergrad.cn/games/solitaire.html",
+  "genre": "Card",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any (Web Browser)",
+  "offers": {"@type":"Offer","price":"0","priceCurrency":"USD"},
+  "publisher": {"@type":"Organization","name":"HyperGrad"}
+}
+</script>
+<style>
+  .sol-board { display: flex; flex-direction: column; gap: 16px; padding: 10px; }
+  .sol-top { display: flex; gap: 12px; justify-content: space-between; flex-wrap: wrap; }
+  .sol-top-left, .sol-top-right { display: flex; gap: 8px; }
+  .sol-pile { width: 64px; height: 90px; border: 2px dashed var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; }
+  .sol-pile.drop-target { border-color: var(--success); background: rgba(34,197,94,0.1); }
+  .sol-foundations { display: flex; gap: 8px; }
+  .sol-tableau { display: flex; gap: 10px; justify-content: center; flex-wrap: nowrap; overflow-x: auto; }
+  .sol-column { width: 64px; min-height: 90px; position: relative; }
+  .sol-card { width: 64px; height: 90px; border-radius: 8px; position: absolute; cursor: pointer; user-select: none; font-weight: 700; font-size: 13px; display: flex; flex-direction: column; justify-content: space-between; padding: 4px 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.3); transition: transform 0.1s; }
+  .sol-card.face-up { background: #fff; color: #1a1a2e; }
+  .sol-card.face-down { background: linear-gradient(135deg, #4F46E5, #6366F1); border: 2px solid #818CF8; }
+  .sol-card.face-down::after { content: '🂠'; font-size: 28px; color: rgba(255,255,255,0.3); position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+  .sol-card.red { color: #DC2626; }
+  .sol-card.black { color: #1a1a2e; }
+  .sol-card .rank { font-size: 14px; }
+  .sol-card .suit { font-size: 12px; }
+  .sol-card.selected { box-shadow: 0 0 0 3px var(--primary), 0 2px 6px rgba(99,102,241,0.4); transform: translateY(-4px); }
+  .sol-card:hover { transform: translateY(-2px); }
+  .sol-card.selected:hover { transform: translateY(-6px); }
+  @media (max-width: 768px) {
+    .sol-pile, .sol-card, .sol-column { width: 44px; height: 62px; }
+    .sol-card { font-size: 11px; }
+    .sol-card .rank { font-size: 12px; }
+    .sol-card .suit { font-size: 10px; }
+  }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="site-header-inner"><a href="../index.html" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#card">Cards</a><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<div class="game-page">
+  <div class="game-header">
+    <h1 class="game-title">Solitaire</h1>
+    <a href="../index.html" class="game-back">← All Games</a>
+  </div>
+  <div class="game-stats">
+    <div class="stat-box"><div class="stat-label">Moves</div><div class="stat-value" id="moves">0</div></div>
+    <div class="stat-box"><div class="stat-label">Time</div><div class="stat-value" id="time">0:00</div></div>
+  </div>
+  <div class="game-board" style="min-height:auto;">
+    <div class="sol-board" id="board"></div>
+  </div>
+  <div class="game-controls">
+    <button class="btn" onclick="newGame()">New Game</button>
+    <button class="btn btn-secondary" onclick="drawCard()">Draw</button>
+  </div>
+  <div class="game-overlay hidden" id="overlay">
+    <h2 id="overlay-title">You Win!</h2>
+    <p id="overlay-text">All cards sorted!</p>
+    <button class="btn" onclick="newGame()">New Game</button>
+  </div>
+  <div class="game-instructions">
+    <h3>How to Play</h3>
+    <ul>
+      <li><b>Goal:</b> Move all 52 cards to the 4 foundations (top right) by suit, Ace to King</li>
+      <li><b>Tableau:</b> Build down in alternating colors (Red on Black, Black on Red)</li>
+      <li><b>Foundations:</b> Build up by suit from Ace to King</li>
+      <li><b>Stock:</b> Click the deck (top left) to draw a card to the waste pile</li>
+      <li>Click a card to select it, then click destination to move. Double-click to auto-send to foundation.</li>
+      <li>Kings can be placed on empty tableau columns</li>
+    </ul>
+  </div>
+</div>
+<script>
+const SUITS=['♠','♥','♦','♣'];
+const SUIT_COLOR={'♠':'black','♣':'black','♥':'red','♦':'red'};
+const RANKS=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+const RANK_VAL={'A':1,'2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'10':10,'J':11,'Q':12,'K':13};
+
+let stock,waste,foundations,tableau,moves,timer,startTime,selected,gameOver;
+
+function makeDeck(){
+  let deck=[];
+  for(let s of SUITS)for(let r of RANKS)deck.push({suit:s,rank:r,val:RANK_VAL[r],color:SUIT_COLOR[s],faceUp:false,id:s+r});
+  // shuffle
+  for(let i=deck.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}
+  return deck;
+}
+
+function newGame(){
+  let deck=makeDeck();
+  stock=[];waste=[];foundations=[[],[],[],[]];tableau=[];
+  for(let i=0;i<7;i++){
+    let col=[];
+    for(let j=0;j<=i;j++){
+      let card=deck.pop();
+      if(j===i)card.faceUp=true;
+      col.push(card);
+    }
+    tableau.push(col);
+  }
+  stock=deck;
+  moves=0;gameOver=false;selected=null;
+  startTimer();
+  render();
+}
+
+function startTimer(){
+  if(timer)clearInterval(timer);
+  startTime=Date.now();
+  timer=setInterval(()=>{
+    let s=Math.floor((Date.now()-startTime)/1000);
+    document.getElementById('time').textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+  },1000);
+}
+
+function drawCard(){
+  if(!stock.length){
+    // recycle waste to stock
+    stock=waste.reverse().map(c=>{c.faceUp=false;return c;});
+    waste=[];
+  }else{
+    let c=stock.pop();c.faceUp=true;waste.push(c);
+  }
+  moves++;selected=null;render();
+}
+
+function render(){
+  const b=document.getElementById('board');b.innerHTML='';
+  // top row
+  const top=document.createElement('div');top.className='sol-top';
+  const left=document.createElement('div');left.className='sol-top-left';
+  // stock
+  const stockPile=document.createElement('div');stockPile.className='sol-pile';
+  stockPile.onclick=drawCard;
+  if(stock.length)stockPile.innerHTML='<div class="sol-card face-down"></div>';
+  else stockPile.innerHTML='<span style="color:var(--text-dim);font-size:22px;">↻</span>';
+  left.appendChild(stockPile);
+  // waste
+  const wastePile=document.createElement('div');wastePile.className='sol-pile';
+  if(waste.length){
+    let c=waste[waste.length-1];
+    wastePile.appendChild(makeCardEl(c,'waste'));
+  }
+  left.appendChild(wastePile);
+  top.appendChild(left);
+  // foundations
+  const fr=document.createElement('div');fr.className='sol-foundations';
+  for(let i=0;i<4;i++){
+    const fp=document.createElement('div');fp.className='sol-pile';
+    fp.onclick=()=>tryMoveToFoundation(i);
+    if(foundations[i].length){
+      let c=foundations[i][foundations[i].length-1];
+      fp.appendChild(makeCardEl(c,'foundation-'+i));
+    }else{
+      fp.innerHTML='<span style="color:var(--text-dim);font-size:20px;">'+SUITS[i]+'</span>';
+    }
+    fr.appendChild(fp);
+  }
+  top.appendChild(fr);
+  b.appendChild(top);
+  // tableau
+  const t=document.createElement('div');t.className='sol-tableau';
+  for(let i=0;i<7;i++){
+    const col=document.createElement('div');col.className='sol-column';
+    col.style.minHeight=(120+tableau[i].length*24)+'px';
+    col.onclick=(e)=>{if(e.target===col)tryMoveToTableau(i);};
+    tableau[i].forEach((card,j)=>{
+      if(!card.faceUp){card._top=j*24;}
+      const el=makeCardEl(card,'tab-'+i+'-'+j);
+      el.style.top=j*24+'px';
+      col.appendChild(el);
+    });
+    t.appendChild(col);
+  }
+  b.appendChild(t);
+  document.getElementById('moves').textContent=moves;
+}
+
+function makeCardEl(card,loc){
+  const el=document.createElement('div');
+  el.className='sol-card '+(card.faceUp?'face-up '+card.color:'face-down');
+  if(card.faceUp){
+    el.innerHTML='<div class="rank">'+card.rank+'</div><div class="suit">'+card.suit+'</div>';
+  }
+  if(selected&&selected.loc===loc)el.classList.add('selected');
+  el.onclick=(e)=>{
+    e.stopPropagation();
+    if(!card.faceUp){
+      // try to flip (only top card of tableau)
+      let parts=loc.split('-');
+      if(parts[0]==='tab'){
+        let ci=+parts[1],ri=+parts[2];
+        if(ri===tableau[ci].length-1){tableau[ci][ri].faceUp=true;moves++;render();}
+      }
+      return;
+    }
+    if(selected&&selected.loc===loc){selected=null;render();return;}
+    selected={card,loc};render();
+  };
+  el.ondblclick=(e)=>{
+    e.stopPropagation();
+    // auto send to foundation
+    let parts=loc.split('-');
+    if(parts[0]==='waste'){tryAutoFoundation('waste',-1);}
+    else if(parts[0]==='tab'){tryAutoFoundation('tab',+parts[1]);}
+  };
+  return el;
+}
+
+function tryMoveToFoundation(fi){
+  if(!selected)return;
+  let card=selected.card;
+  // check if single card move
+  let parts=selected.loc.split('-');
+  let srcCard=getSourceCard(parts);
+  if(!srcCard)return;
+  // can only move single card to foundation
+  if(parts[0]==='tab'&&parts[2]!=tableau[+parts[1]].length-1)return;
+  if(card.val===1&&foundations[fi].length===0){
+    foundations[fi].push(card);removeFromSource(parts);moves++;selected=null;render();checkWin();
+  }else if(foundations[fi].length&&card.suit===foundations[fi][0].suit&&card.val===foundations[fi][foundations[fi].length-1].val+1){
+    foundations[fi].push(card);removeFromSource(parts);moves++;selected=null;render();checkWin();
+  }
+}
+
+function tryAutoFoundation(type,idx){
+  let card,parts;
+  if(type==='waste'){
+    if(!waste.length)return;
+    card=waste[waste.length-1];parts=['waste'];
+  }else{
+    if(!tableau[idx].length)return;
+    card=tableau[idx][tableau[idx].length-1];
+    if(!card.faceUp)return;
+    parts=['tab',idx,tableau[idx].length-1];
+  }
+  for(let i=0;i<4;i++){
+    if(card.val===1&&foundations[i].length===0){
+      foundations[i].push(card);removeFromSource(parts);moves++;render();checkWin();return;
+    }
+    if(foundations[i].length&&card.suit===foundations[i][0].suit&&card.val===foundations[i][foundations[i].length-1].val+1){
+      foundations[i].push(card);removeFromSource(parts);moves++;render();checkWin();return;
+    }
+  }
+}
+
+function getSourceCard(parts){
+  if(parts[0]==='waste')return waste[waste.length-1];
+  if(parts[0]==='foundation')return foundations[+parts[1]][foundations[+parts[1]].length-1];
+  if(parts[0]==='tab')return tableau[+parts[1]][+parts[2]];
+}
+
+function removeFromSource(parts){
+  if(parts[0]==='waste')waste.pop();
+  else if(parts[0]==='foundation')foundations[+parts[1]].pop();
+  else if(parts[0]==='tab'){
+    let ci=+parts[1];
+    // remove all cards from parts[2] onward (they move together)
+    tableau[ci]=tableau[ci].slice(0,+parts[2]);
+    // flip new top
+    if(tableau[ci].length&&!tableau[ci][tableau[ci].length-1].faceUp)
+      tableau[ci][tableau[ci].length-1].faceUp=true;
+  }
+}
+
+function tryMoveToTableau(ti){
+  if(!selected)return;
+  let card=selected.card;
+  let parts=selected.loc.split('-');
+  let col=tableau[ti];
+  // get cards to move (from tableau, may be multiple)
+  let cardsToMove;
+  if(parts[0]==='waste'){
+    cardsToMove=[waste[waste.length-1]];
+  }else if(parts[0]==='tab'){
+    let ci=+parts[1],ri=+parts[2];
+    cardsToMove=tableau[ci].slice(ri);
+  }else return;
+
+  if(col.length===0){
+    // empty column: only King
+    if(cardsToMove[0].val===13){
+      doMove(cardsToMove,parts,ti);return;
+    }
+  }else{
+    let topCard=col[col.length-1];
+    if(topCard.faceUp&&topCard.color!==cardsToMove[0].color&&topCard.val===cardsToMove[0].val+1){
+      doMove(cardsToMove,parts,ti);return;
+    }
+  }
+}
+
+function doMove(cards,parts,ti){
+  tableau[ti]=tableau[ti].concat(cards);
+  removeFromSource(parts);
+  moves++;selected=null;render();
+}
+
+function checkWin(){
+  let total=foundations.reduce((s,f)=>s+f.length,0);
+  if(total===52){
+    gameOver=true;clearInterval(timer);
+    document.getElementById('overlay-title').textContent='You Win!';
+    document.getElementById('overlay').classList.remove('hidden');
+  }
+}
+
+newGame();
+</script>
+</body>
+</html>

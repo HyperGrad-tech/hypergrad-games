@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>2048 Cupcakes - Play Free Online | HyperGrad Games</title>
+<meta name="description" content="Play 2048 Cupcakes online for free. A delicious twist on 2048 - merge cupcakes to discover new flavors! No download, works on mobile and desktop.">
+<link rel="canonical" href="https://games.hypergrad.cn/games/2048-cupcakes.html">
+<link rel="stylesheet" href="../css/style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "2048 Cupcakes",
+  "description": "A delicious twist on 2048 - merge cupcakes to discover new flavors!",
+  "url": "https://games.hypergrad.cn/games/2048-cupcakes.html",
+  "genre": "Puzzle",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any (Web Browser)",
+  "offers": {"@type":"Offer","price":"0","priceCurrency":"USD"},
+  "publisher": {"@type":"Organization","name":"HyperGrad"}
+}
+</script>
+<style>
+  .grid-cup { grid-template-columns: repeat(4, 80px); grid-template-rows: repeat(4, 80px); }
+  .grid-cup .cell { background: #F3DDB8; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 700; transition: all 0.1s; }
+  .grid-cup .cell[data-val="2"] { background:#FFF5E0; }
+  .grid-cup .cell[data-val="4"] { background:#FFE4C4; }
+  .grid-cup .cell[data-val="8"] { background:#FFDAB0; }
+  .grid-cup .cell[data-val="16"] { background:#FFC78E; }
+  .grid-cup .cell[data-val="32"] { background:#FF9E7D; }
+  .grid-cup .cell[data-val="64"] { background:#FF7E5F; color:#fff; }
+  .grid-cup .cell[data-val="128"] { background:#D4A0A0; color:#fff; font-size:26px; }
+  .grid-cup .cell[data-val="256"] { background:#C08EC0; color:#fff; font-size:26px; }
+  .grid-cup .cell[data-val="512"] { background:#A070DB; color:#fff; font-size:24px; }
+  .grid-cup .cell[data-val="1024"] { background:#7B5FC4; color:#fff; font-size:22px; }
+  .grid-cup .cell[data-val="2048"] { background:#E8972D; color:#fff; font-size:22px; }
+  @media (max-width: 768px) {
+    .grid-cup { grid-template-columns: repeat(4, 70px); grid-template-rows: repeat(4, 70px); }
+    .grid-cup .cell { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="site-header-inner"><a href="../index.html" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<div class="game-page">
+  <div class="game-header">
+    <h1 class="game-title">2048 Cupcakes</h1>
+    <a href="../index.html" class="game-back">← All Games</a>
+  </div>
+  <div class="game-stats">
+    <div class="stat-box"><div class="stat-label">Score</div><div class="stat-value" id="score">0</div></div>
+    <div class="stat-box"><div class="stat-label">Best</div><div class="stat-value" id="best">0</div></div>
+  </div>
+  <div class="game-board">
+    <div class="game-grid grid-cup" id="grid"></div>
+    <div class="game-overlay hidden" id="overlay">
+      <h2 id="overlay-title">Game Over!</h2>
+      <p id="overlay-text">Press New Game to try again</p>
+      <button class="btn" onclick="newGame()">New Game</button>
+    </div>
+  </div>
+  <div class="game-controls">
+    <button class="btn" onclick="newGame()">New Game</button>
+  </div>
+  <div class="game-instructions">
+    <h3>How to Play</h3>
+    <ul>
+      <li>Use Arrow keys (or swipe) to move all tiles</li>
+      <li>When two tiles with the same cupcake touch, they merge into one</li>
+      <li>Each merge reveals a new cupcake flavor!</li>
+      <li>Reach the final cupcake to win! Keep going for higher scores</li>
+    </ul>
+  </div>
+</div>
+<script>
+const SIZE=4;
+// cupcake emojis by value
+const EMOJIS={2:'🧁',4:'🎂',8:'🍰',16:'🥧',32:'🍩',64:'🍪',128:'🥐',256:'🧇',512:'🍯',1024:'🍫',2048:'🍭'};
+let grid,score,best=+localStorage.getItem('bestCup2048')||0;
+document.getElementById('best').textContent=best;
+
+function newGame(){
+  grid=Array(SIZE).fill().map(()=>Array(SIZE).fill(0));
+  score=0;addTile();addTile();render();
+  document.getElementById('overlay').classList.add('hidden');
+}
+function addTile(){
+  let empty=[];
+  for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++)if(!grid[r][c])empty.push([r,c]);
+  if(!empty.length)return;
+  let[r,c]=empty[Math.floor(Math.random()*empty.length)];
+  grid[r][c]=Math.random()<0.9?2:4;
+}
+function render(){
+  const g=document.getElementById('grid');g.innerHTML='';
+  for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++){
+    const cell=document.createElement('div');cell.className='cell';
+    const v=grid[r][c];cell.dataset.val=v;
+    if(v)cell.textContent=EMOJIS[v]||v;
+    g.appendChild(cell);
+  }
+  document.getElementById('score').textContent=score;
+}
+function slide(row){
+  let arr=row.filter(v=>v);
+  for(let i=0;i<arr.length-1;i++){if(arr[i]===arr[i+1]){arr[i]*=2;score+=arr[i];arr[i+1]=0;}}
+  arr=arr.filter(v=>v);while(arr.length<SIZE)arr.push(0);return arr;
+}
+function rotateLeft(g){const n=g.length;const res=Array(n).fill().map(()=>Array(n).fill(0));for(let r=0;r<n;r++)for(let c=0;c<n;c++)res[n-1-c][r]=g[r][c];return res;}
+function rotateRight(g){const n=g.length;const res=Array(n).fill().map(()=>Array(n).fill(0));for(let r=0;r<n;r++)for(let c=0;c<n;c++)res[c][n-1-r]=g[r][c];return res;}
+function move(dir){
+  let moved=false,g=grid.map(r=>[...r]);
+  if(dir==='left')g=g.map(slide);
+  if(dir==='right')g=g.map(r=>slide(r.reverse()).reverse());
+  if(dir==='up'){g=rotateLeft(g);g=g.map(slide);g=rotateRight(g);}
+  if(dir==='down'){g=rotateLeft(g);g=g.map(r=>slide(r.reverse()).reverse());g=rotateRight(g);}
+  for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++)if(g[r][c]!==grid[r][c])moved=true;
+  if(moved){grid=g;addTile();render();checkEnd();}
+}
+function checkEnd(){
+  let canMove=false;
+  for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++){
+    if(!grid[r][c])canMove=true;
+    if(c<SIZE-1&&grid[r][c]===grid[r][c+1])canMove=true;
+    if(r<SIZE-1&&grid[r][c]===grid[r+1][c])canMove=true;
+  }
+  if(score>best){best=score;localStorage.setItem('bestCup2048',best);document.getElementById('best').textContent=best;}
+  if(!canMove){
+    document.getElementById('overlay-title').textContent='Game Over!';
+    document.getElementById('overlay').classList.remove('hidden');
+  }
+}
+document.addEventListener('keydown',e=>{
+  const map={'ArrowUp':'up','ArrowDown':'down','ArrowLeft':'left','ArrowRight':'right','w':'up','s':'down','a':'left','d':'right'};
+  if(map[e.key]){e.preventDefault();move(map[e.key]);}
+});
+let tx,ty;
+document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+document.addEventListener('touchend',e=>{
+  if(tx===undefined)return;
+  const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)<30&&Math.abs(dy)<30)return;
+  if(Math.abs(dx)>Math.abs(dy))move(dx>0?'right':'left');else move(dy>0?'down':'up');
+  tx=undefined;
+},{passive:true});
+newGame();
+</script>
+</body>
+</html>

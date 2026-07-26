@@ -84,6 +84,24 @@ a:hover {
   font-weight: 500;
 }
 
+.lang-btn {
+  background: var(--bg-elevated);
+  color: var(--primary-light);
+  border: 1px solid var(--border);
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.lang-btn:hover {
+  border-color: var(--primary);
+  color: var(--text);
+}
+
 .main-content {
   max-width: 1200px;
   margin: 0 auto;

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Gomoku (Five in a Row) - Play Free Online | HyperGrad Games</title>
+<meta name="description" content="Play Gomoku (Five in a Row) online for free. Classic strategy board game vs AI. Place 5 stones in a row to win. No download, works on mobile and desktop.">
+<link rel="canonical" href="https://games.hypergrad.cn/games/gomoku.html">
+<link rel="stylesheet" href="../css/style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Gomoku",
+  "description": "Classic Gomoku (Five in a Row) strategy board game vs AI. Place 5 stones in a row to win.",
+  "url": "https://games.hypergrad.cn/games/gomoku.html",
+  "genre": "Strategy",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any (Web Browser)",
+  "offers": {"@type":"Offer","price":"0","priceCurrency":"USD"},
+  "publisher": {"@type":"Organization","name":"HyperGrad"}
+}
+</script>
+<style>
+  .gomoku-board { display: grid; grid-template-columns: repeat(15, 1fr); gap: 0; background: #D4A055; border: 3px solid #8B6914; border-radius: 8px; padding: 4px; width: 100%; max-width: 540px; aspect-ratio: 1; margin: 0 auto; }
+  .gomoku-cell { background: #D4A055; border: 1px solid #C49145; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.1s; position: relative; }
+  .gomoku-cell:hover { background: #E0B570; }
+  .gomoku-stone { width: 85%; height: 85%; border-radius: 50%; box-shadow: 1px 2px 3px rgba(0,0,0,0.3); }
+  .gomoku-stone.black { background: radial-gradient(circle at 35% 30%, #555, #000); }
+  .gomoku-stone.white { background: radial-gradient(circle at 35% 30%, #fff, #ccc); }
+  .gomoku-cell.hint::after { content:''; position:absolute; width:30%; height:30%; border-radius:50%; background:rgba(99,102,241,0.4); }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="site-header-inner"><a href="../index.html" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#strategy">Strategy</a><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a></nav></div></header>
+<div class="game-page">
+  <div class="game-header">
+    <h1 class="game-title">Gomoku (五子棋)</h1>
+    <a href="../index.html" class="game-back">← All Games</a>
+  </div>
+  <div class="game-stats">
+    <div class="stat-box"><div class="stat-label">Turn</div><div class="stat-value" id="turn">You (Black)</div></div>
+    <div class="stat-box"><div class="stat-label">Moves</div><div class="stat-value" id="moves">0</div></div>
+  </div>
+  <div class="game-board">
+    <div class="gomoku-board" id="board"></div>
+  </div>
+  <div class="game-controls">
+    <button class="btn" onclick="newGame()">New Game</button>
+  </div>
+  <div class="game-overlay hidden" id="overlay">
+    <h2 id="overlay-title">Game Over!</h2>
+    <p id="overlay-text"></p>
+    <button class="btn" onclick="newGame()">New Game</button>
+  </div>
+  <div class="game-instructions">
+    <h3>How to Play</h3>
+    <ul>
+      <li>You play Black, AI plays White. Click an intersection to place your stone</li>
+      <li>Get 5 stones in a row (horizontal, vertical, or diagonal) to win</li>
+      <li>Black goes first. The AI will try to block you and build its own lines</li>
+      <li>Click the board to place — works on desktop and mobile</li>
+    </ul>
+  </div>
+</div>
+<script>
+const SIZE=15;
+let board,moves,gameOver,playerTurn;
+
+function newGame(){
+  board=Array(SIZE).fill().map(()=>Array(SIZE).fill(0));
+  moves=0;gameOver=false;playerTurn=true;
+  document.getElementById('overlay').classList.add('hidden');
+  renderBoard();
+  updateStats();
+}
+
+function renderBoard(){
+  const b=document.getElementById('board');
+  b.innerHTML='';
+  for(let r=0;r<SIZE;r++){
+    for(let c=0;c<SIZE;c++){
+      const cell=document.createElement('div');
+      cell.className='gomoku-cell';
+      if(board[r][c]===1)cell.innerHTML='<div class="gomoku-stone black"></div>';
+      else if(board[r][c]===2)cell.innerHTML='<div class="gomoku-stone white"></div>';
+      cell.onclick=()=>placeStone(r,c);
+      b.appendChild(cell);
+    }
+  }
+}
+
+function updateStats(){
+  document.getElementById('turn').textContent=playerTurn?'You (Black)':'AI (White)';
+  document.getElementById('moves').textContent=moves;
+}
+
+function placeStone(r,c){
+  if(gameOver||!playerTurn||board[r][c])return;
+  board[r][c]=1;moves++;playerTurn=false;
+  renderBoard();updateStats();
+  if(checkWin(r,c,1)){
+    endGame('You Win!','Five in a row!');
+    return;
+  }
+  if(moves>=SIZE*SIZE){endGame('Draw!','Board is full.');return;}
+  setTimeout(aiMove,400);
+}
+
+function aiMove(){
+  if(gameOver)return;
+  let best=findBestMove();
+  if(best){
+    board[best[0]][best[1]]=2;moves++;playerTurn=true;
+    renderBoard();updateStats();
+    if(checkWin(best[0],best[1],2)){endGame('AI Wins!','Better luck next time.');return;}
+    if(moves>=SIZE*SIZE){endGame('Draw!','Board is full.');return;}
+  }
+}
+
+function findBestMove(){
+  // Score every empty cell
+  let bestScore=-1,bestMove=null;
+  for(let r=0;r<SIZE;r++){
+    for(let c=0;c<SIZE;c++){
+      if(board[r][c])continue;
+      // only consider cells near existing stones
+      if(!hasNeighbor(r,c))continue;
+      let score=evalCell(r,c,2)*1.1+evalCell(r,c,1);
+      if(score>bestScore){bestScore=score;bestMove=[r,c];}
+    }
+  }
+  if(!bestMove&&moves===0)return[Math.floor(SIZE/2),Math.floor(SIZE/2)];
+  return bestMove;
+}
+
+function hasNeighbor(r,c){
+  for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){
+    if(!dr&&!dc)continue;
+    let nr=r+dr,nc=c+dc;
+    if(nr>=0&&nr<SIZE&&nc>=0&&nc<SIZE&&board[nr][nc])return true;
+  }
+  return false;
+}
+
+function evalCell(r,c,player){
+  let total=0;
+  const dirs=[[0,1],[1,0],[1,1],[1,-1]];
+  for(const[dr,dc]of dirs){
+    let count=1,blocks=0;
+    for(let i=1;i<5;i++){let nr=r+dr*i,nc=c+dc*i;if(nr<0||nr>=SIZE||nc<0||nc>=SIZE){blocks++;break;}if(board[nr][nc]===player)count++;else if(board[nr][nc]===0)break;else{blocks++;break;}}
+    for(let i=1;i<5;i++){let nr=r-dr*i,nc=c-dc*i;if(nr<0||nr>=SIZE||nc<0||nc>=SIZE){blocks++;break;}if(board[nr][nc]===player)count++;else if(board[nr][nc]===0)break;else{blocks++;break;}}
+    if(count>=5)total+=100000;
+    else if(count===4&&blocks===0)total+=10000;
+    else if(count===4)total+=1000;
+    else if(count===3&&blocks===0)total+=500;
+    else if(count===3)total+=100;
+    else if(count===2&&blocks===0)total+=50;
+    else if(count===2)total+=10;
+    else total+=1;
+  }
+  return total;
+}
+
+function checkWin(r,c,player){
+  const dirs=[[0,1],[1,0],[1,1],[1,-1]];
+  for(const[dr,dc]of dirs){
+    let count=1;
+    for(let i=1;i<5;i++){let nr=r+dr*i,nc=c+dc*i;if(nr<0||nr>=SIZE||nc<0||nc>=SIZE||board[nr][nc]!==player)break;count++;}
+    for(let i=1;i<5;i++){let nr=r-dr*i,nc=c-dc*i;if(nr<0||nr>=SIZE||nc<0||nc>=SIZE||board[nr][nc]!==player)break;count++;}
+    if(count>=5)return true;
+  }
+  return false;
+}
+
+function endGame(title,text){
+  gameOver=true;
+  document.getElementById('overlay-title').textContent=title;
+  document.getElementById('overlay-text').textContent=text;
+  document.getElementById('overlay').classList.remove('hidden');
+}
+
+newGame();
+</script>
+</body>
+</html>

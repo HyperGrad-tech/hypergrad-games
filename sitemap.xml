@@ -36,4 +36,11 @@
   <url><loc>https://games.hypergrad.cn/games/mancala.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://games.hypergrad.cn/games/rock-paper-scissors.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://games.hypergrad.cn/games/dice-roll.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/2048-cupcakes.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/mastermind.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/gomoku.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/color-switch.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/solitaire.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/mahjong.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/ludo.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
 </urlset>

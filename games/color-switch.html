@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Color Switch - Play Free Online | HyperGrad Games</title>
+<meta name="description" content="Play Color Switch online for free. Tap to switch ball color and pass through matching obstacles. Addictive hyper-casual game. No download, works on mobile and desktop.">
+<link rel="canonical" href="https://games.hypergrad.cn/games/color-switch.html">
+<link rel="stylesheet" href="../css/style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Color Switch",
+  "description": "Tap to switch ball color and pass through matching obstacles in this addictive hyper-casual game.",
+  "url": "https://games.hypergrad.cn/games/color-switch.html",
+  "genre": "Arcade",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any (Web Browser)",
+  "offers": {"@type":"Offer","price":"0","priceCurrency":"USD"},
+  "publisher": {"@type":"Organization","name":"HyperGrad"}
+}
+</script>
+<style>
+  .cs-canvas { display: block; margin: 0 auto; background: #0a0a15; border-radius: 12px; touch-action: none; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="site-header-inner"><a href="../index.html" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#arcade">Arcade</a><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<div class="game-page">
+  <div class="game-header">
+    <h1 class="game-title">Color Switch</h1>
+    <a href="../index.html" class="game-back">← All Games</a>
+  </div>
+  <div class="game-stats">
+    <div class="stat-box"><div class="stat-label">Score</div><div class="stat-value" id="score">0</div></div>
+    <div class="stat-box"><div class="stat-label">Best</div><div class="stat-value" id="best">0</div></div>
+  </div>
+  <div class="game-board">
+    <canvas id="c" class="cs-canvas" width="360" height="500"></canvas>
+  </div>
+  <div class="game-controls">
+    <button class="btn" onclick="startGame()">Start / Restart</button>
+  </div>
+  <div class="game-instructions">
+    <h3>How to Play</h3>
+    <ul>
+      <li>Tap or click anywhere on the game area to switch your ball color</li>
+      <li>The ball cycles through 4 colors: Red, Yellow, Green, Blue</li>
+      <li>Pass through obstacles that match your ball's color</li>
+      <li>Hitting the wrong color or falling off = Game Over</li>
+      <li>The ball auto-moves up; obstacles scroll down</li>
+    </ul>
+  </div>
+</div>
+<script>
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+const W=360,H=500;
+const COLORS=['#EF4444','#F59E0B','#22C55E','#3B82F6'];
+let ball,obstacles,score,best=+localStorage.getItem('cs-best')||0,running,gameOver,speed;
+document.getElementById('best').textContent=best;
+
+function startGame(){
+  ball={x:W/2,y:H-80,vy:0,color:0,r:12};
+  obstacles=[];score=0;speed=1.5;running=true;gameOver=false;
+  spawnObstacle(H-200);
+  spawnObstacle(H-400);
+  updateScore();
+  loop();
+}
+
+function spawnObstacle(y){
+  obstacles.push({y:y,type:Math.random()<0.5?'ring':'bar',color:Math.floor(Math.random()*4)});
+}
+
+function updateScore(){
+  document.getElementById('score').textContent=score;
+  if(score>best){best=score;localStorage.setItem('cs-best',best);document.getElementById('best').textContent=best;}
+}
+
+function loop(){
+  if(!running)return;
+  // ball physics
+  ball.vy+=0.15;
+  ball.y+=ball.vy;
+  // keep ball on screen
+  if(ball.y>H-30)ball.y=H-30;
+  if(ball.y<30){ball.y=30;ball.vy=0;}
+  // scroll obstacles
+  for(let o of obstacles){o.y+=speed;}
+  // spawn new
+  if(obstacles[obstacles.length-1].y>H-200){
+    spawnObstacle(obstacles[obstacles.length-1].y-220);
+  }
+  // remove offscreen
+  obstacles=obstacles.filter(o=>o.y<H+50);
+  // collision
+  for(let o of obstacles){
+    if(Math.abs(o.y-ball.y)<25){
+      if(ball.color!==o.color){
+        running=false;gameOver=true;
+      }else if(!o.scored){
+        o.scored=true;score++;updateScore();speed+=0.05;
+      }
+    }
+  }
+  draw();
+  if(running)requestAnimationFrame(loop);
+  else if(gameOver)drawGameOver();
+}
+
+function draw(){
+  ctx.fillStyle='#0a0a15';ctx.fillRect(0,0,W,H);
+  // obstacles
+  for(let o of obstacles){
+    ctx.fillStyle=COLORS[o.color];
+    if(o.type==='ring'){
+      ctx.fillRect(W/2-60,o.y,120,12);
+      ctx.fillRect(W/2-60,o.y,12,12);
+      ctx.fillRect(W/2+48,o.y,12,12);
+    }else{
+      ctx.fillRect(W/2-80,o.y,160,12);
+    }
+  }
+  // ball
+  ctx.fillStyle=COLORS[ball.color];
+  ctx.beginPath();ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2);ctx.fill();
+}
+
+function drawGameOver(){
+  draw();
+  ctx.fillStyle='rgba(0,0,0,0.7)';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#fff';ctx.font='bold 28px sans-serif';ctx.textAlign='center';
+  ctx.fillText('Game Over!',W/2,H/2-20);
+  ctx.font='16px sans-serif';
+  ctx.fillText('Score: '+score,W/2,H/2+10);
+  ctx.fillText('Click Start to retry',W/2,H/2+40);
+}
+
+function switchColor(){
+  if(!running)return;
+  ball.color=(ball.color+1)%4;
+}
+
+canvas.addEventListener('click',switchColor);
+canvas.addEventListener('touchstart',e=>{e.preventDefault();switchColor();},{passive:false});
+document.addEventListener('keydown',e=>{if(e.key===' '||e.key==='ArrowUp'){e.preventDefault();switchColor();}});
+</script>
+</body>
+</html>

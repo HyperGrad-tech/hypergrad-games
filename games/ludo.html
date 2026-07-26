@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Ludo - Play Free Online | HyperGrad Games</title>
+<meta name="description" content="Play Ludo online for free. Classic board race game for 1-4 players. Roll dice, move tokens, reach home first to win. No download, works on mobile and desktop.">
+<link rel="canonical" href="https://games.hypergrad.cn/games/ludo.html">
+<link rel="stylesheet" href="../css/style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Ludo",
+  "description": "Classic Ludo board race game. Roll dice, move tokens, reach home first to win. Play vs AI opponents.",
+  "url": "https://games.hypergrad.cn/games/ludo.html",
+  "genre": "Board",
+  "gamePlatform": "Web Browser",
+  "applicationCategory": "Game",
+  "operatingSystem": "Any (Web Browser)",
+  "offers": {"@type":"Offer","price":"0","priceCurrency":"USD"},
+  "publisher": {"@type":"Organization","name":"HyperGrad"}
+}
+</script>
+<style>
+  .ludo-canvas { display: block; margin: 0 auto; background: #1a1a2e; border-radius: 12px; touch-action: manipulation; }
+  .ludo-msg { text-align: center; font-size: 16px; color: var(--primary-light); margin: 8px 0; font-weight: 600; min-height: 24px; }
+</style>
+</head>
+<body>
+<header class="site-header"><div class="site-header-inner"><a href="../index.html" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#card">Board</a><a href="../index.html#strategy">Strategy</a><a href="../index.html#puzzle">Puzzle</a></nav></div></header>
+<div class="game-page">
+  <div class="game-header">
+    <h1 class="game-title">Ludo</h1>
+    <a href="../index.html" class="game-back">← All Games</a>
+  </div>
+  <div class="game-stats">
+    <div class="stat-box"><div class="stat-label">Turn</div><div class="stat-value" id="turn">Red</div></div>
+    <div class="stat-box"><div class="stat-label">Dice</div><div class="stat-value" id="dice">-</div></div>
+  </div>
+  <div class="game-board">
+    <canvas id="c" class="ludo-canvas" width="420" height="420"></canvas>
+  </div>
+  <div class="ludo-msg" id="msg">Click "Roll Dice" to start</div>
+  <div class="game-controls">
+    <button class="btn" onclick="rollDice()">Roll Dice</button>
+    <button class="btn btn-secondary" onclick="newGame()">New Game</button>
+  </div>
+  <div class="game-overlay hidden" id="overlay">
+    <h2 id="overlay-title">Game Over!</h2>
+    <p id="overlay-text"></p>
+    <button class="btn" onclick="newGame()">New Game</button>
+  </div>
+  <div class="game-instructions">
+    <h3>How to Play</h3>
+    <ul>
+      <li><b>Goal:</b> Move all 4 of your tokens from base to the center Home</li>
+      <li>You play <span style="color:#EF4444;">Red</span>, AI plays Yellow, Green, Blue</li>
+      <li>Roll a 6 to move a token out of base. Roll again on a 6</li>
+      <li>Move tokens along the path. Landing on opponent sends them back to base</li>
+      <li>Click a token after rolling to move it (when movable tokens glow)</li>
+      <li>Safe squares (star) protect tokens from capture</li>
+    </ul>
+  </div>
+</div>
+<script>
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+const W=420,H=420;
+const PLAYERS=['Red','Yellow','Green','Blue'];
+const COLORS=['#EF4444','#F59E0B','#22C55E','#3B82F6'];
+// Path: 52 positions around the board + 6 home stretch per player
+// Using simplified grid coordinates
+const CELL=30;
+const PATH=buildPath();
+const HOME_PATH=buildHomePath();
+
+function buildPath(){
+  // Main path: 52 cells. Starting positions per player: 0,13,26,39
+  let p=[];
+  // simplified: go around 15x15 grid outer ring
+  const bx=60,by=60;
+  // Path coordinates (x,y) in pixels for 52 positions
+  // Using standard Ludo path
+  const coords=[
+    [1,6],[2,6],[3,6],[4,6],[5,6],[6,5],[6,4],[6,3],[6,2],[6,1],[6,0],
+    [7,0],[8,0],
+    [8,1],[8,2],[8,3],[8,4],[8,5],[9,6],[10,6],[11,6],[12,6],[13,6],[14,6],
+    [14,7],[14,8],
+    [13,8],[12,8],[11,8],[10,8],[9,8],[8,9],[8,10],[8,11],[8,12],[8,13],[8,14],
+    [7,14],[6,14],
+    [6,13],[6,12],[6,11],[6,10],[6,9],[5,8],[4,8],[3,8],[2,8],[1,8],[0,8],
+    [0,7],[0,6]
+  ];
+  return coords.map(([x,y])=>({x:bx+x*CELL+CELL/2,y:by+y*CELL+CELL/2}));
+}
+
+function buildHomePath(){
+  // 5 cells per player leading to center
+  return [
+    [{x:165,y:75},{x:165,y:105},{x:165,y:135},{x:165,y:165},{x:165,y:195}], // Red (top, going down)
+    [{x:375,y:165},{x:345,y:165},{x:315,y:165},{x:285,y:165},{x:255,y:165}], // Yellow (right, going left)
+    [{x:255,y:345},{x:255,y:315},{x:255,y:285},{x:255,y:255},{x:255,y:225}], // Green (bottom, going up)
+    [{x:75,y:255},{x:105,y:255},{x:135,y:255},{x:165,y:255},{x:195,y:255}], // Blue (left, going right)
+  ];
+}
+
+const START_POS=[0,13,26,39];
+let tokens,dice,curPlayer,gameOver,canRoll,canMove,movableTokens;
+
+function newGame(){
+  tokens=[];
+  for(let p=0;p<4;p++){
+    for(let t=0;t<4;t++){
+      tokens.push({player:p,token:t,path:-1,inBase:true,home:false,x:0,y:0});
+    }
+  }
+  // place base tokens
+  const basePos=[
+    [{x:105,y:105},{x:135,y:105},{x:105,y:135},{x:135,y:135}],
+    [{x:345,y:105},{x:315,y:105},{x:345,y:135},{x:315,y:135}],
+    [{x:345,y:315},{x:315,y:315},{x:345,y:285},{x:315,y:285}],
+    [{x:105,y:315},{x:135,y:315},{x:105,y:285},{x:135,y:285}],
+  ];
+  let ti=[0,0,0,0];
+  for(let tk of tokens){
+    let bp=basePos[tk.player][ti[tk.player]++];
+    tk.x=bp.x;tk.y=bp.y;
+  }
+  dice=0;curPlayer=0;gameOver=false;canRoll=true;canMove=false;movableTokens=[];
+  document.getElementById('overlay').classList.add('hidden');
+  document.getElementById('msg').textContent='Red: Click Roll Dice';
+  updateStats();
+  draw();
+}
+
+function updateStats(){
+  document.getElementById('turn').textContent=PLAYERS[curPlayer];
+  document.getElementById('dice').textContent=dice||'-';
+}
+
+function rollDice(){
+  if(!canRoll||gameOver)return;
+  dice=Math.floor(Math.random()*6)+1;
+  canRoll=false;
+  updateStats();
+  // find movable tokens
+  movableTokens=[];
+  for(let tk of tokens){
+    if(tk.player!==curPlayer||tk.home)continue;
+    if(tk.inBase){
+      if(dice===6)movableTokens.push(tk);
+    }else{
+      // check if move is valid (won't overshoot)
+      let newPos=tk.path+dice;
+      if(newPos<=57)movableTokens.push(tk);
+    }
+  }
+  if(movableTokens.length===0){
+    document.getElementById('msg').textContent=PLAYERS[curPlayer]+': No moves. Next turn.';
+    setTimeout(nextTurn,1200);
+  }else{
+    canMove=true;
+    if(curPlayer===0){
+      document.getElementById('msg').textContent='Red: Click a token to move';
+    }else{
+      // AI auto move
+      setTimeout(aiMove,800);
+    }
+  }
+  draw();
+}
+
+function aiMove(){
+  if(!canMove||gameOver)return;
+  // simple AI: prefer token closest to home, or bring out new token on 6
+  let best=movableTokens[0];
+  if(dice===6){
+    let inBase=movableTokens.find(t=>t.inBase);
+    if(inBase)best=inBase;
+  }
+  // pick furthest along
+  let maxPath=-1;
+  for(let tk of movableTokens){
+    if(!tk.inBase&&tk.path>maxPath){maxPath=tk.path;best=tk;}
+  }
+  moveToken(best);
+}
+
+canvas.addEventListener('click',e=>{
+  if(!canMove||curPlayer!==0||gameOver)return;
+  const rect=canvas.getBoundingClientRect();
+  const sx=canvas.width/rect.width,sy=canvas.height/rect.height;
+  const mx=(e.clientX-rect.left)*sx,my=(e.clientY-rect.top)*sy;
+  // find clicked token
+  for(let tk of movableTokens){
+    if(Math.abs(tk.x-mx)<15&&Math.abs(tk.y-my)<15){
+      moveToken(tk);return;
+    }
+  }
+});
+
+function moveToken(tk){
+  if(tk.inBase){
+    tk.inBase=false;tk.path=0;
+    tk.x=PATH[START_POS[tk.player]].x;tk.y=PATH[START_POS[tk.player]].y;
+  }else{
+    let start=tk.path;
+    let steps=tk.path+dice;
+    // animate or just set
+    tk.path=steps;
+    let absPath=tk.path; // 0-50 = main path from start, 51-56 = home stretch
+    if(absPath<=50){
+      let realPos=(START_POS[tk.player]+absPath)%52;
+      tk.x=PATH[realPos].x;tk.y=PATH[realPos].y;
+    }else if(absPath<=56){
+      let hp=absPath-51;
+      let c=HOME_PATH[tk.player][hp];
+      tk.x=c.x;tk.y=c.y;
+      if(absPath===56){tk.home=true;}
+    }
+    // check capture (only on main path, not safe squares)
+    if(absPath<=50){
+      let realPos=(START_POS[tk.player]+absPath)%52;
+      // safe squares: start positions + 8
+      const safe=[0,8,13,21,26,34,39,47];
+      if(!safe.includes(absPath)){
+        for(let other of tokens){
+          if(other.player!==tk.player&&!other.inBase&&!other.home&&other.path<=50){
+            let otherPos=(START_POS[other.player]+other.path)%52;
+            if(otherPos===realPos){
+              // capture
+              other.inBase=true;other.path=-1;
+              // send back to base
+              const basePos=[[105,105],[345,105],[345,315],[105,315]];
+              other.x=basePos[other.player][0]+(other.token%2)*30;
+              other.y=basePos[other.player][1]+Math.floor(other.token/2)*30;
+            }
+          }
+        }
+      }
+    }
+  }
+  canMove=false;draw();
+  // check win
+  let homeCount=tokens.filter(t=>t.player===curPlayer&&t.home).length;
+  if(homeCount===4){
+    gameOver=true;
+    document.getElementById('overlay-title').textContent=PLAYERS[curPlayer]+' Wins!';
+    document.getElementById('overlay').classList.remove('hidden');
+    return;
+  }
+  if(dice===6){
+    canRoll=true;
+    document.getElementById('msg').textContent=PLAYERS[curPlayer]+': Rolled 6! Roll again';
+    updateStats();
+  }else{
+    setTimeout(nextTurn,600);
+  }
+}
+
+function nextTurn(){
+  curPlayer=(curPlayer+1)%4;
+  dice=0;canRoll=true;canMove=false;movableTokens=[];
+  document.getElementById('msg').textContent=PLAYERS[curPlayer]+': Roll Dice';
+  updateStats();draw();
+  if(curPlayer!==0)setTimeout(rollDice,800);
+}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  // board background
+  ctx.fillStyle='#1a1a2e';ctx.fillRect(0,0,W,H);
+  // draw 4 colored base quadrants
+  const q=150;
+  ctx.fillStyle='#3a1515';ctx.fillRect(30,30,q,q);
+  ctx.fillStyle='#3a2e15';ctx.fillRect(240,30,q,q);
+  ctx.fillStyle='#153a15';ctx.fillRect(240,240,q,q);
+  ctx.fillStyle='#15153a';ctx.fillRect(30,240,q,q);
+  // inner white base circles
+  for(let p=0;p<4;p++){
+    let cx=p===0||p===3?90:330,cy=p===0||p===1?90:330;
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(cx,cy,45,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=COLORS[p];ctx.globalAlpha=0.2;ctx.beginPath();ctx.arc(cx,cy,45,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
+  }
+  // draw path cells
+  ctx.strokeStyle='#555';
+  for(let i=0;i<52;i++){
+    ctx.fillStyle='#2a2a3e';
+    ctx.beginPath();ctx.arc(PATH[i].x,PATH[i].y,13,0,Math.PI*2);ctx.stroke();ctx.fill();
+  }
+  // start positions colored
+  for(let p=0;p<4;p++){
+    ctx.fillStyle=COLORS[p];
+    ctx.beginPath();ctx.arc(PATH[START_POS[p]].x,PATH[START_POS[p]].y,13,0,Math.PI*2);ctx.fill();
+  }
+  // home paths
+  for(let p=0;p<4;p++){
+    for(let c of HOME_PATH[p]){
+      ctx.fillStyle=COLORS[p];ctx.globalAlpha=0.5;
+      ctx.beginPath();ctx.arc(c.x,c.y,12,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
+    }
+  }
+  // center home triangle
+  ctx.fillStyle='#F59E0B';
+  ctx.beginPath();
+  ctx.moveTo(210,180);ctx.lineTo(240,210);ctx.lineTo(210,240);ctx.lineTo(180,210);
+  ctx.closePath();ctx.fill();
+  // draw tokens
+  for(let tk of tokens){
+    if(tk.home)continue; // home tokens drawn in center
+    ctx.fillStyle=COLORS[tk.player];
+    ctx.beginPath();ctx.arc(tk.x,tk.y,10,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+    // highlight movable
+    if(canMove&&curPlayer===0&&movableTokens.includes(tk)){
+      ctx.strokeStyle='#FBBF24';ctx.lineWidth=3;
+      ctx.beginPath();ctx.arc(tk.x,tk.y,14,0,Math.PI*2);ctx.stroke();
+    }
+  }
+  // draw home tokens
+  let homeArr=[[],[],[],[]];
+  for(let tk of tokens)if(tk.home)homeArr[tk.player].push(tk);
+  const homePos=[[195,195],[225,195],[225,225],[195,225]];
+  for(let p=0;p<4;p++){
+    homeArr[p].forEach((tk,i)=>{
+      ctx.fillStyle=COLORS[p];
+      ctx.beginPath();ctx.arc(homePos[p][0]+(i%2)*6,homePos[p][1]+Math.floor(i/2)*6,6,0,Math.PI*2);ctx.fill();
+    });
+  }
+}
+
+newGame();
+</script>
+</body>
+</html>
