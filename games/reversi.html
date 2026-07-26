@@ -87,13 +87,25 @@ function clickCell(r,c){
   if(flips.length===0)return;
   board[r][c]='black';flips.forEach(([fr,fc])=>board[fr][fc]='black');
   lastMove={r,c};updateCounts();render();
-  if(checkEnd())return;
+  // Check if white can move; if not, check if black can continue (pass white's turn)
+  const whiteMoves=getValidMoves('white');
+  if(whiteMoves.length===0){
+    if(getValidMoves('black').length===0){endGame();return;}
+    // White has no moves, black continues
+    document.getElementById('turn').textContent='Your Move (AI passed)';
+    return;
+  }
   currentPlayer='white';document.getElementById('turn').textContent='AI Thinking...';
   setTimeout(aiMove,600);
 }
 function aiMove(){
   let moves=getValidMoves('white');
-  if(moves.length===0){currentPlayer='black';document.getElementById('turn').textContent='Your Move';if(getValidMoves('black').length===0)endGame();render();return;}
+  if(moves.length===0){
+    currentPlayer='black';document.getElementById('turn').textContent='Your Move';
+    if(getValidMoves('black').length===0){endGame();}
+    else{render();}
+    return;
+  }
   // Weighted AI: prefer corners, avoid edges next to corners
   const weights=[
     [99,-8,8,6,6,8,-8,99],[-8,-24,-4,-3,-3,-4,-24,-8],[8,-4,7,4,4,7,-4,8],[6,-3,4,0,0,4,-3,6],
@@ -107,14 +119,15 @@ function aiMove(){
   const flips=getFlips(best.r,best.c,'white');
   board[best.r][best.c]='white';flips.forEach(([fr,fc])=>board[fr][fc]='white');
   lastMove=best;updateCounts();render();
-  if(checkEnd())return;
+  // Check if black can move; if not, check if white can continue (pass black's turn)
+  const blackMoves=getValidMoves('black');
+  if(blackMoves.length===0){
+    if(getValidMoves('white').length===0){endGame();return;}
+    currentPlayer='white';document.getElementById('turn').textContent='AI Thinking...';
+    setTimeout(aiMove,600);
+    return;
+  }
   currentPlayer='black';document.getElementById('turn').textContent='Your Move';
-}
-function checkEnd(){
-  const blackMoves=getValidMoves('black'),whiteMoves=getValidMoves('white');
-  if(blackMoves.length===0&&whiteMoves.length===0){endGame();return true;}
-  if(currentPlayer==='white'&&getValidMoves('black').length===0){return false;}
-  return false;
 }
 function endGame(){
   let black=0,white=0;

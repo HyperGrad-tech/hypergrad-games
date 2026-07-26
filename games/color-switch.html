@@ -47,11 +47,11 @@
   <div class="game-instructions">
     <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
-      <li data-i18n-en="Tap or click anywhere on the game area to switch your ball color" data-i18n-zh="点击或触摸游戏区域任意位置来切换球的颜色">Tap or click anywhere on the game area to switch your ball color</li>
+      <li data-i18n-en="Tap or click anywhere to switch ball color and bounce up" data-i18n-zh="点击或触摸任意位置切换球的颜色并弹起">Tap or click anywhere to switch ball color and bounce up</li>
       <li data-i18n-en="The ball cycles through 4 colors: Red, Yellow, Green, Blue" data-i18n-zh="球在 4 种颜色间循环：红、黄、绿、蓝">The ball cycles through 4 colors: Red, Yellow, Green, Blue</li>
       <li data-i18n-en="Pass through obstacles that match your ball's color" data-i18n-zh="穿过与球颜色相同的障碍物">Pass through obstacles that match your ball's color</li>
       <li data-i18n-en="Hitting the wrong color or falling off = Game Over" data-i18n-zh="撞到错误颜色或掉落 = 游戏结束">Hitting the wrong color or falling off = Game Over</li>
-      <li data-i18n-en="The ball auto-moves up; obstacles scroll down" data-i18n-zh="球自动向上移动，障碍物向下滚动">The ball auto-moves up; obstacles scroll down</li>
+      <li data-i18n-en="Obstacles scroll down — time your taps to pass through!" data-i18n-zh="障碍物向下滚动——掌握节奏点击穿过！">Obstacles scroll down — time your taps to pass through!</li>
     </ul>
   </div>
 </div>
@@ -83,11 +83,11 @@ function updateScore(){
 function loop(){
   if(!running)return;
   // ball physics
-  ball.vy+=0.15;
+  ball.vy+=0.2;
   ball.y+=ball.vy;
   // keep ball on screen
-  if(ball.y>H-30)ball.y=H-30;
-  if(ball.y<30){ball.y=30;ball.vy=0;}
+  if(ball.y>H-20){ball.y=H-20;ball.vy=0;}
+  if(ball.y<20){ball.y=20;ball.vy=0;}
   // scroll obstacles
   for(let o of obstacles){o.y+=speed;}
   // spawn new
@@ -142,6 +142,7 @@ function drawGameOver(){
 function switchColor(){
   if(!running)return;
   ball.color=(ball.color+1)%4;
+  ball.vy=-5; // 给球一个向上推力
 }
 
 canvas.addEventListener('click',switchColor);

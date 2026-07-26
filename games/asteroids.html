@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Asteroids - Play Free Online Space Shooter | HyperGrad Games</title>
-<meta name="description" content="Play Asteroids online for free. Pilot your spaceship, shoot asteroids and avoid collisions. Classic arcade space shooter in your browser. No download needed.">
+<title>Asteroid Blaster - Play Free Online Space Shooter | HyperGrad Games</title>
+<meta name="description" content="Play Asteroid Blaster online for free. Pilot your spaceship, shoot asteroids and avoid collisions. Classic arcade space shooter in your browser. No download needed.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/asteroids.html">
 <link rel="stylesheet" href="../css/style.css">
 <script src="../js/i18n.js"></script>
@@ -12,14 +12,14 @@
   canvas { display: block; border-radius: 8px; background: #050510; cursor: crosshair; touch-action: none; }
 </style>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"VideoGame","name":"Asteroids","description":"Play Asteroids online for free. Pilot your spaceship, shoot asteroids and avoid collisions. Classic arcade space shooter in your browser.","url":"https://games.hypergrad.cn/games/asteroids.html","genre":"Arcade","gamePlatform":"Web Browser","applicationCategory":"Game","operatingSystem":"Any (Web Browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"HyperGrad"}}
+{"@context":"https://schema.org","@type":"VideoGame","name":"Asteroid Blaster","description":"Play Asteroid Blaster online for free. Pilot your spaceship, shoot asteroids and avoid collisions. Classic arcade space shooter in your browser.","url":"https://games.hypergrad.cn/games/asteroids.html","genre":"Arcade","gamePlatform":"Web Browser","applicationCategory":"Game","operatingSystem":"Any (Web Browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"HyperGrad"}}
 </script>
 </head>
 <body>
 <header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
-    <h1 class="game-title">Asteroids</h1>
+    <h1 class="game-title">Asteroid Blaster</h1>
     <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
@@ -152,6 +152,7 @@ function draw(){
   });
 
   // Asteroids
+  const newAsteroids=[];
   asteroids=asteroids.filter(a=>{
     a.x+=a.vx;a.y+=a.vy;a.angle+=a.rotSpeed;
     if(a.x<0)a.x=W;if(a.x>W)a.x=0;if(a.y<0)a.y=H;if(a.y>H)a.y=0;
@@ -172,7 +173,7 @@ function draw(){
           for(let j=0;j<2;j++){
             const na=makeAsteroid(a.x,a.y,a.size-1);
             na.vx=a.vx+(Math.random()-0.5)*1;na.vy=a.vy+(Math.random()-0.5)*1;
-            asteroids.push(na);
+            newAsteroids.push(na);
           }
         }
         return false;
@@ -182,6 +183,7 @@ function draw(){
     if(Math.hypot(ship.x-a.x,ship.y-a.y)<a.r+ship.r-2)hitShip();
     return true;
   });
+  asteroids.push(...newAsteroids);
 
   // Particles
   particles=particles.filter(p=>{

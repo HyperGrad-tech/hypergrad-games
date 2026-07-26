@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Tetris - Play Free Online | HyperGrad Games</title>
-<meta name="description" content="Play Tetris online for free. Stack falling blocks, clear lines, and chase the high score. No download needed, works on mobile and desktop.">
+<title>Block Drop - Play Free Online | HyperGrad Games</title>
+<meta name="description" content="Play Block Drop online for free. Stack falling blocks, clear lines, and chase the high score. No download needed, works on mobile and desktop.">
 <link rel="canonical" href="https://games.hypergrad.cn/games/tetris.html">
 <link rel="stylesheet" href="../css/style.css">
 <script src="../js/i18n.js"></script>
@@ -12,8 +12,8 @@
   {
     "@context": "https://schema.org",
     "@type": "VideoGame",
-    "name": "Tetris",
-    "description": "Stack falling blocks, clear lines, and chase the high score in Tetris.",
+    "name": "Block Drop",
+    "description": "Stack falling blocks, clear lines, and chase the high score in Block Drop.",
     "url": "https://games.hypergrad.cn/games/tetris.html",
     "genre": "Arcade",
     "gamePlatform": "Web Browser",
@@ -35,7 +35,7 @@
 <header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav><button id="lang-switch" class="lang-btn" onclick="I18N.toggle()">中文</button></div></header>
 <div class="game-page">
   <div class="game-header">
-    <h1 class="game-title">Tetris</h1>
+    <h1 class="game-title">Block Drop</h1>
     <a href="../index.html" class="game-back"><span data-i18n="game.back">← All Games</span></a>
   </div>
   <div class="game-stats">
@@ -72,7 +72,7 @@ const PIECES={I:[[1,1,1,1]],O:[[1,1],[1,1]],T:[[0,1,0],[1,1,1]],S:[[0,1,1],[1,1,
 const COLORS={I:'#06b6d4',O:'#f59e0b',T:'#a855f7',S:'#22c55e',Z:'#ef4444',J:'#3b82f6',L:'#f97316'};
 let board,piece,nextX,nextY,score,lines,level,gameLoop,running,paused,dropCounter,dropInterval;
 function startGame(){board=Array(ROWS).fill().map(()=>Array(COLS).fill(null));score=0;lines=0;level=1;dropInterval=800;running=true;paused=false;document.getElementById('overlay').classList.add('hidden');newPiece();document.getElementById('score').textContent=score;document.getElementById('lines').textContent=lines;document.getElementById('level').textContent=level;if(gameLoop)cancelAnimationFrame(gameLoop);dropCounter=0;let lastTime=0;function loop(time){gameLoop=requestAnimationFrame(loop);const dt=time-lastTime;lastTime=time;if(!paused){dropCounter+=dt;if(dropCounter>dropInterval){drop();dropCounter=0;}draw();}}gameLoop=requestAnimationFrame(loop);}
-function newPiece(){const keys=Object.keys(PIECES);const type=keys[Math.floor(Math.random()*keys.length)];piece={shape:PIECES[type].map(r=>[...r]),type,color:COLORS[type],x:Math.floor((COLS-piece.shape[0].length)/2),y:0};if(collide(piece.x,piece.y,piece.shape))gameOver();}
+function newPiece(){const keys=Object.keys(PIECES);const type=keys[Math.floor(Math.random()*keys.length)];const shape=PIECES[type].map(r=>[...r]);piece={shape:shape,type,color:COLORS[type],x:Math.floor((COLS-shape[0].length)/2),y:0};if(collide(piece.x,piece.y,piece.shape))gameOver();}
 function collide(px,py,shape){for(let y=0;y<shape.length;y++)for(let x=0;x<shape[y].length;x++){if(shape[y][x]){if(px+x<0||px+x>=COLS||py+y>=ROWS)return true;if(py+y>=0&&board[py+y][px+x])return true;}}return false;}
 function merge(){for(let y=0;y<piece.shape.length;y++)for(let x=0;x<piece.shape[y].length;x++)if(piece.shape[y][x]&&piece.y+y>=0)board[piece.y+y][piece.x+x]=piece.color;}
 function rotate(){const N=piece.shape.length;const M=piece.shape[0].length;const rotated=Array(M).fill().map((_,i)=>Array(N).fill().map((_,j)=>piece.shape[N-1-j][i]));const oldShape=piece.shape;piece.shape=rotated;if(collide(piece.x,piece.y,rotated)){piece.shape=oldShape;}}
