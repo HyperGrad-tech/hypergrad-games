@@ -39,6 +39,7 @@
     <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
       <li data-i18n-en="Use Arrow keys or WASD to hop the frog" data-i18n-zh="用方向键或 WASD 让青蛙跳跃">Use Arrow keys or WASD to hop the frog</li>
+      <li data-i18n-en="On mobile, tap near the frog in the direction you want to hop" data-i18n-zh="手机端朝想跳的方向点击青蛙附近">On mobile, tap near the frog in the direction you want to hop</li>
       <li data-i18n-en="Cross the road - avoid cars and trucks" data-i18n-zh="过马路——躲开汽车和卡车">Cross the road - avoid cars and trucks</li>
       <li data-i18n-en="Cross the river - jump on logs and lily pads" data-i18n-zh="过河——跳到圆木和荷叶上">Cross the river - jump on logs and lily pads</li>
       <li data-i18n-en="Reach each of the 5 home slots to complete the level" data-i18n-zh="到达 5 个家位即可通关">Reach each of the 5 home slots to complete the level</li>
@@ -100,7 +101,6 @@ function hop(dx,dy){
 }
 function checkHome(){
   if(frog.y===1){
-    const slot=Math.floor(frog.x/2.6);
     const slots=[1,3,5,7,9];
     const idx=slots.findIndex(s=>Math.abs(s-frog.x)<=1);
     if(idx>=0&&!homes[idx]){
@@ -110,6 +110,9 @@ function checkHome(){
       update();
     }else if(idx>=0&&homes[idx]){
       frog.x=6;frog.y=13;frog.ox=6;frog.oy=13;
+    }else{
+      // Not on a home slot and not on a log → fell in the water
+      die();
     }
   }
 }
@@ -173,7 +176,9 @@ function draw(){
         break;
       }
     }
-    if(!onLog&&frog.y!==1&&frog.y!==6){die();}
+    // In water rows (1-5), if not on a log and not on the safe row 6, you drown.
+    // Row 1 home slots are handled by checkHome(); non-home positions in row 1 also drown.
+    if(!onLog&&frog.y!==6){die();}
   }
   // Car collision
   if(frog.y>=7&&frog.y<=12){

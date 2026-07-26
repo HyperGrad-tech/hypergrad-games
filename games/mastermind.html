@@ -53,6 +53,11 @@
   </div>
   <div class="game-board">
     <div class="mm-board" id="board"></div>
+    <div class="game-overlay hidden" id="overlay">
+      <h2 id="overlay-title"></h2>
+      <p id="overlay-detail" style="margin:8px 0 16px;font-size:16px;color:var(--text-dim);"></p>
+      <button class="btn" onclick="newGame()" data-i18n-en="Play Again" data-i18n-zh="再玩一次">Play Again</button>
+    </div>
   </div>
   <div class="game-controls">
     <div class="mm-picker" id="picker"></div>
@@ -74,7 +79,10 @@
 <script>
 const COLORS=['#EF4444','#F59E0B','#22C55E','#3B82F6','#A855F7','#EC4899'];
 const CODE_LEN=4,MAX_ROUNDS=10;
+let history=[],feedback=[];
 let secret,curGuess,curRound,gameOver;
+const MM_MSG={win:{en:'You Cracked It!',zh:'破解成功！'},lose:{en:'Game Over',zh:'游戏结束'},codePrefix:{en:'The code was:',zh:'正确密码是：'}};
+function mmLang(){return(localStorage.getItem('mmLang')==='zh'||(typeof I18N!=='undefined'&&I18N.get&&I18N.get()==='zh'))?'zh':'en';}
 
 function newGame(){
   secret=[];
@@ -82,6 +90,8 @@ function newGame(){
   curGuess=new Array(CODE_LEN).fill(-1);
   curRound=0;
   gameOver=false;
+  history=[];feedback=[];
+  document.getElementById('overlay').classList.add('hidden');
   renderBoard();
   renderPicker();
   document.getElementById('round').textContent=1;
@@ -123,8 +133,6 @@ function renderBoard(){
   }
 }
 
-let history=[],feedback=[];
-
 function submitGuess(){
   if(gameOver)return;
   if(curGuess.includes(-1))return;
@@ -144,14 +152,27 @@ function submitGuess(){
   curRound++;
   if(hit===CODE_LEN){
     gameOver=true;
-    setTimeout(()=>alert('You cracked the code! You win!'),100);
+    showOverlay('win','');
   }else if(curRound>=MAX_ROUNDS){
     gameOver=true;
-    setTimeout(()=>alert('Game Over! The code was: '+secret.map(c=>'●').join(' ')),100);
+    const lang=mmLang();
+    const codeStr=secret.map(c=>`<span style="display:inline-block;width:18px;height:18px;border-radius:50%;background:${COLORS[c]};vertical-align:middle;margin:0 2px;"></span>`).join('');
+    showOverlay('lose',MM_MSG.codePrefix[lang]+' '+codeStr);
   }
   curGuess=new Array(CODE_LEN).fill(-1);
   document.getElementById('round').textContent=Math.min(curRound+1,MAX_ROUNDS);
   renderBoard();
+}
+
+function showOverlay(type,detailHTML){
+  const lang=mmLang();
+  const t=document.getElementById('overlay-title');
+  t.textContent=MM_MSG[type][lang];
+  t.setAttribute('data-i18n-en',MM_MSG[type].en);
+  t.setAttribute('data-i18n-zh',MM_MSG[type].zh);
+  const d=document.getElementById('overlay-detail');
+  d.innerHTML=detailHTML||'';
+  setTimeout(()=>document.getElementById('overlay').classList.remove('hidden'),250);
 }
 
 function renderPicker(){

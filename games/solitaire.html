@@ -220,6 +220,18 @@ function makeCardEl(card,loc){
     if(parts[0]==='waste'){tryAutoFoundation('waste',-1);}
     else if(parts[0]==='tab'){tryAutoFoundation('tab',+parts[1]);}
   };
+  // Long-press support for mobile (auto-send to foundation)
+  let pressTimer=null;
+  el.addEventListener('pointerdown',e=>{
+    pressTimer=setTimeout(()=>{
+      pressTimer=null;
+      let parts=loc.split('-');
+      if(parts[0]==='waste'){tryAutoFoundation('waste',-1);}
+      else if(parts[0]==='tab'){tryAutoFoundation('tab',+parts[1]);}
+    },500);
+  });
+  el.addEventListener('pointerup',()=>{if(pressTimer){clearTimeout(pressTimer);pressTimer=null;}});
+  el.addEventListener('pointerleave',()=>{if(pressTimer){clearTimeout(pressTimer);pressTimer=null;}});
   return el;
 }
 

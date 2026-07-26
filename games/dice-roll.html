@@ -123,9 +123,11 @@ function toggleHold(i){
 }
 function renderDice(){
   const row=document.getElementById('dice-row');row.innerHTML='';
+  // When rolls are used up or game hasn't started, dice are disabled visually
+  const disabled=!hasRolled||rollsLeft===0||gameOver;
   for(let i=0;i<5;i++){
     const die=document.createElement('div');
-    die.className='dr-die'+(held[i]?' held':'')+(!hasRolled?' disabled':'');
+    die.className='dr-die'+(held[i]?' held':'')+(disabled?' disabled':'');
     die.id='die-'+i;
     die.textContent=DOTS[dice[i]-1];
     die.onclick=()=>toggleHold(i);

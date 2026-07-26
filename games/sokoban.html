@@ -50,6 +50,7 @@
     <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
       <li data-i18n-en="Use Arrow keys or WASD to move the blue player" data-i18n-zh="用方向键或 WASD 移动蓝色角色">Use Arrow keys or WASD to move the blue player</li>
+      <li data-i18n-en="On mobile, swipe in the direction you want to move" data-i18n-zh="手机端向想移动的方向滑动屏幕">On mobile, swipe in the direction you want to move</li>
       <li data-i18n-en="Push brown boxes onto the star targets" data-i18n-zh="将棕色箱子推到星标目标上">Push brown boxes onto the star targets</li>
       <li data-i18n-en="You can only push, never pull — plan ahead!" data-i18n-zh="只能推不能拉——提前规划！">You can only push, never pull — plan ahead!</li>
       <li data-i18n-en="Place all boxes on targets to complete the level" data-i18n-zh="将所有箱子放到目标上即可通关">Place all boxes on targets to complete the level</li>
@@ -74,6 +75,16 @@ function move(dr,dc){const nr=playerRow+dr,nc=playerCol+dc;if(isWall(nr,nc))retu
 function checkWin(){return boxes.every(b=>isTarget(b.r,b.c));}
 function render(){const g=document.getElementById('grid');const cols=Math.max(...map.map(r=>r.length));g.style.gridTemplateColumns=`repeat(${cols}, 42px)`;g.innerHTML='';for(let r=0;r<map.length;r++)for(let c=0;c<cols;c++){const cell=document.createElement('div');cell.className='soko-cell';if(!map[r][c])cell.classList.add('floor');else if(map[r][c]==='wall')cell.classList.add('wall');else{cell.classList.add('floor');if(isTarget(r,c))cell.classList.add('target');}const bi=getBox(r,c);if(bi>=0){cell.classList.remove('target');cell.classList.add(isTarget(r,c)?'box-done':'box');cell.textContent='📦';}if(r===playerRow&&c===playerCol){cell.classList.add('player');cell.textContent='🙂';}g.appendChild(cell);}}
 document.addEventListener('keydown',e=>{const k=e.key;if(k==='ArrowUp'||k==='w')move(-1,0);if(k==='ArrowDown'||k==='s')move(1,0);if(k==='ArrowLeft'||k==='a')move(0,-1);if(k==='ArrowRight'||k==='d')move(0,1);if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(k))e.preventDefault();});
+// Touch / swipe support
+let touchStartX=0,touchStartY=0;
+document.addEventListener('touchstart',e=>{const t=e.touches[0];touchStartX=t.clientX;touchStartY=t.clientY;},{passive:true});
+document.addEventListener('touchend',e=>{
+  const t=e.changedTouches[0];const dx=t.clientX-touchStartX,dy=t.clientY-touchStartY;
+  const ax=Math.abs(dx),ay=Math.abs(dy);
+  if(Math.max(ax,ay)<20)return; // ignore tiny taps
+  if(ax>ay)move(0,dx>0?1:-1);
+  else move(dy>0?1:-1,0);
+},{passive:true});
 newGame(1);
 </script>
 </body>

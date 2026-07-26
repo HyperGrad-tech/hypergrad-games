@@ -40,6 +40,7 @@
     <ul>
       <li data-i18n-en="Use Left/Right Arrow keys or A/D to move" data-i18n-zh="用左右方向键或 A/D 移动">Use Left/Right Arrow keys or A/D to move</li>
       <li data-i18n-en="Press Space to shoot" data-i18n-zh="按空格键射击">Press Space to shoot</li>
+      <li data-i18n-en="On mobile, drag to move and tap to shoot" data-i18n-zh="手机端拖动移动，点击射击">On mobile, drag to move and tap to shoot</li>
       <li data-i18n-en="Destroy all aliens to advance to the next wave" data-i18n-zh="消灭所有外星人即可进入下一波">Destroy all aliens to advance to the next wave</li>
       <li data-i18n-en="Aliens move faster as their numbers decrease" data-i18n-zh="外星人越少移动越快">Aliens move faster as their numbers decrease</li>
       <li data-i18n-en="Don't let aliens reach your level or you lose a life!" data-i18n-zh="不要让外星人到达你的位置，否则失去一条命！">Don't let aliens reach your level or you lose a life!</li>
@@ -138,9 +139,11 @@ function draw(){
 }
 window.addEventListener('keydown',e=>{keys[e.key]=true;if(e.key===' '){e.preventDefault();shoot();}});
 window.addEventListener('keyup',e=>{keys[e.key]=false;});
-// Touch controls
-canvas.addEventListener('touchstart',e=>{e.preventDefault();const t=e.touches[0];const rect=canvas.getBoundingClientRect();player.x=(t.clientX-rect.left)*(W/rect.width)-player.w/2;player.x=Math.max(0,Math.min(W-player.w,player.x));shoot();},{passive:false});
-canvas.addEventListener('touchmove',e=>{e.preventDefault();const t=e.touches[0];const rect=canvas.getBoundingClientRect();player.x=(t.clientX-rect.left)*(W/rect.width)-player.w/2;player.x=Math.max(0,Math.min(W-player.w,player.x));},{passive:false});
+// Touch controls: tap to shoot, drag to move
+let touchActive=false,touchMoved=false,touchStartX=0;
+canvas.addEventListener('touchstart',e=>{e.preventDefault();const t=e.touches[0];const rect=canvas.getBoundingClientRect();touchStartX=t.clientX;touchActive=true;touchMoved=false;},{passive:false});
+canvas.addEventListener('touchmove',e=>{e.preventDefault();const t=e.touches[0];const rect=canvas.getBoundingClientRect();player.x=(t.clientX-rect.left)*(W/rect.width)-player.w/2;player.x=Math.max(0,Math.min(W-player.w,player.x));touchMoved=true;},{passive:false});
+canvas.addEventListener('touchend',e=>{e.preventDefault();if(touchActive&&!touchMoved)shoot();touchActive=false;},{passive:false});
 function loop(){draw();requestAnimationFrame(loop);}
 newGame();loop();
 </script>
