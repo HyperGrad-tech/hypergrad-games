@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Sokoban - Play Free Online | HyperGrad Games</title>
+<meta name="description" content="Play Sokoban puzzle game online for free. Push boxes to target spots. Think before you move! No download needed.">
+<link rel="canonical" href="https://games.hypergrad.cn/games/sokoban.html">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  .soko-grid { display: grid; gap: 0; }
+  .soko-cell { width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+  .soko-cell.wall { background: #5C4033; }
+  .soko-cell.floor { background: #2D2D4A; }
+  .soko-cell.target { background: #2D2D4A; }
+  .soko-cell.target::after { content: '⭐'; font-size: 18px; opacity: 0.4; }
+  .soko-cell.box { background: #8B6F47; }
+  .soko-cell.box-done { background: var(--success); }
+  .soko-cell.player { background: #6366F1; }
+  @media (max-width: 768px) { .soko-cell { width: 34px; height: 34px; font-size: 22px; } }
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoGame","name":"Sokoban","description":"Push boxes to target spots. Think before you move!","url":"https://games.hypergrad.cn/games/sokoban.html","genre":"Puzzle","gamePlatform":"Web Browser","applicationCategory":"Game","operatingSystem":"Any (Web Browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"HyperGrad"}}
+</script>
+</head>
+<body>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<div class="game-page">
+  <div class="game-header">
+    <h1 class="game-title">Sokoban</h1>
+    <a href="../index.html" class="game-back">← All Games</a>
+  </div>
+  <div class="game-stats">
+    <div class="stat-box"><div class="stat-label">Moves</div><div class="stat-value" id="moves">0</div></div>
+    <div class="stat-box"><div class="stat-label">Level</div><div class="stat-value" id="level">1</div></div>
+  </div>
+  <div class="game-board">
+    <div class="soko-grid" id="grid"></div>
+    <div class="game-overlay hidden" id="overlay">
+      <h2>Level Complete!</h2>
+      <p id="overlay-text"></p>
+      <button class="btn" id="next-btn" onclick="nextLevel()">Next Level</button>
+    </div>
+  </div>
+  <div class="game-controls">
+    <button class="btn" onclick="resetLevel()">Reset Level</button>
+  </div>
+  <div class="game-instructions">
+    <h3>How to Play</h3>
+    <ul>
+      <li>Use Arrow keys or WASD to move the blue player</li>
+      <li>Push brown boxes onto the star targets</li>
+      <li>You can only push, never pull — plan ahead!</li>
+      <li>Place all boxes on targets to complete the level</li>
+    </ul>
+  </div>
+</div>
+<script>
+// Map symbols: # = wall, . = floor, @ = player, $ = box, * = target, & = box on target, ! = player on target
+const LEVELS=[
+"#######;#.....#;#.*$.*#;#.$.@.#;#.*$.*#;#.....#;#######",
+"#########;#.......#;#.*$..*.#;#..$.$..#;#.@...$.#;#..*.*..#;#.......#;#########",
+"########;#......#;#.$..$.#;#.@##..#;#..*.*.#;#..*.*.#;#......#;########"
+];
+let level,map,playerRow,playerCol,moves,boxes,targets;
+function newGame(l){level=l;const data=LEVELS[Math.min(l-1,LEVELS.length-1)].split(';');const rows=data.length;map=[];boxes=[];targets=[];for(let r=0;r<rows;r++){map[r]=[];for(let c=0;c<data[r].length;c++){const ch=data[r][c];if(ch==='#')map[r][c]='wall';else{map[r][c]='floor';if(ch==='*')targets.push({r,c});if(ch==='$')boxes.push({r,c});if(ch==='&'){boxes.push({r,c});targets.push({r,c});}if(ch==='@'){playerRow=r;playerCol=c;}if(ch==='!'){playerRow=r;playerCol=c;targets.push({r,c});}}}}moves=0;document.getElementById('level').textContent=level;document.getElementById('moves').textContent=0;document.getElementById('overlay').classList.add('hidden');if(level>=LEVELS.length)document.getElementById('next-btn').textContent='Start Over';else document.getElementById('next-btn').textContent='Next Level';render();}
+function nextLevel(){if(level<LEVELS.length)newGame(level+1);else newGame(1);}
+function resetLevel(){newGame(level);}
+function isWall(r,c){return map[r]&&map[r][c]==='wall';}
+function getBox(r,c){return boxes.findIndex(b=>b.r===r&&b.c===c);}
+function isTarget(r,c){return targets.some(t=>t.r===r&&t.c===c);}
+function move(dr,dc){const nr=playerRow+dr,nc=playerCol+dc;if(isWall(nr,nc))return;const bi=getBox(nr,nc);if(bi>=0){const br=nr+dr,bc=nc+dc;if(isWall(br,bc))return;if(getBox(br,bc)>=0)return;boxes[bi]={r:br,c:bc};}playerRow=nr;playerCol=nc;moves++;document.getElementById('moves').textContent=moves;render();if(checkWin()){document.getElementById('overlay-text').textContent=`Solved in ${moves} moves!`;document.getElementById('overlay').classList.remove('hidden');}}
+function checkWin(){return boxes.every(b=>isTarget(b.r,b.c));}
+function render(){const g=document.getElementById('grid');const cols=Math.max(...map.map(r=>r.length));g.style.gridTemplateColumns=`repeat(${cols}, 42px)`;g.innerHTML='';for(let r=0;r<map.length;r++)for(let c=0;c<cols;c++){const cell=document.createElement('div');cell.className='soko-cell';if(!map[r][c])cell.classList.add('floor');else if(map[r][c]==='wall')cell.classList.add('wall');else{cell.classList.add('floor');if(isTarget(r,c))cell.classList.add('target');}const bi=getBox(r,c);if(bi>=0){cell.classList.remove('target');cell.classList.add(isTarget(r,c)?'box-done':'box');cell.textContent='📦';}if(r===playerRow&&c===playerCol){cell.classList.add('player');cell.textContent='🙂';}g.appendChild(cell);}}
+document.addEventListener('keydown',e=>{const k=e.key;if(k==='ArrowUp'||k==='w')move(-1,0);if(k==='ArrowDown'||k==='s')move(1,0);if(k==='ArrowLeft'||k==='a')move(0,-1);if(k==='ArrowRight'||k==='d')move(0,1);if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(k))e.preventDefault();});
+newGame(1);
+</script>
+</body>
+</html>

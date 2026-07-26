@@ -22,4 +22,6 @@
   <url><loc>https://games.hypergrad.cn/games/maze.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://games.hypergrad.cn/games/color-match.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://games.hypergrad.cn/games/checkers.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/typing-test.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/sokoban.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
 </urlset>
