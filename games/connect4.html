@@ -9,12 +9,22 @@
 <link rel="stylesheet" href="../css/style.css">
 <script src="../js/i18n.js"></script>
 <style>
+  .c4-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .c4-preview { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; width: 420px; height: 56px; box-sizing: border-box; }
+  .c4-preview-cell { width: 56px; height: 56px; border-radius: 50%; visibility: hidden; }
+  .c4-preview-cell.show { visibility: visible; background: rgba(239,68,68,0.45); box-shadow: inset 0 2px 6px rgba(0,0,0,0.15); animation: c4pulse 1.2s ease-in-out infinite; }
+  @keyframes c4pulse { 0%,100% { transform: scale(0.85); opacity: 0.7; } 50% { transform: scale(1.0); opacity: 1; } }
   .c4-board { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; background: var(--primary); padding: 8px; border-radius: 8px; width: 420px; }
-  .c4-cell { width: 56px; height: 56px; background: var(--bg); border-radius: 50%; cursor: pointer; transition: background 0.1s; }
+  .c4-cell { width: 56px; height: 56px; background: var(--bg); border-radius: 50%; cursor: pointer; transition: background 0.1s, transform 0.1s; }
   .c4-cell.red { background: #EF4444; cursor: default; }
   .c4-cell.yellow { background: #F59E0B; cursor: default; }
-  .c4-cell.hover-red { background: rgba(239,68,68,0.3); }
-  @media (max-width: 768px) { .c4-board { width: 340px; } .c4-cell { width: 44px; height: 44px; } }
+  .c4-cell.col-hover { background: rgba(239,68,68,0.18); }
+  .c4-cell.red.col-hover, .c4-cell.yellow.col-hover { /* 已落子格不高亮 */ }
+  @media (max-width: 768px) {
+    .c4-preview { width: 308px; height: 44px; }
+    .c4-board { width: 308px; }
+    .c4-preview-cell, .c4-cell { width: 40px; height: 40px; }
+  }
 </style>
   <script type="application/ld+json">
   {
@@ -52,7 +62,10 @@
     <div class="stat-box"><div class="stat-label" data-i18n-en="Losses" data-i18n-zh="负">Losses</div><div class="stat-value" id="losses">0</div></div>
   </div>
   <div class="game-board">
-    <div class="c4-board" id="board"></div>
+    <div class="c4-wrap">
+      <div class="c4-preview" id="preview"></div>
+      <div class="c4-board" id="board"></div>
+    </div>
     <div class="game-overlay hidden" id="overlay">
       <h2 id="overlay-title" data-i18n-en="Draw!" data-i18n-zh="平局！">Draw!</h2>
       <button class="btn" onclick="newGame()" data-i18n-en="Play Again" data-i18n-zh="再玩一次">Play Again</button>
@@ -65,19 +78,29 @@
     <h3 data-i18n="game.howto">How to Play</h3>
     <ul>
       <li data-i18n-en="You are Red, the AI is Yellow" data-i18n-zh="你是红方，AI 是黄方">You are Red, the AI is Yellow</li>
-      <li data-i18n-en="Click a column to drop your disc" data-i18n-zh="点击某一列放下你的棋子">Click a column to drop your disc</li>
+      <li data-i18n-en="Hover a column to see where your disc will land, then click to drop it" data-i18n-zh="把鼠标移到某一列可预览落点，点击即可放下棋子">Hover a column to see where your disc will land, then click to drop it</li>
+      <li data-i18n-en="Discs fall to the lowest empty slot in that column" data-i18n-zh="棋子会落到该列最下方的空位">Discs fall to the lowest empty slot in that column</li>
       <li data-i18n-en="Get four discs in a row (horizontal, vertical, or diagonal) to win" data-i18n-zh="连成四子一线（横、竖、斜）即可获胜">Get four discs in a row (horizontal, vertical, or diagonal) to win</li>
       <li data-i18n-en="The AI uses a minimax algorithm with alpha-beta pruning for a tough challenge" data-i18n-zh="AI 使用极小化极大算法加阿尔法-贝塔剪枝，挑战性十足">The AI uses a minimax algorithm with alpha-beta pruning for a tough challenge</li>
     </ul>
   </div>
 </div>
 <script>
-const ROWS=6,COLS=7;let board,gameOver,stats={wins:+localStorage.getItem('c4Wins')||0,draws:+localStorage.getItem('c4Draws')||0,losses:+localStorage.getItem('c4Losses')||0};
+const ROWS=6,COLS=7;let board,gameOver,hoveredCol=-1,aiThinking=false,stats={wins:+localStorage.getItem('c4Wins')||0,draws:+localStorage.getItem('c4Draws')||0,losses:+localStorage.getItem('c4Losses')||0};
 document.getElementById('wins').textContent=stats.wins;document.getElementById('draws').textContent=stats.draws;document.getElementById('losses').textContent=stats.losses;
-function newGame(){board=Array(ROWS).fill().map(()=>Array(COLS).fill(0));gameOver=false;document.getElementById('overlay').classList.add('hidden');render();}
-function render(){const b=document.getElementById('board');b.innerHTML='';for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const cell=document.createElement('div');cell.className='c4-cell';if(board[r][c]===1)cell.classList.add('red');if(board[r][c]===2)cell.classList.add('yellow');cell.dataset.r=r;cell.dataset.c=c;cell.addEventListener('click',()=>playerDrop(c));b.appendChild(cell);}}
-function playerDrop(col){if(gameOver)return;const row=dropRow(col);if(row===-1)return;board[row][col]=1;render();if(checkWin(1)){end(1);return;}if(isFull()){end(0);return;}setTimeout(aiMove,400);}
-function aiMove(){const col=bestCol();const row=dropRow(col);board[row][col]=2;render();if(checkWin(2)){end(2);return;}if(isFull()){end(0);return;}}
+const MESSAGES={1:{en:'You Win!',zh:'你赢了！'},2:{en:'AI Wins!',zh:'AI 获胜！'},0:{en:'Draw!',zh:'平局！'}};
+function currentLang(){return(I18N.get&&I18N.get())||(localStorage.getItem('c4Lang')==='zh'?'zh':'en');}
+function msgFor(r){const m=MESSAGES[r];return m?m[currentLang()]:'';}
+function newGame(){board=Array(ROWS).fill().map(()=>Array(COLS).fill(0));gameOver=false;aiThinking=false;hoveredCol=-1;document.getElementById('overlay').classList.add('hidden');buildPreview();render();}
+function buildPreview(){const p=document.getElementById('preview');p.innerHTML='';for(let c=0;c<COLS;c++){const cell=document.createElement('div');cell.className='c4-preview-cell';cell.dataset.c=c;p.appendChild(cell);}}
+function render(){const b=document.getElementById('board');b.innerHTML='';for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const cell=document.createElement('div');cell.className='c4-cell';const v=board[r][c];if(v===1)cell.classList.add('red');if(v===2)cell.classList.add('yellow');if(hoveredCol===c&&!gameOver&&!aiThinking&&!v)cell.classList.add('col-hover');cell.dataset.r=r;cell.dataset.c=c;cell.addEventListener('click',()=>playerDrop(c));cell.addEventListener('pointerenter',()=>setHover(c));b.appendChild(cell);}
+updatePreview();}
+function setHover(c){if(gameOver||aiThinking){hoveredCol=-1;}else{hoveredCol=c;}
+render();}
+function clearHover(){hoveredCol=-1;render();}
+function updatePreview(){const cells=document.getElementById('preview').children;for(let c=0;c<COLS;c++){cells[c].classList.toggle('show',c===hoveredCol&&!gameOver&&!aiThinking);}}
+function playerDrop(col){if(gameOver||aiThinking)return;const row=dropRow(col);if(row===-1)return;board[row][col]=1;aiThinking=true;hoveredCol=-1;render();if(checkWin(1)){end(1);return;}if(isFull()){end(0);return;}setTimeout(aiMove,400);}
+function aiMove(){const col=bestCol();const row=dropRow(col);board[row][col]=2;render();aiThinking=false;if(checkWin(2)){end(2);return;}if(isFull()){end(0);return;}}
 function dropRow(col){for(let r=ROWS-1;r>=0;r--)if(!board[r][col])return r;return -1;}
 function isFull(){return board[0].every(c=>c);}
 function checkWin(p){for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){if(board[r][c]!==p)continue;if(c+3<COLS&&board[r][c+1]===p&&board[r][c+2]===p&&board[r][c+3]===p)return true;if(r+3<ROWS&&board[r+1][c]===p&&board[r+2][c]===p&&board[r+3][c]===p)return true;if(r+3<ROWS&&c+3<COLS&&board[r+1][c+1]===p&&board[r+2][c+2]===p&&board[r+3][c+3]===p)return true;if(r+3<ROWS&&c-3>=0&&board[r+1][c-1]===p&&board[r+2][c-2]===p&&board[r+3][c-3]===p)return true;}return false;}
@@ -88,7 +111,7 @@ function isFullOn(b){return b[0].every(c=>c);}
 function checkWinOn(b){for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const p=b[r][c];if(!p)continue;if(c+3<COLS&&b[r][c+1]===p&&b[r][c+2]===p&&b[r][c+3]===p)return p;if(r+3<ROWS&&b[r+1][c]===p&&b[r+2][c]===p&&b[r+3][c]===p)return p;if(r+3<ROWS&&c+3<COLS&&b[r+1][c+1]===p&&b[r+2][c+2]===p&&b[r+3][c+3]===p)return p;if(r+3<ROWS&&c-3>=0&&b[r+1][c-1]===p&&b[r+2][c-2]===p&&b[r+3][c-3]===p)return p;}return 0;}
 function evaluate(b){let score=0;for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){if(c+3<COLS){const w=[b[r][c],b[r][c+1],b[r][c+2],b[r][c+3]];score+=scoreWin(w);}if(r+3<ROWS){const w=[b[r][c],b[r+1][c],b[r+2][c],b[r+3][c]];score+=scoreWin(w);}if(r+3<ROWS&&c+3<COLS){const w=[b[r][c],b[r+1][c+1],b[r+2][c+2],b[r+3][c+3]];score+=scoreWin(w);}if(r+3<ROWS&&c-3>=0){const w=[b[r][c],b[r+1][c-1],b[r+2][c-2],b[r+3][c-3]];score+=scoreWin(w);}}return score;}
 function scoreWin(w){const y=w.filter(x=>x===2).length,r=w.filter(x=>x===1).length,e=w.filter(x=>x===0).length;if(y===4)return 100;if(y===3&&e===1)return 10;if(y===2&&e===2)return 2;if(r===3&&e===1)return -10;if(r===2&&e===2)return -2;return 0;}
-function end(result){gameOver=true;const t=document.getElementById('overlay-title');if(result===1){t.textContent='You Win!';stats.wins++;localStorage.setItem('c4Wins',stats.wins);}else if(result===2){t.textContent='AI Wins!';stats.losses++;localStorage.setItem('c4Losses',stats.losses);}else{t.textContent='Draw!';stats.draws++;localStorage.setItem('c4Draws',stats.draws);}document.getElementById('wins').textContent=stats.wins;document.getElementById('draws').textContent=stats.draws;document.getElementById('losses').textContent=stats.losses;setTimeout(()=>document.getElementById('overlay').classList.remove('hidden'),300);}
+function end(result){gameOver=true;aiThinking=false;const t=document.getElementById('overlay-title');const txt=msgFor(result);t.textContent=txt;t.setAttribute('data-i18n-en',MESSAGES[result].en);t.setAttribute('data-i18n-zh',MESSAGES[result].zh);if(result===1){stats.wins++;localStorage.setItem('c4Wins',stats.wins);}else if(result===2){stats.losses++;localStorage.setItem('c4Losses',stats.losses);}else{stats.draws++;localStorage.setItem('c4Draws',stats.draws);}document.getElementById('wins').textContent=stats.wins;document.getElementById('draws').textContent=stats.draws;document.getElementById('losses').textContent=stats.losses;setTimeout(()=>document.getElementById('overlay').classList.remove('hidden'),300);}
 newGame();
 </script>
 </body>
