@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Asteroids - Play Free Online Space Shooter | HyperGrad Games</title>
+<meta name="description" content="Play Asteroids online for free. Pilot your spaceship, shoot asteroids and avoid collisions. Classic arcade space shooter in your browser. No download needed.">
+<link rel="canonical" href="https://games.hypergrad.cn/games/asteroids.html">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  canvas { display: block; border-radius: 8px; background: #050510; cursor: crosshair; touch-action: none; }
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoGame","name":"Asteroids","description":"Play Asteroids online for free. Pilot your spaceship, shoot asteroids and avoid collisions. Classic arcade space shooter in your browser.","url":"https://games.hypergrad.cn/games/asteroids.html","genre":"Arcade","gamePlatform":"Web Browser","applicationCategory":"Game","operatingSystem":"Any (Web Browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"HyperGrad"}}
+</script>
+</head>
+<body>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<div class="game-page">
+  <div class="game-header">
+    <h1 class="game-title">Asteroids</h1>
+    <a href="../index.html" class="game-back">&larr; All Games</a>
+  </div>
+  <div class="game-stats">
+    <div class="stat-box"><div class="stat-label">Score</div><div class="stat-value" id="score">0</div></div>
+    <div class="stat-box"><div class="stat-label">Lives</div><div class="stat-value" id="lives">3</div></div>
+    <div class="stat-box"><div class="stat-label">Wave</div><div class="stat-value" id="wave">1</div></div>
+  </div>
+  <div class="game-board" style="padding:10px;">
+    <canvas id="canvas" width="400" height="500"></canvas>
+    <div class="game-overlay hidden" id="overlay">
+      <h2 id="overlay-title">Game Over</h2>
+      <p id="overlay-text"></p>
+      <button class="btn" onclick="newGame()">Play Again</button>
+    </div>
+  </div>
+  <div class="game-instructions">
+    <h3>How to Play</h3>
+    <ul>
+      <li>Use Arrow keys or WASD: Left/Right to rotate, Up to thrust</li>
+      <li>Press Space to shoot asteroids</li>
+      <li>Large asteroids split into medium, then small when shot</li>
+      <li>Small asteroids give the most points</li>
+      <li>Don't crash into asteroids - you have 3 lives</li>
+      <li>Clear all asteroids to advance to the next wave</li>
+    </ul>
+  </div>
+</div>
+<script>
+const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+const W=400,H=500;
+let ship,asteroids,bullets,score,lives,wave,gameOver,keys,particles,hyperspace;
+
+function newGame(){
+  ship={x:W/2,y:H/2,angle:0,vx:0,vy:0,r:8,invuln:120};
+  asteroids=[];bullets=[];particles=[];score=0;lives=3;wave=1;gameOver=false;
+  keys={};hyperspace=false;
+  spawnWave(wave);
+  document.getElementById('overlay').classList.add('hidden');
+  update();
+}
+
+function spawnWave(n){
+  for(let i=0;i<3+n;i++){
+    let x,y;
+    do{x=Math.random()*W;y=Math.random()*H;}while(Math.hypot(x-ship.x,y-ship.y)<100);
+    asteroids.push(makeAsteroid(x,y,3));
+  }
+}
+
+function makeAsteroid(x,y,size){
+  const speed=0.5+Math.random()*1+wave*0.1;
+  const angle=Math.random()*Math.PI*2;
+  const verts=[];
+  const sides=8+Math.floor(Math.random()*4);
+  for(let i=0;i<sides;i++)verts.push(0.7+Math.random()*0.5);
+  return{x,y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,size,r:size*12,verts,angle:0,rotSpeed:(Math.random()-0.5)*0.05};
+}
+
+function update(){
+  document.getElementById('score').textContent=score;
+  document.getElementById('lives').textContent=lives;
+  document.getElementById('wave').textContent=wave;
+}
+
+function shoot(){
+  if(gameOver||bullets.length>4)return;
+  bullets.push({x:ship.x+Math.cos(ship.angle)*ship.r,y:ship.y+Math.sin(ship.angle)*ship.r,vx:Math.cos(ship.angle)*6+ship.vx,vy:Math.sin(ship.angle)*6+ship.vy,life:60});
+}
+
+function explode(x,y){
+  for(let i=0;i<20;i++){
+    const a=Math.random()*Math.PI*2,s=Math.random()*3;
+    particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:30+Math.random()*20,color:'#F59E0B'});
+  }
+}
+
+function hitShip(){
+  if(ship.invuln>0||gameOver)return;
+  explode(ship.x,ship.y);
+  lives--;
+  update();
+  if(lives<=0){endGame();return;}
+  ship.x=W/2;ship.y=H/2;ship.vx=0;ship.vy=0;ship.invuln=120;
+}
+
+function endGame(){
+  gameOver=true;
+  const best=parseInt(localStorage.getItem('ast-best')||0);
+  if(score>best)localStorage.setItem('ast-best',score);
+  document.getElementById('overlay-title').textContent='Game Over';
+  document.getElementById('overlay-text').textContent='Score: '+score;
+  document.getElementById('overlay').classList.remove('hidden');
+}
+
+function draw(){
+  ctx.fillStyle='#050510';ctx.fillRect(0,0,W,H);
+  // Stars
+  ctx.fillStyle='rgba(255,255,255,0.3)';
+  for(let i=0;i<50;i++){ctx.fillRect((i*37)%W,(i*73+Date.now()/100)%H,1,1);}
+
+  if(!gameOver){
+    if(keys['ArrowLeft']||keys['a'])ship.angle-=0.08;
+    if(keys['ArrowRight']||keys['d'])ship.angle+=0.08;
+    if(keys['ArrowUp']||keys['w']){
+      ship.vx+=Math.cos(ship.angle)*0.15;ship.vy+=Math.sin(ship.angle)*0.15;
+    }
+  }
+  ship.vx*=0.99;ship.vy*=0.99;
+  ship.x+=ship.vx;ship.y+=ship.vy;
+  if(ship.x<0)ship.x=W;if(ship.x>W)ship.x=0;if(ship.y<0)ship.y=H;if(ship.y>H)ship.y=0;
+  if(ship.invuln>0)ship.invuln--;
+
+  // Ship
+  if(!gameOver&&(ship.invuln===0||Math.floor(ship.invuln/4)%2===0)){
+    ctx.save();ctx.translate(ship.x,ship.y);ctx.rotate(ship.angle);
+    ctx.strokeStyle='#818CF8';ctx.lineWidth=2;ctx.fillStyle='rgba(99,102,241,0.1)';
+    ctx.beginPath();ctx.moveTo(ship.r,0);ctx.lineTo(-ship.r*0.7,-ship.r*0.7);ctx.lineTo(-ship.r*0.4,0);ctx.lineTo(-ship.r*0.7,ship.r*0.7);ctx.closePath();ctx.fill();ctx.stroke();
+    if(keys['ArrowUp']||keys['w']){
+      ctx.strokeStyle='#F59E0B';ctx.beginPath();ctx.moveTo(-ship.r*0.5,0);ctx.lineTo(-ship.r*1.2,0);ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  // Bullets
+  bullets=bullets.filter(b=>{
+    b.x+=b.vx;b.y+=b.vy;b.life--;
+    if(b.x<0)b.x=W;if(b.x>W)b.x=0;if(b.y<0)b.y=H;if(b.y>H)b.y=0;
+    ctx.fillStyle='#F59E0B';ctx.beginPath();ctx.arc(b.x,b.y,2,0,Math.PI*2);ctx.fill();
+    return b.life>0;
+  });
+
+  // Asteroids
+  asteroids=asteroids.filter(a=>{
+    a.x+=a.vx;a.y+=a.vy;a.angle+=a.rotSpeed;
+    if(a.x<0)a.x=W;if(a.x>W)a.x=0;if(a.y<0)a.y=H;if(a.y>H)a.y=0;
+    ctx.save();ctx.translate(a.x,a.y);ctx.rotate(a.angle);
+    ctx.strokeStyle='#94A3B8';ctx.lineWidth=1.5;ctx.fillStyle='rgba(45,45,74,0.5)';
+    ctx.beginPath();
+    for(let i=0;i<a.verts.length;i++){const ang=(i/a.verts.length)*Math.PI*2;const r=a.r*a.verts[i];if(i===0)ctx.moveTo(Math.cos(ang)*r,Math.sin(ang)*r);else ctx.lineTo(Math.cos(ang)*r,Math.sin(ang)*r);}
+    ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();
+
+    // Bullet collision
+    for(let i=bullets.length-1;i>=0;i--){
+      if(Math.hypot(bullets[i].x-a.x,bullets[i].y-a.y)<a.r){
+        bullets.splice(i,1);
+        explode(a.x,a.y);
+        score+=a.size===3?20:a.size===2?50:100;
+        update();
+        if(a.size>1){
+          for(let j=0;j<2;j++){
+            const na=makeAsteroid(a.x,a.y,a.size-1);
+            na.vx=a.vx+(Math.random()-0.5)*1;na.vy=a.vy+(Math.random()-0.5)*1;
+            asteroids.push(na);
+          }
+        }
+        return false;
+      }
+    }
+    // Ship collision
+    if(Math.hypot(ship.x-a.x,ship.y-a.y)<a.r+ship.r-2)hitShip();
+    return true;
+  });
+
+  // Particles
+  particles=particles.filter(p=>{
+    p.x+=p.vx;p.y+=p.vy;p.vx*=0.95;p.vy*=0.95;p.life--;
+    ctx.fillStyle=`rgba(245,158,11,${p.life/40})`;
+    ctx.fillRect(p.x-1,p.y-1,2,2);
+    return p.life>0;
+  });
+
+  if(asteroids.length===0&&!gameOver){wave++;spawnWave(wave);update();}
+}
+
+window.addEventListener('keydown',e=>{
+  keys[e.key]=true;
+  if(e.key===' '){e.preventDefault();shoot();}
+  if(e.key==='Shift'&&!gameOver){ship.x=Math.random()*W;ship.y=Math.random()*H;ship.vx=0;ship.vy=0;ship.invuln=60;}
+});
+window.addEventListener('keyup',e=>{keys[e.key]=false;});
+
+function loop(){draw();requestAnimationFrame(loop);}
+newGame();loop();
+</script>
+</body>
+</html>

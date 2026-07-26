@@ -24,4 +24,8 @@
   <url><loc>https://games.hypergrad.cn/games/checkers.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://games.hypergrad.cn/games/typing-test.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://games.hypergrad.cn/games/sokoban.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/reversi.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/bubble-shooter.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/number-guess.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://games.hypergrad.cn/games/asteroids.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
 </urlset>

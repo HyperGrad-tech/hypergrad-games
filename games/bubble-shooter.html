@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Bubble Shooter - Play Free Online Bubble Game | HyperGrad Games</title>
+<meta name="description" content="Play Bubble Shooter online for free. Aim and shoot bubbles to match 3 or more colors. Clear the board before bubbles reach the bottom. No download needed.">
+<link rel="canonical" href="https://games.hypergrad.cn/games/bubble-shooter.html">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  canvas { display: block; border-radius: 8px; cursor: crosshair; touch-action: none; }
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoGame","name":"Bubble Shooter","description":"Play Bubble Shooter online for free. Aim and shoot bubbles to match 3 or more colors. Clear the board before bubbles reach the bottom.","url":"https://games.hypergrad.cn/games/bubble-shooter.html","genre":"Arcade","gamePlatform":"Web Browser","applicationCategory":"Game","operatingSystem":"Any (Web Browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"HyperGrad"}}
+</script>
+</head>
+<body>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<div class="game-page">
+  <div class="game-header">
+    <h1 class="game-title">Bubble Shooter</h1>
+    <a href="../index.html" class="game-back">&larr; All Games</a>
+  </div>
+  <div class="game-stats">
+    <div class="stat-box"><div class="stat-label">Score</div><div class="stat-value" id="score">0</div></div>
+    <div class="stat-box"><div class="stat-label">Best</div><div class="stat-value" id="best">0</div></div>
+    <div class="stat-box"><div class="stat-label">Shots</div><div class="stat-value" id="shots">0</div></div>
+  </div>
+  <div class="game-board" style="padding:10px;">
+    <canvas id="canvas" width="400" height="500"></canvas>
+    <div class="game-overlay hidden" id="overlay">
+      <h2 id="overlay-title">Game Over</h2>
+      <p id="overlay-text"></p>
+      <button class="btn" onclick="newGame()">Play Again</button>
+    </div>
+  </div>
+  <div class="game-instructions">
+    <h3>How to Play</h3>
+    <ul>
+      <li>Move your mouse to aim the shooter at the bottom</li>
+      <li>Click to shoot a bubble in that direction</li>
+      <li>Match 3 or more bubbles of the same color to pop them</li>
+      <li>Hover over the shooter to swap with the next bubble</li>
+      <li>Don't let bubbles touch the bottom line!</li>
+    </ul>
+  </div>
+</div>
+<script>
+const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+const W=400,H=500,R=18,COLS=10,COLORS=['#EF4444','#F59E0B','#22C55E','#6366F1','#EC4899'];
+let grid,score,shots,current,next,gameOver,mouseX,aimAngle,bubbles;
+aimAngle=-Math.PI/2;
+
+function newGame(){
+  grid=[];for(let r=0;r<6;r++){grid.push([]);for(let c=0;c<COLS;c++)grid[r].push(Math.random()<0.7?Math.floor(Math.random()*COLORS.length):-1);}
+  score=0;shots=0;bubbles=[];gameOver=false;
+  current=Math.floor(Math.random()*COLORS.length);
+  next=Math.floor(Math.random()*COLORS.length);
+  document.getElementById('overlay').classList.add('hidden');
+  update();draw();
+}
+
+function update(){
+  document.getElementById('score').textContent=score;
+  document.getElementById('shots').textContent=shots;
+  const best=localStorage.getItem('bs-best')||0;
+  document.getElementById('best').textContent=best;
+}
+
+function getBubblePos(r,c){
+  const offset=r%2===1?R:0;
+  return {x:c*R*2+R+offset,y:r*R*2+R+20};
+}
+
+function getGridCell(x,y){
+  const r=Math.floor((y-20)/(R*2));
+  const offset=r%2===1?R:0;
+  const c=Math.floor((x-offset)/ (R*2));
+  return {r,c};
+}
+
+function shoot(){
+  if(gameOver||bubbles.length>0)return;
+  const angle=aimAngle;
+  bubbles.push({x:W/2,y:H-40,vx:Math.cos(angle)*8,vy:Math.sin(angle)*8,color:current});
+  current=next;
+  next=Math.floor(Math.random()*COLORS.length);
+  shots++;
+  update();
+}
+
+function snapBubble(b){
+  const {r,c}=getGridCell(b.x,b.y);
+  let tr=Math.max(0,r),tc=Math.max(0,Math.min(COLS-1,c));
+  if(tr>=grid.length){for(let i=grid.length;i<=tr;i++)grid.push(Array(COLS).fill(-1));}
+  if(tc<0)tc=0;if(tc>=COLS)tc=COLS-1;
+  // Find nearest empty cell
+  let bestCell={r:tr,c:tc},bestDist=999;
+  for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){
+    const nr=tr+dr,nc=tc+dc;
+    if(nr>=0&&nr<20&&nc>=0&&nc<COLS){
+      while(nr>=grid.length)grid.push(Array(COLS).fill(-1));
+      if(grid[nr]&&grid[nr][nc]===-1){
+        const pos=getBubblePos(nr,nc);
+        const d=Math.hypot(pos.x-b.x,pos.y-b.y);
+        if(d<bestDist){bestDist=d;bestCell={r:nr,c:nc};}
+      }
+    }
+  }
+  while(bestCell.r>=grid.length)grid.push(Array(COLS).fill(-1));
+  grid[bestCell.r][bestCell.c]=b.color;
+  checkMatches(bestCell.r,bestCell.c);
+}
+
+function checkMatches(r,c){
+  const color=grid[r][c];
+  if(color===-1)return;
+  const visited=new Set();
+  const matches=[];
+  const stack=[[r,c]];
+  while(stack.length){
+    const[cr,cc]=stack.pop();
+    const key=cr+','+cc;
+    if(visited.has(key))continue;
+    visited.add(key);
+    if(cr<0||cr>=grid.length||cc<0||cc>=COLS)continue;
+    if(grid[cr]&&grid[cr][cc]===color){
+      matches.push([cr,cc]);
+      const off=cr%2===1?1:0;
+      stack.push([cr-1,cc-1+off],[cr-1,cc+off],[cr,cc-1],[cr,cc+1],[cr+1,cc-1+off],[cr+1,cc+off]);
+    }
+  }
+  if(matches.length>=3){
+    matches.forEach(([mr,mc])=>{grid[mr][mc]=-1;});
+    score+=matches.length*10;
+    // Remove floating bubbles
+    removeFloating();
+    update();
+  }
+  // Check game over
+  for(let c=0;c<COLS;c++)if(grid[grid.length-1]&&grid[grid.length-1][c]!==-1&&getBubblePos(grid.length-1,c).y>H-60){endGame(false);return;}
+  // Check win
+  let remaining=0;
+  for(let r=0;r<grid.length;r++)for(let c=0;c<COLS;c++)if(grid[r][c]!==-1)remaining++;
+  if(remaining===0)endGame(true);
+}
+
+function removeFloating(){
+  const connected=new Set();
+  const stack=[];
+  for(let c=0;c<COLS;c++)if(grid[0]&&grid[0][c]!==-1){stack.push([0,c]);connected.add('0,'+c);}
+  while(stack.length){
+    const[r,c]=stack.pop();
+    const off=r%2===1?1:0;
+    const neighbors=[[r-1,c-1+off],[r-1,c+off],[r,c-1],[r,c+1],[r+1,c-1+off],[r+1,c+off]];
+    for(const[nr,nc]of neighbors){
+      const key=nr+','+nc;
+      if(nr>=0&&nr<grid.length&&nc>=0&&nc<COLS&&grid[nr]&&grid[nr][nc]!==-1&&!connected.has(key)){
+        connected.add(key);stack.push([nr,nc]);
+      }
+    }
+  }
+  for(let r=0;r<grid.length;r++)for(let c=0;c<COLS;c++)if(grid[r][c]!==-1&&!connected.has(r+','+c)){grid[r][c]=-1;score+=10;}
+}
+
+function endGame(won){
+  gameOver=true;
+  const best=parseInt(localStorage.getItem('bs-best')||0);
+  if(score>best)localStorage.setItem('bs-best',score);
+  document.getElementById('overlay-title').textContent=won?'You Win!':'Game Over';
+  document.getElementById('overlay-text').textContent='Score: '+score;
+  document.getElementById('overlay').classList.remove('hidden');
+}
+
+function draw(){
+  ctx.fillStyle='#0f0f1a';ctx.fillRect(0,0,W,H);
+  // Grid bubbles
+  for(let r=0;r<grid.length;r++)for(let c=0;c<COLS;c++){
+    if(grid[r]&&grid[r][c]!==-1){
+      const pos=getBubblePos(r,c);
+      drawBubble(pos.x,pos.y,COLORS[grid[r][c]]);
+    }
+  }
+  // Danger line
+  ctx.strokeStyle='#EF4444';ctx.lineWidth=2;ctx.setLineDash([8,4]);
+  ctx.beginPath();ctx.moveTo(0,H-60);ctx.lineTo(W,H-60);ctx.stroke();ctx.setLineDash([]);
+  // Aim line
+  if(!gameOver){
+    ctx.strokeStyle='rgba(129,140,248,0.4)';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(W/2,H-40);
+    let x=W/2,y=H-40,vx=Math.cos(aimAngle),vy=Math.sin(aimAngle);
+    for(let i=0;i<100;i++){x+=vx*4;y+=vy*4;if(x<R||x>W-R)vx=-vx;if(y<0)break;ctx.lineTo(x,y);if(y>H-60)break;}
+    ctx.stroke();
+    drawBubble(W/2,H-40,COLORS[current]);
+    // Next bubble preview
+    ctx.fillStyle='rgba(148,163,184,0.5)';ctx.font='10px sans-serif';ctx.textAlign='center';
+    ctx.fillText('Next',W/2,H-10);
+    drawBubble(W/2+30,H-52,COLORS[next],0.7);
+  }
+  // Moving bubbles
+  bubbles=bubbles.filter(b=>{
+    b.x+=b.vx;b.y+=b.vy;
+    if(b.x<R){b.x=R;b.vx=-b.vx;}
+    if(b.x>W-R){b.x=W-R;b.vx=-b.vx;}
+    if(b.y<R){b.y=R;snapBubble(b);return false;}
+    // Check collision with grid
+    for(let r=0;r<grid.length;r++)for(let c=0;c<COLS;c++){
+      if(grid[r]&&grid[r][c]!==-1){
+        const pos=getBubblePos(r,c);
+        if(Math.hypot(pos.x-b.x,pos.y-b.y)<R*1.8){snapBubble(b);return false;}
+      }
+    }
+    drawBubble(b.x,b.y,COLORS[b.color]);
+    return true;
+  });
+}
+
+function drawBubble(x,y,color,scale=1){
+  ctx.fillStyle=color;
+  ctx.beginPath();ctx.arc(x,y,R*scale,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,0.3)';
+  ctx.beginPath();ctx.arc(x-R*0.3*scale,y-R*0.3*scale,R*0.35*scale,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='rgba(0,0,0,0.2)';ctx.lineWidth=1;ctx.stroke();
+}
+
+canvas.addEventListener('mousemove',e=>{
+  const rect=canvas.getBoundingClientRect();
+  mouseX=(e.clientX-rect.left)*(W/rect.width);
+  const my=(e.clientY-rect.top)*(H/rect.height);
+  aimAngle=Math.atan2(my-H+40,mouseX-W/2);
+  if(aimAngle<-Math.PI*0.95)aimAngle=-Math.PI*0.95;
+  if(aimAngle>-Math.PI*0.05)aimAngle=-Math.PI*0.05;
+});
+canvas.addEventListener('click',shoot);
+canvas.addEventListener('touchmove',e=>{
+  e.preventDefault();
+  const rect=canvas.getBoundingClientRect();
+  const t=e.touches[0];
+  mouseX=(t.clientX-rect.left)*(W/rect.width);
+  const my=(t.clientY-rect.top)*(H/rect.height);
+  aimAngle=Math.atan2(my-H+40,mouseX-W/2);
+  if(aimAngle<-Math.PI*0.95)aimAngle=-Math.PI*0.95;
+  if(aimAngle>-Math.PI*0.05)aimAngle=-Math.PI*0.05;
+},{passive:false});
+canvas.addEventListener('touchstart',e=>{e.preventDefault();shoot();},{passive:false});
+
+function loop(){if(!gameOver)draw();else draw();requestAnimationFrame(loop);}
+newGame();loop();
+</script>
+</body>
+</html>

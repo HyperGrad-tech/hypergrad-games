@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Number Guess - Play Free Number Guessing Game | HyperGrad Games</title>
+<meta name="description" content="Play Number Guess - a free online number guessing game. Find the secret number in minimum tries with hints. Easy to play, hard to master. No download needed.">
+<link rel="canonical" href="https://games.hypergrad.cn/games/number-guess.html">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  .ng-display { font-size: 120px; font-weight: 900; text-align: center; line-height: 1; padding: 20px 0; min-height: 200px; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+  .ng-hint { font-size: 18px; color: var(--text-muted); text-align: center; margin-bottom: 16px; min-height: 28px; }
+  .ng-hint .arrow { font-size: 40px; margin: 0 12px; vertical-align: middle; }
+  .ng-input-row { display: flex; gap: 12px; justify-content: center; align-items: center; flex-wrap: wrap; }
+  .ng-input { font-size: 24px; width: 120px; text-align: center; padding: 10px; background: var(--bg-elevated); border: 2px solid var(--border); border-radius: 8px; color: var(--text); font-weight: 700; }
+  .ng-input:focus { outline: none; border-color: var(--primary); }
+  .ng-range { display: flex; justify-content: space-between; padding: 0 20px; font-size: 14px; color: var(--text-dim); margin-top: 12px; }
+  .ng-history { margin-top: 20px; text-align: center; }
+  .ng-history h3 { font-size: 14px; color: var(--text-dim); margin-bottom: 8px; }
+  .ng-history-list { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .ng-hist-item { padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+  .ng-hist-item.high { background: rgba(239,68,68,0.2); color: #EF4444; }
+  .ng-hist-item.low { background: rgba(34,197,94,0.2); color: #22C55E; }
+  .ng-hist-item.correct { background: rgba(245,158,11,0.2); color: #F59E0B; }
+  .ng-pulse { animation: ngPulse 0.4s ease; }
+  @keyframes ngPulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.1);} }
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoGame","name":"Number Guess","description":"Play Number Guess - a free online number guessing game. Find the secret number in minimum tries with hints.","url":"https://games.hypergrad.cn/games/number-guess.html","genre":"Puzzle","gamePlatform":"Web Browser","applicationCategory":"Game","operatingSystem":"Any (Web Browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"HyperGrad"}}
+</script>
+</head>
+<body>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<div class="game-page">
+  <div class="game-header">
+    <h1 class="game-title">Number Guess</h1>
+    <a href="../index.html" class="game-back">&larr; All Games</a>
+  </div>
+  <div class="game-stats">
+    <div class="stat-box"><div class="stat-label">Tries</div><div class="stat-value" id="tries">0</div></div>
+    <div class="stat-box"><div class="stat-label">Best Score</div><div class="stat-value" id="best">-</div></div>
+    <div class="stat-box"><div class="stat-label">Range</div><div class="stat-value" id="range-display" style="font-size:16px;">1 - 100</div></div>
+  </div>
+  <div class="game-board" style="flex-direction:column;">
+    <div class="ng-display" id="display">?</div>
+    <div class="ng-hint" id="hint">Guess a number between 1 and 100</div>
+    <div class="ng-input-row">
+      <input type="number" class="ng-input" id="guess-input" min="1" max="100" placeholder="?" onkeydown="if(event.key==='Enter')submitGuess()">
+      <button class="btn" onclick="submitGuess()">Guess</button>
+    </div>
+    <div class="ng-range"><span id="range-low">1</span><span id="range-high">100</span></div>
+    <div class="ng-history">
+      <h3>Guess History</h3>
+      <div class="ng-history-list" id="history"></div>
+    </div>
+    <div class="game-overlay hidden" id="overlay" style="position:absolute;">
+      <h2 id="overlay-title">You Got It!</h2>
+      <p id="overlay-text"></p>
+      <button class="btn" onclick="newGame()">Play Again</button>
+    </div>
+  </div>
+  <div class="game-controls">
+    <button class="btn" onclick="newGame()">New Game</button>
+  </div>
+  <div class="game-instructions">
+    <h3>How to Play</h3>
+    <ul>
+      <li>The game picks a secret number between 1 and 100</li>
+      <li>Enter your guess and press Enter or click Guess</li>
+      <li>You'll get a hint: too high, too low, or correct!</li>
+      <li>Try to find the number in as few tries as possible</li>
+      <li>Your best score is saved in your browser</li>
+    </ul>
+  </div>
+</div>
+<script>
+let secret,tries,lowBound,highBound,history,gameOver;
+function newGame(){
+  secret=Math.floor(Math.random()*100)+1;tries=0;lowBound=1;highBound=100;history=[];gameOver=false;
+  document.getElementById('display').textContent='?';
+  document.getElementById('display').style.color='';
+  document.getElementById('hint').textContent='Guess a number between 1 and 100';
+  document.getElementById('hint').style.color='';
+  document.getElementById('tries').textContent='0';
+  document.getElementById('range-display').textContent='1 - 100';
+  document.getElementById('range-low').textContent='1';
+  document.getElementById('range-high').textContent='100';
+  document.getElementById('history').innerHTML='';
+  document.getElementById('guess-input').value='';
+  document.getElementById('guess-input').disabled=false;
+  document.getElementById('guess-input').focus();
+  document.getElementById('overlay').classList.add('hidden');
+  const best=localStorage.getItem('ng-best');
+  document.getElementById('best').textContent=best||'-';
+}
+function submitGuess(){
+  if(gameOver)return;
+  const input=document.getElementById('guess-input');
+  const val=parseInt(input.value);
+  if(isNaN(val)||val<1||val>100)return;
+  tries++;
+  document.getElementById('tries').textContent=tries;
+  const display=document.getElementById('display');
+  display.textContent=val;
+  display.classList.add('ng-pulse');
+  setTimeout(()=>display.classList.remove('ng-pulse'),400);
+  const hint=document.getElementById('hint');
+  const hist=document.createElement('span');
+  if(val===secret){
+    display.style.color='#F59E0B';
+    hint.textContent='Correct! You found it!';
+    hint.style.color='#22C55E';
+    hist.className='ng-hist-item correct';hist.textContent=val+' ✓';
+    gameOver=true;
+    input.disabled=true;
+    const best=localStorage.getItem('ng-best');
+    if(!best||tries<parseInt(best)){localStorage.setItem('ng-best',tries);document.getElementById('best').textContent=tries;}
+    document.getElementById('overlay-title').textContent='You Got It!';
+    document.getElementById('overlay-text').textContent=`Found in ${tries} tries!`;
+    document.getElementById('overlay').classList.remove('hidden');
+  }else if(val>secret){
+    hint.innerHTML='<span class="arrow">⬇️</span> Too high! Go lower.';
+    hint.style.color='#EF4444';
+    if(val<highBound)highBound=val-1;
+    hist.className='ng-hist-item high';hist.textContent=val+' ↓';
+    input.value='';
+  }else{
+    hint.innerHTML='<span class="arrow">⬆️</span> Too low! Go higher.';
+    hint.style.color='#22C55E';
+    if(val>lowBound)lowBound=val+1;
+    hist.className='ng-hist-item low';hist.textContent=val+' ↑';
+    input.value='';
+  }
+  document.getElementById('range-low').textContent=lowBound;
+  document.getElementById('range-high').textContent=highBound;
+  document.getElementById('range-display').textContent=lowBound+' - '+highBound;
+  document.getElementById('history').appendChild(hist);
+  input.focus();
+}
+newGame();
+</script>
+</body>
+</html>

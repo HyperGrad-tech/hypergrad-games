@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Reversi - Play Othello Online Free vs AI | HyperGrad Games</title>
+<meta name="description" content="Play Reversi (Othello) online for free against an AI opponent. Place pieces to flip your opponent's discs. Simple rules, deep strategy. No download needed.">
+<link rel="canonical" href="https://games.hypergrad.cn/games/reversi.html">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  .rv-board { display: grid; grid-template-columns: repeat(8, 48px); grid-template-rows: repeat(8, 48px); border: 3px solid var(--border); border-radius: 4px; overflow: hidden; background: #2D5F3F; }
+  .rv-cell { display: flex; align-items: center; justify-content: center; cursor: pointer; background: #3A7050; border: 1px solid #2D5F3F; }
+  .rv-cell.valid::before { content: ''; width: 16px; height: 16px; border-radius: 50%; background: rgba(255,255,255,0.15); }
+  .rv-disc { width: 38px; height: 38px; border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,0.4); transition: transform 0.3s; }
+  .rv-disc.black { background: linear-gradient(135deg, #2a2a3e, #0a0a14); }
+  .rv-disc.white { background: linear-gradient(135deg, #ffffff, #c8c8d0); }
+  .rv-cell.last-move { box-shadow: inset 0 0 0 2px var(--accent); }
+  @media (max-width: 768px) { .rv-board { grid-template-columns: repeat(8, 38px); grid-template-rows: repeat(8, 38px); } .rv-disc { width: 30px; height: 30px; } .rv-cell.valid::before { width: 12px; height: 12px; } }
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoGame","name":"Reversi","description":"Play Reversi (Othello) online for free against an AI opponent. Place pieces to flip your opponent's discs.","url":"https://games.hypergrad.cn/games/reversi.html","genre":"Strategy","gamePlatform":"Web Browser","applicationCategory":"Game","operatingSystem":"Any (Web Browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"HyperGrad"}}
+</script>
+</head>
+<body>
+<header class="site-header"><div class="site-header-inner"><a href="/" class="site-logo">HyperGrad <span>Games</span></a><nav class="site-nav"><a href="../index.html#puzzle">Puzzle</a><a href="../index.html#arcade">Arcade</a><a href="../index.html#strategy">Strategy</a></nav></div></header>
+<div class="game-page">
+  <div class="game-header">
+    <h1 class="game-title">Reversi</h1>
+    <a href="../index.html" class="game-back">&larr; All Games</a>
+  </div>
+  <div class="game-stats">
+    <div class="stat-box"><div class="stat-label">Black (You)</div><div class="stat-value" id="black-count">2</div></div>
+    <div class="stat-box"><div class="stat-label">White (AI)</div><div class="stat-value" id="white-count">2</div></div>
+    <div class="stat-box"><div class="stat-label">Turn</div><div class="stat-value" id="turn" style="font-size:16px;">Your Move</div></div>
+  </div>
+  <div class="game-board">
+    <div class="rv-board" id="board"></div>
+    <div class="game-overlay hidden" id="overlay">
+      <h2 id="overlay-title">You Win!</h2>
+      <button class="btn" onclick="newGame()">Play Again</button>
+    </div>
+  </div>
+  <div class="game-controls">
+    <button class="btn" onclick="newGame()">New Game</button>
+  </div>
+  <div class="game-instructions">
+    <h3>How to Play</h3>
+    <ul>
+      <li>You are Black, the AI is White. Black moves first.</li>
+      <li>Click on a highlighted green dot to place your disc</li>
+      <li>You must place your disc so it flanks one or more opponent discs in a straight line</li>
+      <li>All flanked opponent discs flip to your color</li>
+      <li>If you have no valid moves, your turn is skipped</li>
+      <li>Game ends when neither player can move. Most discs wins!</li>
+    </ul>
+  </div>
+</div>
+<script>
+const N=8,DIRS=[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+let board,currentPlayer,gameOver,lastMove;
+function newGame(){
+  board=Array(N).fill().map(()=>Array(N).fill(null));
+  board[3][3]='white';board[3][4]='black';board[4][3]='black';board[4][4]='white';
+  currentPlayer='black';gameOver=false;lastMove=null;
+  document.getElementById('overlay').classList.add('hidden');render();
+}
+function getFlips(r,c,color){
+  if(board[r][c])return[];
+  const opp=color==='black'?'white':'black';
+  let flips=[];
+  for(const[dr,dc]of DIRS){
+    let nr=r+dr,nc=c+dc,line=[];
+    while(nr>=0&&nr<N&&nc>=0&&nc<N&&board[nr][nc]===opp){line.push([nr,nc]);nr+=dr;nc+=dc;}
+    if(nr>=0&&nr<N&&nc>=0&&nc<N&&board[nr][nc]===color&&line.length>0)flips=flips.concat(line);
+  }
+  return flips;
+}
+function getValidMoves(color){
+  let moves=[];
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(!board[r][c]&&getFlips(r,c,color).length>0)moves.push({r,c});
+  return moves;
+}
+function clickCell(r,c){
+  if(gameOver||currentPlayer!=='black')return;
+  const flips=getFlips(r,c,'black');
+  if(flips.length===0)return;
+  board[r][c]='black';flips.forEach(([fr,fc])=>board[fr][fc]='black');
+  lastMove={r,c};updateCounts();render();
+  if(checkEnd())return;
+  currentPlayer='white';document.getElementById('turn').textContent='AI Thinking...';
+  setTimeout(aiMove,600);
+}
+function aiMove(){
+  let moves=getValidMoves('white');
+  if(moves.length===0){currentPlayer='black';document.getElementById('turn').textContent='Your Move';if(getValidMoves('black').length===0)endGame();render();return;}
+  // Weighted AI: prefer corners, avoid edges next to corners
+  const weights=[
+    [99,-8,8,6,6,8,-8,99],[-8,-24,-4,-3,-3,-4,-24,-8],[8,-4,7,4,4,7,-4,8],[6,-3,4,0,0,4,-3,6],
+    [6,-3,4,0,0,4,-3,6],[8,-4,7,4,4,7,-4,8],[-8,-24,-4,-3,-3,-4,-24,-8],[99,-8,8,6,6,8,-8,99]
+  ];
+  let best=moves[0],bestScore=-999;
+  for(const m of moves){
+    const score=weights[m.r][m.c]+getFlips(m.r,m.c,'white').length;
+    if(score>bestScore){bestScore=score;best=m;}
+  }
+  const flips=getFlips(best.r,best.c,'white');
+  board[best.r][best.c]='white';flips.forEach(([fr,fc])=>board[fr][fc]='white');
+  lastMove=best;updateCounts();render();
+  if(checkEnd())return;
+  currentPlayer='black';document.getElementById('turn').textContent='Your Move';
+}
+function checkEnd(){
+  const blackMoves=getValidMoves('black'),whiteMoves=getValidMoves('white');
+  if(blackMoves.length===0&&whiteMoves.length===0){endGame();return true;}
+  if(currentPlayer==='white'&&getValidMoves('black').length===0){return false;}
+  return false;
+}
+function endGame(){
+  let black=0,white=0;
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++){if(board[r][c]==='black')black++;else if(board[r][c]==='white')white++;}
+  gameOver=true;
+  document.getElementById('overlay-title').textContent=black>white?'You Win!':white>black?'AI Wins!':"It's a Tie!";
+  document.getElementById('overlay').classList.remove('hidden');
+}
+function updateCounts(){
+  let black=0,white=0;
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++){if(board[r][c]==='black')black++;else if(board[r][c]==='white')white++;}
+  document.getElementById('black-count').textContent=black;
+  document.getElementById('white-count').textContent=white;
+}
+function render(){
+  const b=document.getElementById('board');b.innerHTML='';
+  const validMoves=currentPlayer==='black'&&!gameOver?getValidMoves('black'):[];
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+    const cell=document.createElement('div');cell.className='rv-cell';
+    if(lastMove&&lastMove.r===r&&lastMove.c===c)cell.classList.add('last-move');
+    if(board[r][c]){const d=document.createElement('div');d.className='rv-disc '+board[r][c];cell.appendChild(d);}
+    else if(validMoves.some(m=>m.r===r&&m.c===c))cell.classList.add('valid');
+    cell.onclick=()=>clickCell(r,c);b.appendChild(cell);
+  }
+}
+newGame();
+</script>
+</body>
+</html>
